@@ -60,3 +60,16 @@ They live here so the whole team runs the same prompt instead of each inventing 
 A machine-readable map of the repo: where things are, who owns them, which files are frozen.
 An agent that wants to navigate on its own should read that first rather than `ls -R` the
 whole tree.
+
+## `.claude/` and `.mcp.json` — one exception to "everything is a shim"
+
+Claude Code subagents (`.claude/agents/*.md`), skills (`.claude/skills/*/SKILL.md`) and hooks
+(`.claude/settings.json`) can't be shims the way `CLAUDE.md` is: their physical path **is** how
+Claude Code finds them, so the file has to live there to work at all. The same is true of MCP
+server config (`.mcp.json`, repo root).
+
+The rule still holds in spirit: those files hold *only* Claude-Code-specific mechanics (which
+tool, which trigger, which command) and point back into `.agent/` and `docs/` for the actual rule
+text — `invariant-guardian.md` and `trust-boundary-reviewer.md` both open with "read
+`.agent/rules/invariants.md` first" rather than restating R1–R5. The full list is in
+`index.json`'s `claude_code_automations` key.

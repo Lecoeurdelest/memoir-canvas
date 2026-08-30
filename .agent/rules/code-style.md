@@ -18,11 +18,22 @@ Vietnamese in seed data and demo copy is intentional, because the story is Vietn
 
 ## Comments
 
-Comments explain **why**, not **what**. The code already says what.
+Prefer no comment. Let names carry the meaning — a well-named variable or function
+beats a comment that restates it.
+
+- Keep comments short and dense. One line where one line does.
+- Comment only genuinely complex logic — the **why** the code cannot show.
+- Never restate **what** the code already says.
 
 ```ts
 // ✗ increment the counter
 count += 1;
+
+// ✗ let the name explain instead
+const c = x + 1; // running total
+
+// ✓ self-explaining name, no comment needed
+const runningTotal = previousTotal + amount;
 
 // ✓ PGlite has a single connection — serialise here to avoid writer contention
 await queue.run(() => db.exec(sql));

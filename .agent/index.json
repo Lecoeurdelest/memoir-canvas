@@ -169,5 +169,28 @@
     "let an agent set certainty='confirmed' without confirmed_by",
     "drop or weaken the three core constraints in schema.sql",
     "commit node_modules, secrets, or real family data"
-  ]
+  ],
+  "claude_code_automations": {
+    "note": "Claude-Code-specific mechanisms — not shimmable to Codex/Cursor/Copilot the way .agent/ is, since their physical location is their registration with the harness. Documented here so this map stays complete; the RULE TEXT they check against still lives only in .agent/ and docs/ — these files point to it rather than restate it.",
+    "mcp_servers": {
+      "path": ".mcp.json",
+      "servers": {
+        "playwright": "real-browser automation — replaces ad hoc Puppeteer scratch scripts",
+        "context7": "live docs for fast-moving deps: PGlite, WebMCP draft, r3f/drei"
+      }
+    },
+    "subagents": {
+      "path": ".claude/agents/",
+      "invariant-guardian.md": "manual R1-R5 pass; points at .agent/rules/invariants.md for the rule text",
+      "trust-boundary-reviewer.md": "hunts the resolveClaim bug class; points at .agent/rules/invariants.md + docs/requirements/non-functional/NFR-TRUST-epistemic-integrity.md"
+    },
+    "skills": {
+      "path": ".claude/skills/",
+      "gen-test/SKILL.md": "generates Vitest tests against real PGlite for the untested write door (commands.ts, audit.ts, db.ts, modelContext.ts)"
+    },
+    "hooks": {
+      "path": ".claude/settings.json",
+      "PostToolUse": "typecheck (blocking) + arch:check (advisory) on Edit/Write under src/"
+    }
+  }
 }

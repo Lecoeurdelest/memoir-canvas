@@ -146,11 +146,20 @@ export interface AuditEvent {
   registered_because: string;
 }
 
-/** One row of v_open_disagreement. */
+/**
+ * One row of v_open_disagreement.
+ *
+ * The object columns are part of the grouping key, not decoration: two claims only disagree if
+ * they are about the same object. Without them the view reported "moved to Đà Nẵng in 1972" and
+ * "moved to Sài Gòn in 1980" as a contradiction.
+ */
 export interface OpenDisagreement {
   subject_kind: SubjectKind;
   subject_id: string;
   predicate: string;
+  object_person_id: string | null;
+  object_place_id: string | null;
+  object_text: string | null;
   claim_ids: string[];
   distinct_years: number;
 }

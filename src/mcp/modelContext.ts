@@ -36,11 +36,6 @@ export interface ToolHandler {
   (args: unknown): Promise<unknown>;
 }
 
-/**
- * One place that talks to the browser API. Everything else goes through provide().
- * R4 lives next door in registry.ts: this file does not decide WHICH tools, only how
- * to hand them over.
- */
 export class ModelContextBridge {
   readonly flavour: ModelContextFlavour;
   private readonly mc: ModelContextLike | null;
@@ -55,8 +50,8 @@ export class ModelContextBridge {
     return this.mc !== null;
   }
 
-  /** Whole-set replacement — the semantics a pure tools = f(uiState) actually wants. */
   provide(tools: ToolDescriptor[], handlers: Record<string, ToolHandler>): void {
+    const previous = this.lastProvided;
     this.lastProvided = tools;
     if (!this.mc) return;
 
@@ -72,14 +67,16 @@ export class ModelContextBridge {
       return;
     }
 
-    // Fallback for a runtime that only shipped the per-tool API: emulate replacement.
     if (this.mc.registerTool && this.mc.unregisterTool) {
-      for (const t of this.lastProvided) this.mc.unregisterTool(t.name);
+      const incoming = new Set(tools.map((t) => t.name));
+      // Withdraw only what is gone: re-registering a current tool drops it for an instant.
+      for (const t of previous) {
+        if (!incoming.has(t.name)) this.mc.unregisterTool(t.name);
+      }
       for (const t of payload) this.mc.registerTool(t);
     }
   }
 
-  /** What the manual tool panel renders when the API is absent. */
   currentTools(): ToolDescriptor[] {
     return this.lastProvided;
   }

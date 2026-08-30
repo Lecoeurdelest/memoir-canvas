@@ -128,14 +128,47 @@ await expect(
   false,
 );
 await expect(
-  'conflict closed with a named person confirming',
+  'closing a conflict with a claim that was never part of it',
   `INSERT INTO conflict (id, subject_kind, subject_id, predicate, status, detected_by,
-                         winning_claim_id, resolved_by, resolved_at, resolution_note)
-   VALUES ('${K1}','person','${P1}','moved_to','resolved','agent','${C2}','${P2}',now(),
-           'Uncle Ba confirmed it from the back of the photograph');
+                         winning_claim_id, resolved_by, resolved_at)
+   VALUES ('${K1}','person','${P1}','moved_to','open','agent',NULL,NULL,NULL);
+   INSERT INTO conflict_member (conflict_id, claim_id) VALUES ('${K1}','${C1}');
+   UPDATE conflict SET status='resolved', winning_claim_id='${C2}', resolved_by='${P2}',
+                       resolved_at=now()
+    WHERE id='${K1}';`,
+  false,
+);
+await expect(
+  'conflict closed with a named person confirming',
+  // The winner must actually be one of the claims in dispute — conflict_resolution_coherent
+  // enforces that, so the members go in before the resolution. This mirrors what
+  // commands.flagConflict() then commands.resolveClaim() do, in that order.
+  `INSERT INTO conflict (id, subject_kind, subject_id, predicate, status, detected_by)
+   VALUES ('${K1}','person','${P1}','moved_to','open','agent');
+   INSERT INTO conflict_member (conflict_id, claim_id) VALUES ('${K1}','${C1}'),('${K1}','${C2}');
+   UPDATE conflict SET status='resolved', winning_claim_id='${C2}', resolved_by='${P2}',
+                       resolved_at=now(),
+                       resolution_note='Uncle Ba confirmed it from the back of the photograph'
+    WHERE id='${K1}';
    UPDATE claim SET certainty='confirmed', confirmed_by='${P2}', confirmed_at=now()
     WHERE id='${C2}';`,
   true,
+);
+await expect(
+  'a fact signed for by a person the AGENT invented',
+  // SET ROLE matters here and nowhere else in this file. person.created_by is stamped by the
+  // engine from current_user (see stamp_actor in schema.sql), so an INSERT run as the superuser
+  // is recorded as 'human' no matter what the statement says — which is correct, a developer at
+  // a console IS a human. To test the thing that actually threatens the argument, the insert
+  // has to happen as app_agent, exactly as it would when the agent calls add_person.
+  `SET ROLE app_agent;
+   INSERT INTO person (id, display_name, created_by)
+   VALUES ('77777777-7777-7777-7777-777777777777','Nhân chứng giả','human');
+   RESET ROLE;
+   UPDATE claim SET certainty='confirmed',
+                    confirmed_by='77777777-7777-7777-7777-777777777777', confirmed_at=now()
+    WHERE id='${C1}';`,
+  false,
 );
 
 console.log('\nsupporting constraints');

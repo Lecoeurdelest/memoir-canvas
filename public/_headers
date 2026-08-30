@@ -3,7 +3,14 @@
 # PGlite persists to IndexedDB, which needs no cross-origin isolation — that is exactly why
 # we did not pick OPFS. Do NOT add COOP/COEP here unless someone deliberately moves storage
 # to OPFS SyncAccessHandle, and then re-test in the ChatGPT in-app browser first.
+#
+# The CSP enforces NFR-PRIV-01 rather than intending it. Not theoretical: drei pulls in
+# troika-three-text, whose font resolver hard-codes jsdelivr — measured seven requests, one named
+# font-files/vietnamese/..., so the URL itself discloses the reader's language.
+#
+# wasm-unsafe-eval permits wasm compilation only, not eval(); PGlite will not start without it.
 
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'

@@ -12,7 +12,7 @@
  */
 
 import { AUDIT_INSERT, auditParams, type AuditInput } from './audit';
-import { transaction, query } from './db';
+import { transaction, query, type Tx } from './db';
 import type {
   ActorKind,
   Certainty,
@@ -38,13 +38,8 @@ export class RefusedError extends Error {
 }
 
 /**
- * `crypto.randomUUID()` is annotated `[SecureContext]`, so it is undefined on a plain-http
- * origin — which is exactly what `vite dev --host` gives you at http://192.168.x.x:5173, the
- * only way to open the app on a phone before TASK-028 has deployed anything over https. That
- * is the day-one in-app-browser probe in `.agent/context/constraints.md`. Without this
- * fallback every single write throws there, and it looks like PGlite is broken when it is not.
- *
- * `crypto.getRandomValues()` carries no such annotation, so build the v4 by hand from it.
+ * `crypto.randomUUID()` is `[SecureContext]`, so it is undefined over plain http — the origin
+ * `vite dev --host` gives you when probing a phone. getRandomValues carries no such annotation.
  */
 function uuid(): string {
   const c = globalThis.crypto;
@@ -58,15 +53,59 @@ function uuid(): string {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
+/** Postgres puts the violated constraint's name on the error object. NFR-OBS-04 wants it. */
+function constraintNameOf(err: unknown): string | null {
+  const c = (err as { constraint?: unknown } | null)?.constraint;
+  return typeof c === 'string' && c.length > 0 ? c : null;
+}
+
+/**
+ * NFR-OBS-02 — a refusal cannot be recorded in the transaction that just rolled back, so it gets
+ * its own. Best-effort: never mask the original error with a logging failure.
+ */
+async function recordRefusal(
+  audit: AuditInput,
+  err: unknown,
+  reason: string,
+): Promise<void> {
+  try {
+    await transaction(audit.actor, async (tx) => {
+      await tx.exec(
+        AUDIT_INSERT,
+        auditParams({
+          ...audit,
+          after: { outcome: 'refused', reason, constraint: constraintNameOf(err) },
+        }),
+      );
+    });
+  } catch {
+    /* the refusal row is desirable, not load-bearing; never mask the original failure */
+  }
+}
+
+/** One transaction carrying the write and its audit row; a failure still records the attempt. */
 async function withAudit<T>(
-  audit: Omit<AuditInput, 'actor'> & { actor: ActorKind },
-  work: (tx: Parameters<Parameters<typeof transaction>[0]>[0]) => Promise<T>,
+  audit: AuditInput,
+  work: (tx: Tx) => Promise<T>,
 ): Promise<T> {
-  return transaction(async (tx) => {
-    const result = await work(tx);
-    await tx.exec(AUDIT_INSERT, auditParams(audit));
-    return result;
-  });
+  try {
+    return await transaction(audit.actor, async (tx) => {
+      const result = await work(tx);
+      await tx.exec(AUDIT_INSERT, auditParams(audit));
+      return result;
+    });
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    await recordRefusal(audit, err, reason);
+    throw err;
+  }
+}
+
+/** Refuse before touching the database, and still leave a trace of the attempt. */
+async function refuse(audit: AuditInput, reason: string): Promise<never> {
+  const err = new RefusedError(reason);
+  await recordRefusal(audit, err, reason);
+  throw err;
 }
 
 // ─────────────────────────────── people and places ───────────────────────────────
@@ -303,6 +342,16 @@ export async function flagConflict(
   input: FlagConflictInput,
   ctx: CommandContext,
 ): Promise<{ conflictId: string; claimIds: string[] }> {
+  const conflictId = uuid();
+  const audit: AuditInput = {
+    actor: ctx.actor,
+    toolName: 'flag_conflict',
+    args: input,
+    targetTable: 'conflict',
+    targetId: conflictId,
+    registeredBecause: ctx.registeredBecause,
+  };
+
   const rows = await query<OpenDisagreement>(
     `SELECT * FROM v_open_disagreement
       WHERE subject_kind = $1 AND subject_id = $2 AND predicate = $3`,
@@ -310,39 +359,53 @@ export async function flagConflict(
   );
 
   if (rows.length === 0) {
-    throw new RefusedError(
+    return refuse(
+      audit,
       'no open disagreement exists for this subject and predicate — nothing was recorded',
     );
   }
 
-  const claimIds = rows[0].claim_ids;
-  const conflictId = uuid();
+  // One predicate can now carry several independent disagreements, and the frozen tool contract
+  // has no object argument to tell them apart. An ambiguous instruction is not a licence to guess.
+  if (rows.length > 1) {
+    return refuse(
+      audit,
+      `this subject and predicate carry ${rows.length} separate disagreements — ` +
+        'resolve them one at a time from the conflict view rather than as a group',
+    );
+  }
 
-  await withAudit(
-    {
-      actor: ctx.actor,
-      toolName: 'flag_conflict',
-      args: input,
-      targetTable: 'conflict',
-      targetId: conflictId,
-      after: { claimIds },
-      registeredBecause: ctx.registeredBecause,
-    },
-    async (tx) => {
-      await tx.exec(
-        `INSERT INTO conflict (id, subject_kind, subject_id, predicate, detected_by)
-         VALUES ($1, $2, $3, $4, $5)`,
-        [conflictId, input.subject_kind, input.subject_id, input.predicate, ctx.actor],
-      );
-      for (const claimId of claimIds) {
-        await tx.exec(
-          `INSERT INTO conflict_member (conflict_id, claim_id) VALUES ($1, $2)`,
-          [conflictId, claimId],
-        );
-        await tx.exec(`UPDATE claim SET certainty = 'conflicting' WHERE id = $1`, [claimId]);
-      }
-    },
+  const claimIds = rows[0].claim_ids;
+
+  // One disagreement, one conflict row — otherwise the book tears twice over the same claims.
+  const [{ n: alreadyOpen }] = await query<{ n: number }>(
+    `SELECT count(*)::int AS n FROM conflict
+      WHERE status = 'open' AND subject_kind = $1 AND subject_id = $2 AND predicate = $3`,
+    [input.subject_kind, input.subject_id, input.predicate],
   );
+  if (alreadyOpen > 0) {
+    return refuse(audit, 'a conflict is already open for this subject and predicate');
+  }
+
+  await withAudit({ ...audit, after: { claimIds } }, async (tx) => {
+    await tx.exec(
+      `INSERT INTO conflict (id, subject_kind, subject_id, predicate, detected_by)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [conflictId, input.subject_kind, input.subject_id, input.predicate, ctx.actor],
+    );
+    for (const claimId of claimIds) {
+      await tx.exec(`INSERT INTO conflict_member (conflict_id, claim_id) VALUES ($1, $2)`, [
+        conflictId,
+        claimId,
+      ]);
+      // A human decision stands until a human reopens it.
+      await tx.exec(
+        `UPDATE claim SET certainty = 'conflicting'
+          WHERE id = $1 AND certainty <> 'confirmed'`,
+        [claimId],
+      );
+    }
+  });
 
   return { conflictId, claimIds };
 }
@@ -358,47 +421,92 @@ export interface ResolveClaimInput {
 /**
  * R2 in one function: the confirm button and the agent's resolve_claim tool both land here.
  *
- * `resolved_by` is not optional and not defaultable. conflict_resolution_needs_a_human and
- * claim_confirmed_needs_a_human both reject the write without a named person — the check
- * below only exists to give a readable error before the database gives a blunt one.
+ * Three layers stand between an agent and a fact, because any one could be got wrong again:
+ * privilege (app_agent holds no UPDATE on claim.confirmed_by), constraint triggers
+ * (conflict_resolution_coherent, claim_confirmed_by_a_human), and the readable refusals below.
  */
 export async function resolveClaim(input: ResolveClaimInput, ctx: CommandContext): Promise<void> {
+  const audit: AuditInput = {
+    actor: ctx.actor,
+    toolName: 'resolve_claim',
+    args: input,
+    targetTable: 'conflict',
+    targetId: input.conflict_id,
+    after: input,
+    registeredBecause: ctx.registeredBecause,
+  };
+
   if (!input.resolved_by) {
-    throw new RefusedError('resolving a conflict requires the id of the person who decided');
+    return refuse(audit, 'resolving a conflict requires the id of the person who decided');
   }
 
-  await withAudit(
-    {
-      actor: ctx.actor,
-      toolName: 'resolve_claim',
-      args: input,
-      targetTable: 'conflict',
-      targetId: input.conflict_id,
-      after: input,
-      registeredBecause: ctx.registeredBecause,
-    },
-    async (tx) => {
-      await tx.exec(
-        `UPDATE conflict
-            SET status = 'resolved', winning_claim_id = $2, resolved_by = $3,
-                resolution_note = $4, resolved_at = now()
-          WHERE id = $1 AND status = 'open'`,
-        [input.conflict_id, input.winning_claim_id, input.resolved_by, input.resolution_note ?? null],
-      );
-      await tx.exec(
-        `UPDATE claim
-            SET certainty = 'confirmed', confirmed_by = $2, confirmed_at = now()
-          WHERE id = $1`,
-        [input.winning_claim_id, input.resolved_by],
-      );
-      await tx.exec(
-        `UPDATE claim SET status = 'superseded'
-          WHERE id IN (SELECT claim_id FROM conflict_member WHERE conflict_id = $1)
-            AND id <> $2`,
-        [input.conflict_id, input.winning_claim_id],
-      );
-    },
+  const [membership] = await query<{ is_member: boolean; is_open: boolean }>(
+    `SELECT EXISTS (SELECT 1 FROM conflict_member m
+                    WHERE m.conflict_id = k.id AND m.claim_id = $2) AS is_member,
+            (k.status = 'open')                                      AS is_open
+       FROM conflict k WHERE k.id = $1`,
+    [input.conflict_id, input.winning_claim_id],
+  ) ?? [];
+
+  if (!membership) {
+    return refuse(audit, 'no such conflict');
+  }
+  if (!membership.is_open) {
+    return refuse(audit, 'that conflict is already closed');
+  }
+  if (!membership.is_member) {
+    return refuse(
+      audit,
+      'winning_claim_id is not one of the claims in this conflict — a claim cannot win a ' +
+        'disagreement it was never part of',
+    );
+  }
+
+  // add_person is a base tool, so without this the agent mints the witness that signs for its
+  // own guess. Enforced again by claim_confirmed_by_a_human.
+  const [signer] = await query<{ created_by: ActorKind }>(
+    'SELECT created_by FROM person WHERE id = $1',
+    [input.resolved_by],
   );
+  if (!signer) {
+    return refuse(audit, 'resolved_by does not name anyone in this archive');
+  }
+  if (signer.created_by !== 'human') {
+    return refuse(
+      audit,
+      'resolved_by names a person the agent created — a fact needs someone a human entered',
+    );
+  }
+
+  await withAudit(audit, async (tx) => {
+    const closed = await tx.query<{ id: string }>(
+      `UPDATE conflict
+          SET status = 'resolved', winning_claim_id = $2, resolved_by = $3,
+              resolution_note = $4, resolved_at = now()
+        WHERE id = $1 AND status = 'open'
+        RETURNING id`,
+      [input.conflict_id, input.winning_claim_id, input.resolved_by, input.resolution_note ?? null],
+    );
+    // A zero-row UPDATE is not an error in Postgres — discarding that is how a bogus conflict id
+    // used to fall through to the confirm below.
+    if (closed.length === 0) {
+      throw new RefusedError('the conflict was closed by someone else while you were deciding');
+    }
+
+    await tx.exec(
+      `UPDATE claim
+          SET certainty = 'confirmed', confirmed_by = $2, confirmed_at = now()
+        WHERE id = $1
+          AND id IN (SELECT claim_id FROM conflict_member WHERE conflict_id = $3)`,
+      [input.winning_claim_id, input.resolved_by, input.conflict_id],
+    );
+    await tx.exec(
+      `UPDATE claim SET status = 'superseded'
+        WHERE id IN (SELECT claim_id FROM conflict_member WHERE conflict_id = $1)
+          AND id <> $2`,
+      [input.conflict_id, input.winning_claim_id],
+    );
+  });
 }
 
 export interface ProposeQuestionInput {
@@ -413,20 +521,23 @@ export async function proposeFollowupQuestion(
   input: ProposeQuestionInput,
   ctx: CommandContext,
 ): Promise<string> {
-  if (!input.conflict_id && !input.claim_id) {
-    throw new RefusedError('a follow-up question must point at a conflict or a claim');
-  }
   const id = uuid();
+  const audit: AuditInput = {
+    actor: ctx.actor,
+    toolName: 'propose_followup_question',
+    args: input,
+    targetTable: 'followup_question',
+    targetId: id,
+    after: input,
+    registeredBecause: ctx.registeredBecause,
+  };
+
+  if (!input.conflict_id && !input.claim_id) {
+    return refuse(audit, 'a follow-up question must point at a conflict or a claim');
+  }
+
   await withAudit(
-    {
-      actor: ctx.actor,
-      toolName: 'propose_followup_question',
-      args: input,
-      targetTable: 'followup_question',
-      targetId: id,
-      after: input,
-      registeredBecause: ctx.registeredBecause,
-    },
+    audit,
     async (tx) => {
       await tx.exec(
         `INSERT INTO followup_question
@@ -481,8 +592,10 @@ export async function resetArchive(ctx: CommandContext): Promise<void> {
     throw new RefusedError('only a person may reset the archive');
   }
 
-  await transaction(async (tx) => {
-    await tx.exec(`TRUNCATE ${ALL_TABLES.join(', ')} RESTART IDENTITY CASCADE`);
+  await transaction(ctx.actor, async (tx) => {
+    // No RESTART IDENTITY: app_human has TRUNCATE but does not own the sequences. Letting
+    // audit_event.id keep climbing is better anyway — an id is never reused across resets.
+    await tx.exec(`TRUNCATE ${ALL_TABLES.join(', ')} CASCADE`);
     // Written after the truncate, so the fresh log opens by saying what happened to the old one
     // rather than starting with an unexplained silence.
     await tx.exec(
