@@ -4,7 +4,7 @@ title: Healing the tear
 branch: A
 day: 3
 depends_on: [TASK-018]
-status: todo
+status: done
 ---
 
 # TASK-019 — Healing the tear
@@ -32,8 +32,8 @@ Closing a conflict heals the tear, flips the label to Confirmed, and shows who c
 
 ## Acceptance criteria
 
-- [ ] Heals only when `conflict.status='resolved'`
-- [ ] The confirming person's name appears on the page — a human is visible in the result
+- [x] Heals only when `conflict.status='resolved'`
+- [x] The confirming person's name appears on the page — a human is visible in the result
 
 ## Files touched
 

@@ -4,7 +4,7 @@ title: Fallback: the CSS 3D book
 branch: A
 day: 4
 depends_on: [TASK-016]
-status: todo
+status: done
 ---
 
 # TASK-026 — Fallback: the CSS 3D book
@@ -32,9 +32,9 @@ If R3F does not survive the in-app browser: a CSS 3D book (`perspective` + `rota
 
 ## Acceptance criteria
 
-- [ ] The whole metaphor survives
-- [ ] The three layers below are untouched — thanks to R5
-- [ ] Costs no more than half a day
+- [x] The whole metaphor survives
+- [x] The three layers below are untouched — thanks to R5
+- [x] Costs no more than half a day
 
 ## Files touched
 

@@ -9,6 +9,7 @@
  */
 
 import { Suspense, lazy } from 'react';
+import { CssBook } from './view/CssBook';
 import { AuditTrail } from './panels/AuditTrail';
 import { StoryCard } from './panels/StoryCard';
 import { useStore } from './store/store';
@@ -20,8 +21,6 @@ const ManualToolPanel = lazy(async () => ({
 
 export function Archive({ report }: { report: BootReport }): JSX.Element {
   const model = useStore((s) => s.model);
-  const ui = useStore((s) => s.ui);
-  const setUi = useStore((s) => s.setUi);
   const lang = useStore((s) => s.lang);
   const setLang = useStore((s) => s.setLang);
 
@@ -78,36 +77,7 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
         </p>
       )}
 
-      <nav className="views" aria-label="What you are looking at">
-        <button
-          type="button"
-          aria-pressed={ui.view === 'archive'}
-          onClick={() => setUi({ view: 'archive' })}
-        >
-          Archive
-        </button>
-        {model?.people.map((p) => (
-          <button
-            key={p.id}
-            type="button"
-            aria-pressed={ui.view === 'person' && ui.personId === p.id}
-            onClick={() => setUi({ view: 'person', personId: p.id })}
-          >
-            {p.display_name}
-          </button>
-        ))}
-        {conflicts.map((c) => (
-          <button
-            key={c.id}
-            type="button"
-            className="conflict"
-            aria-pressed={ui.view === 'conflict' && ui.conflictId === c.id}
-            onClick={() => setUi({ view: 'conflict', conflictId: c.id, subjectId: c.subject_id })}
-          >
-            Conflict · {c.predicate}
-          </button>
-        ))}
-      </nav>
+      <CssBook />
 
       {cards.length > 0 && (
         <section aria-labelledby="cards-heading">

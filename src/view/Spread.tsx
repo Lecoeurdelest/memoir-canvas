@@ -1,10 +1,52 @@
 /**
- * TASK-016 — The spread: recollection left, evidence right. Content is DOM through <Html transform occlude>.
+ * TASK-016 — one spread: recollection left, evidence right.
  *
- * R5: read from src/store/, never mutate. To write, call src/domain/commands.ts.
+ * Plain DOM. The 3D version renders the same component through `<Html transform>` (without
+ * `occlude`, see FR-BOOK-07), so the accessibility tree and the tests do not change with the
+ * renderer.
+ *
+ * R5: reads the projection, holds no domain state.
  */
 
-export function Spread(): JSX.Element | null {
-  // TODO(TASK-016)
-  return null;
+import { EvidencePanel } from '../panels/EvidencePanel';
+import { Tear } from './Tear';
+import { useStore } from '../store/store';
+import type { Lang } from '../store/store';
+import type { Spread as SpreadModel } from '../store/projection';
+
+const COPY = {
+  recollection: { vi: 'Lời kể', en: 'Recollection' },
+  evidence: { vi: 'Bằng chứng', en: 'Evidence' },
+  about: { vi: 'Về', en: 'About' },
+} satisfies Record<string, Record<Lang, string>>;
+
+export function Spread({ spread }: { spread: SpreadModel }): JSX.Element {
+  const lang = useStore((s) => s.lang);
+  const people = useStore((s) => s.model?.people) ?? [];
+  const places = useStore((s) => s.model?.places) ?? [];
+
+  const subject = people.find((p) => p.id === spread.subjectId);
+  const lead = spread.claims[0];
+  const place = places.find((p) => p.id === lead.object_place_id)?.name;
+  const object = place ?? lead.object_text ?? '';
+
+  return (
+    <article className={`spread${spread.conflict ? ' spread-torn' : ''}`}>
+      <div className="page page-left">
+        <p className="page-label">{COPY.recollection[lang]}</p>
+        <h3 lang={lang}>
+          {subject?.display_name} · {spread.predicate}
+        </h3>
+        {object && <p className="object">{object}</p>}
+        <Tear spread={spread} />
+      </div>
+
+      <div className="page page-right">
+        <p className="page-label">{COPY.evidence[lang]}</p>
+        {spread.claims.map((c) => (
+          <EvidencePanel key={c.id} claim={c} />
+        ))}
+      </div>
+    </article>
+  );
 }

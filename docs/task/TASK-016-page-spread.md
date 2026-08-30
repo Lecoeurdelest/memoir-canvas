@@ -41,6 +41,12 @@ Each spread is one story card: recollection left, evidence right. Content is DOM
 - `src/view/Spread.tsx`
 - `src/view/Page.tsx`
 
+> **Partially built 2026-08-30.** `src/view/Spread.tsx` exists and renders recollection left,
+> evidence right, bound to the projection, with no `useState` holding domain data — in plain DOM,
+> as part of `TASK-026`. The remaining criterion, "Vietnamese diacritics render correctly inside
+> the 3D scene", cannot be checked until `TASK-015` builds a scene. `src/view/Page.tsx` was not
+> needed. Left `todo` deliberately rather than claimed.
+
 ## When it is done
 
 1. `npm run typecheck` · `npm test`

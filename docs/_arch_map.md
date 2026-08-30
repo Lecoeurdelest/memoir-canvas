@@ -150,6 +150,7 @@ PR**. A map pointing the wrong way is worse than no map.
 | `tests/handlers.spec.ts` | all eight handlers, and that a story card cannot overstate itself | `TASK-011`, `TASK-023` |
 | `tests/certainty.spec.ts` | the ladder's glossary wording and its WCAG AA contrast | `TASK-021` |
 | `tests/panels.spec.ts` | every tool has a readable sentence; contradicting sources sort first | `TASK-022`, `TASK-024` |
+| `tests/spreads.spec.ts` | the tear exists iff a conflict is open, and healing names a person | `TASK-018`, `TASK-019`, `TASK-026` |
 
 Tests run against a real in-memory PGlite, never a mock: every guarantee they check is enforced
 by SQL, and a mocked database cannot refuse anything.

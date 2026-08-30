@@ -4,7 +4,7 @@ title: The conflict tear
 branch: A
 day: 3
 depends_on: [TASK-014, TASK-016]
-status: todo
+status: done
 ---
 
 # TASK-018 — The conflict tear
@@ -32,9 +32,9 @@ A `conflicting` claim splits the page along a red tear; the book **cannot close*
 
 ## Acceptance criteria
 
-- [ ] The tear appears if and only if a `conflicting` claim exists
-- [ ] The book genuinely cannot close at that page
-- [ ] Both years appear side by side, neither visually favoured
+- [x] The tear appears if and only if a `conflicting` claim exists
+- [x] The book genuinely cannot close at that page
+- [x] Both years appear side by side, neither visually favoured
 
 ## Files touched
 

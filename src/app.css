@@ -188,3 +188,63 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .entry .constraint { margin: 3px 0 0; }
 .entry .constraint code { font-size: 11px; }
 .entry .context { margin: 2px 0 0; font-size: 12px; color: var(--ink-soft); }
+
+/* ── the book (TASK-026, 016, 018, 019) ─────────────────────────────────────────────────────
+   CSS and DOM, no WebGL. The spine is a timeline; a torn page wedges it open. */
+.book { margin: 0 0 32px; }
+
+.spine { display: flex; gap: 4px; margin: 0 0 12px; flex-wrap: wrap; }
+.vertebra { font: inherit; font-size: 12px; font-variant-numeric: tabular-nums;
+            padding: 4px 10px; cursor: pointer; background: #fff; color: var(--ink-soft);
+            border: 1px solid var(--rule); border-radius: 2px; }
+.vertebra[aria-current="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.vertebra.torn { border-color: var(--lacquer); color: var(--lacquer); }
+.vertebra.torn[aria-current="true"] { background: var(--lacquer); color: #fff; }
+
+.spread { display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+          background: #fff; border: 1px solid var(--rule); border-radius: 3px; overflow: hidden; }
+.page { padding: 18px 20px; }
+.page-left { border-right: 1px solid var(--rule); }
+.page-label { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+              color: var(--ink-soft); margin: 0 0 8px; }
+.page h3 { font-size: 17px; margin: 0 0 2px; }
+.page .object { color: var(--ink-soft); margin: 0 0 10px; }
+
+/* A torn spread is split down the gutter by a visible rip, not merely tinted. */
+.spread-torn { border-color: var(--lacquer); }
+.spread-torn .page-left {
+  border-right: 2px dashed var(--lacquer);
+  background: linear-gradient(180deg, #fdf6f5 0%, #fff 60%);
+}
+
+.tear { margin-top: 10px; }
+.tear-head { display: flex; align-items: center; gap: 7px; margin: 0 0 4px;
+             color: var(--lacquer); font-weight: 600; font-size: 14px; }
+.tear-head .rip { font-size: 15px; }
+.tear-why { margin: 0 0 12px; font-size: 13px; color: var(--ink-soft); max-width: 46ch; }
+.tear-foot { margin: 10px 0 0; font-size: 12px; font-style: italic; color: var(--lacquer); }
+
+/* Equal tracks, identical rules: neither competing claim can be favoured. */
+.competing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                  gap: 12px; }
+.competing { border: 1px solid var(--rule); border-radius: 3px; padding: 10px 12px; background: #fff; }
+.competing .year { font-family: "Newsreader", Georgia, serif; font-size: 22px; margin: 0 0 6px;
+                   font-variant-numeric: tabular-nums; }
+.competing .says { font-size: 12px; color: var(--ink-soft); margin: 8px 0 0; }
+.competing .says-label { display: block; font-size: 10px; letter-spacing: 0.07em;
+                         text-transform: uppercase; margin-bottom: 2px; }
+
+.healed { margin: 10px 0 0; padding: 8px 12px; font-size: 13px;
+          background: #e2eee7; color: var(--ok); border-radius: 3px; }
+
+.turn { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        margin-top: 12px; }
+.turn button { font: inherit; font-size: 13px; padding: 6px 14px; cursor: pointer;
+               background: #fff; border: 1px solid var(--rule); border-radius: 3px; color: var(--ink); }
+.turn button:disabled { opacity: 0.45; cursor: not-allowed; }
+.folio { font-size: 12px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.wedged { margin: 8px 0 0; font-size: 13px; color: var(--lacquer); }
+
+@media (max-width: 640px) { .spread { grid-template-columns: 1fr; }
+                            .page-left { border-right: 0; border-bottom: 1px solid var(--rule); }
+                            .spread-torn .page-left { border-right: 0; border-bottom: 2px dashed var(--lacquer); } }
