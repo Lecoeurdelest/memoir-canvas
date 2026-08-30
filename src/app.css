@@ -84,3 +84,47 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .actor legend { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); padding: 0 4px; }
 .actor label { margin-right: 18px; cursor: pointer; }
 .actor .hint { display: block; margin-top: 6px; max-width: 62ch; }
+
+/* ── certainty ladder (TASK-021) ────────────────────────────────────────────────────────────
+   Colour is the least of it: each badge also carries a word and a filling glyph, so the ladder
+   survives greyscale and a screen reader (NFR-A11Y-02). */
+.badge {
+  display: inline-flex; align-items: baseline; gap: 5px;
+  font-size: 11px; letter-spacing: 0.04em; padding: 2px 8px; border-radius: 2px;
+  border: 1px solid currentColor; white-space: nowrap;
+}
+.badge .glyph { font-size: 12px; line-height: 1; }
+.badge.prominent { font-size: 13px; padding: 4px 12px; font-weight: 600; }
+
+/* Colours come from PALETTE in CertaintyBadge.tsx, as inline styles — one source of truth that
+   tests/certainty.spec.ts can import and check for WCAG AA (NFR-A11Y-05). */
+
+/* ── story card (TASK-023) ──────────────────────────────────────────────────────────────────
+   Tinted by its own floor certainty, so writing it well cannot make it look settled. */
+.card { border: 1px solid var(--rule); border-left: 4px solid var(--rule); background: #fff;
+        padding: 16px 18px; margin: 0 0 16px; border-radius: 3px; }
+.card.certainty-uncertain          { border-left-color: #9aa09d; }
+.card.certainty-oral               { border-left-color: #b99a3e; }
+.card.certainty-document_supported { border-left-color: #4a7f95; }
+.card.certainty-conflicting        { border-left-color: var(--lacquer); }
+.card.certainty-confirmed          { border-left-color: var(--ok); }
+
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+             flex-wrap: wrap; margin-bottom: 10px; }
+.card h3 { font-size: 18px; margin: 0 0 2px; }
+.card .subject { color: var(--ink-soft); font-size: 13px; margin: 0 0 10px; }
+.card .body { margin: 0 0 14px; max-width: 62ch; }
+
+.lang button { font: inherit; font-size: 12px; padding: 3px 9px; cursor: pointer;
+               background: #fff; border: 1px solid var(--rule); color: var(--ink-soft); }
+.lang button:first-child { border-radius: 3px 0 0 3px; }
+.lang button:last-child  { border-radius: 0 3px 3px 0; border-left: 0; }
+.lang button[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+.cited-head { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+              color: var(--ink-faint, #868d88); margin: 0 0 6px; }
+.cited-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.cited { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; font-size: 13px;
+         color: var(--ink-soft); }
+.cited .predicate { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 12px; }
+.cited.missing { font-style: italic; }

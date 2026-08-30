@@ -147,6 +147,8 @@ PR**. A map pointing the wrong way is worse than no map.
 | `tests/registry.spec.ts` | `toolsFor(uiState)` switches tools on and off again | `TASK-013` |
 | `tests/modelContext.spec.ts` | a withdrawn tool is actually gone from the host, on both API shapes | `TASK-006` |
 | `tests/conflict.spec.ts` | conflict detection and the audit trail, against a real PGlite | `TASK-009`, `TASK-014` |
+| `tests/handlers.spec.ts` | all eight handlers, and that a story card cannot overstate itself | `TASK-011`, `TASK-023` |
+| `tests/certainty.spec.ts` | the ladder's glossary wording and its WCAG AA contrast | `TASK-021` |
 
 Tests run against a real in-memory PGlite, never a mock: every guarantee they check is enforced
 by SQL, and a mocked database cannot refuse anything.

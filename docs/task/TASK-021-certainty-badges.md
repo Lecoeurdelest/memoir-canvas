@@ -4,7 +4,7 @@ title: Certainty badges
 branch: C
 day: 2
 depends_on: [TASK-004]
-status: todo
+status: done
 ---
 
 # TASK-021 — Certainty badges
@@ -32,9 +32,9 @@ Five certainty labels, bilingual, not relying on colour alone.
 
 ## Acceptance criteria
 
-- [ ] Readable with colour blindness
-- [ ] Contrast meets WCAG AA against the page background
-- [ ] Translations match the glossary word for word
+- [x] Readable with colour blindness
+- [x] Contrast meets WCAG AA against the page background
+- [x] Translations match the glossary word for word
 
 ## Files touched
 

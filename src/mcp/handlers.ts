@@ -11,6 +11,7 @@
  */
 
 import * as commands from '../domain/commands';
+import { buildReadModel } from '../store/projection';
 import { RefusedError } from '../domain/commands';
 import type { ToolName } from './descriptors';
 import type { CommandContext } from '../domain/commands';
@@ -26,6 +27,24 @@ function must(args: unknown): Record<string, unknown> {
     throw new RefusedError('tool arguments must be an object');
   }
   return args as Record<string, unknown>;
+}
+
+function strArray(o: Record<string, unknown>, key: string): string[] | undefined {
+  const v = o[key];
+  if (v === undefined) return undefined;
+  if (!Array.isArray(v) || v.some((x) => typeof x !== 'string')) {
+    throw new RefusedError(`"${key}" must be an array of strings`);
+  }
+  return v as string[];
+}
+
+function int(o: Record<string, unknown>, key: string): number | undefined {
+  const v = o[key];
+  if (v === undefined) return undefined;
+  if (typeof v !== 'number' || !Number.isInteger(v)) {
+    throw new RefusedError(`"${key}" must be an integer`);
+  }
+  return v;
 }
 
 function str(o: Record<string, unknown>, key: string, required = true): string {
@@ -55,15 +74,58 @@ export function makeHandlers(ctx: CommandContext): Handlers {
   return {
     read_memory_graph: (args) =>
       guard(async () => {
-        void must(args ?? {});
-        // TASK-010 — reads go through store/projection.ts, never straight to db.ts.
-        throw new RefusedError('not implemented yet — see TASK-010');
+        const a = must(args ?? {});
+        const subject = str(a, 'subject_id', false) || undefined;
+        // Reads go through store/projection.ts, never straight to db.ts (R3).
+        const m = await buildReadModel();
+
+        const claims = subject ? m.claims.filter((c) => c.subject_id === subject) : m.claims;
+        const keep = new Set(claims.map((c) => c.id));
+
+        return {
+          people: subject ? m.people.filter((p) => p.id === subject) : m.people,
+          places: m.places,
+          // Every claim carries its label. Nothing here says which of two claims is right.
+          claims: claims.map((c) => ({
+            id: c.id,
+            subject_id: c.subject_id,
+            predicate: c.predicate,
+            object_person_id: c.object_person_id,
+            object_place_id: c.object_place_id,
+            object_text: c.object_text,
+            year_value: c.year_value,
+            year_precision: c.year_precision,
+            certainty: c.certainty,
+            status: c.status,
+            asserted_by: c.asserted_by,
+            confirmed_by: c.confirmed_by,
+          })),
+          sources: m.sources,
+          open_conflicts: m.conflicts
+            .filter((k) => k.status === 'open')
+            .map((k) => ({ id: k.id, subject_id: k.subject_id, predicate: k.predicate })),
+          disagreements: m.disagreements
+            .filter((d) => !subject || d.subject_id === subject)
+            .map((d) => ({
+              subject_id: d.subject_id,
+              predicate: d.predicate,
+              claim_ids: d.claim_ids.filter((c) => !subject || keep.has(c)),
+              resolution: 'requires a person — no tool available to you can settle this',
+            })),
+        };
       }),
 
     add_person: (args) =>
       guard(async () => {
         const a = must(args);
-        const id = await commands.addPerson({ display_name: str(a, 'display_name') }, ctx);
+        const id = await commands.addPerson(
+          {
+            display_name: str(a, 'display_name'),
+            aka: strArray(a, 'aka'),
+            note: str(a, 'note', false) || undefined,
+          },
+          ctx,
+        );
         return { person_id: id };
       }),
 
@@ -75,7 +137,9 @@ export function makeHandlers(ctx: CommandContext): Handlers {
             subject_kind: str(a, 'subject_kind') as never,
             subject_id: str(a, 'subject_id'),
             predicate: str(a, 'predicate'),
-            year_value: typeof a.year_value === 'number' ? a.year_value : undefined,
+            year_value: int(a, 'year_value'),
+            year_min: int(a, 'year_min'),
+            year_max: int(a, 'year_max'),
             year_precision: (a.year_precision as never) ?? undefined,
             object_place_id: str(a, 'object_place_id', false) || undefined,
             object_person_id: str(a, 'object_person_id', false) || undefined,
@@ -83,8 +147,10 @@ export function makeHandlers(ctx: CommandContext): Handlers {
           },
           ctx,
         );
-        // The cap is part of the answer: tell the agent what label it actually got.
-        return { claim_id: id, certainty: 'oral' };
+        // Read the label back rather than asserting it: a handler that reports 'oral' while the
+        // row says otherwise is the same class of lie the audit trail exists to prevent.
+        const [written] = await commands.claimCertainty(id);
+        return { claim_id: id, certainty: written };
       }),
 
     link_claim_to_source: (args) =>
@@ -164,9 +230,31 @@ export function makeHandlers(ctx: CommandContext): Handlers {
         return { status: 'resolved' };
       }),
 
-    generate_story_card: () =>
+    generate_story_card: (args) =>
       guard(async () => {
-        throw new RefusedError('not implemented yet — see TASK-023');
+        const a = must(args);
+        const ids = a.claim_ids;
+        if (!Array.isArray(ids) || ids.some((v) => typeof v !== 'string')) {
+          throw new RefusedError('"claim_ids" must be an array of claim ids');
+        }
+        const { cardId, floorCertainty } = await commands.generateStoryCard(
+          {
+            subject_person_id: str(a, 'subject_person_id'),
+            claim_ids: ids as string[],
+            title_vi: str(a, 'title_vi'),
+            title_en: str(a, 'title_en'),
+            body_vi: str(a, 'body_vi'),
+            body_en: str(a, 'body_en'),
+          },
+          ctx,
+        );
+        // The label is computed from the claims, not chosen. Say so, so the agent cannot believe
+        // it picked one.
+        return {
+          card_id: cardId,
+          floor_certainty: floorCertainty,
+          note: 'floor_certainty is the weakest certainty among the claims cited; it is not yours to set',
+        };
       }),
   };
 }

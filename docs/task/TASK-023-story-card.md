@@ -4,7 +4,7 @@ title: The bilingual story card
 branch: C
 day: 4
 depends_on: [TASK-010, TASK-021]
-status: todo
+status: done
 ---
 
 # TASK-023 — The bilingual story card
@@ -32,8 +32,8 @@ A story card built from several claims, carrying its `floor_certainty`, with its
 
 ## Acceptance criteria
 
-- [ ] A card standing on one unverified recollection **must** carry that label, however well written it is
-- [ ] Switching language does not reload the page
+- [x] A card standing on one unverified recollection **must** carry that label, however well written it is
+- [x] Switching language does not reload the page
 
 ## Files touched
 

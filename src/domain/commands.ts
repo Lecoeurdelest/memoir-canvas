@@ -13,6 +13,7 @@
 
 import { AUDIT_INSERT, auditParams, type AuditInput } from './audit';
 import { transaction, query, isEphemeral, wasRebuilt, type Tx } from './db';
+import { floorCertainty } from './types';
 import type {
   ActorKind,
   Certainty,
@@ -554,9 +555,78 @@ export async function proposeFollowupQuestion(
   return id;
 }
 
-// TASK-023 generate_story_card — same shape as above.
+// ─────────────────────────────────── story cards ───────────────────────────────────
+
+export interface GenerateStoryCardInput {
+  subject_person_id: string;
+  claim_ids: string[];
+  title_vi: string;
+  title_en: string;
+  body_vi: string;
+  body_en: string;
+}
+
+/**
+ * `floor_certainty` is computed here from the claims, never accepted from the caller — the whole
+ * point of FR-CARD is that good prose cannot make shaky evidence stronger. `card_floor_is_honest`
+ * re-derives it in SQL and refuses a mismatch, so a bug in this function cannot ship a card that
+ * overstates itself.
+ */
+export async function generateStoryCard(
+  input: GenerateStoryCardInput,
+  ctx: CommandContext,
+): Promise<{ cardId: string; floorCertainty: Certainty }> {
+  const id = uuid();
+  const audit: AuditInput = {
+    actor: ctx.actor,
+    toolName: 'generate_story_card',
+    args: input,
+    targetTable: 'story_card',
+    targetId: id,
+    registeredBecause: ctx.registeredBecause,
+  };
+
+  if (input.claim_ids.length === 0) {
+    return refuse(audit, 'a story card must stand on at least one claim');
+  }
+
+  const found = await query<{ id: string; certainty: Certainty }>(
+    'SELECT id, certainty FROM claim WHERE id = ANY($1)',
+    [input.claim_ids],
+  );
+  const missing = input.claim_ids.filter((c) => !found.some((f) => f.id === c));
+  if (missing.length > 0) {
+    return refuse(audit, `these claims do not exist: ${missing.join(', ')}`);
+  }
+
+  const floor = floorCertainty(found.map((f) => f.certainty));
+
+  await withAudit({ ...audit, after: { ...input, floor_certainty: floor } }, async (tx) => {
+    await tx.exec(
+      `INSERT INTO story_card
+         (id, subject_person_id, title_vi, title_en, body_vi, body_en,
+          claim_ids, floor_certainty, generated_by)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`,
+      [
+        id, input.subject_person_id, input.title_vi, input.title_en,
+        input.body_vi, input.body_en, input.claim_ids, floor, ctx.actor,
+      ],
+    );
+  });
+
+  return { cardId: id, floorCertainty: floor };
+}
 
 // ──────────────────────────────── resetting the archive ────────────────────────────────
+
+/** Read a claim's stored label back, so a handler never has to assert what it wrote. */
+export async function claimCertainty(id: string): Promise<[Certainty]> {
+  const [row] = await query<{ certainty: Certainty }>(
+    'SELECT certainty FROM claim WHERE id = $1',
+    [id],
+  );
+  return [row.certainty];
+}
 
 /**
  * Archive status for the UI. Re-exported through the command layer because R3 lets only this

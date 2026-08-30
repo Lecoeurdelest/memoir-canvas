@@ -4,7 +4,7 @@ title: The eight tool handlers
 branch: B
 day: 2
 depends_on: [TASK-005, TASK-008]
-status: todo
+status: done
 ---
 
 # TASK-011 — The eight tool handlers
@@ -33,9 +33,9 @@ status: todo
 
 ## Acceptance criteria
 
-- [ ] `grep -iE 'insert |update |select ' src/mcp/handlers.ts` returns nothing
-- [ ] Badly typed arguments produce a structured error, not a crash
-- [ ] The `flag_conflict` return value does not say which claim is right
+- [x] `grep -iE 'insert |update |select ' src/mcp/handlers.ts` returns nothing
+- [x] Badly typed arguments produce a structured error, not a crash
+- [x] The `flag_conflict` return value does not say which claim is right
 
 ## Files touched
 

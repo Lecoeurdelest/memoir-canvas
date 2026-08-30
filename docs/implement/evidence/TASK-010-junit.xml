@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="35" failures="0" errors="0" time="2.530849833">
+    <testsuite name="tests/certainty.spec.ts" timestamp="2026-08-30T08:59:42.461Z" hostname="quyn28654s-Mac-mini.local" tests="5" failures="0" errors="0" skipped="0" time="0.002790625">
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; has a label for every rung of the ladder, in ladder order" time="0.000831917">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; matches the glossary word for word" time="0.000326">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; does not rely on colour alone — every label carries a word and a distinct glyph" time="0.000409959">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; meets WCAG AA against its own background and against the page" time="0.000241208">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; keeps the ladder distinguishable without colour, by luminance order" time="0.000058084">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/conflict.spec.ts" timestamp="2026-08-30T08:59:42.462Z" hostname="quyn28654s-Mac-mini.local" tests="9" failures="0" errors="0" skipped="0" time="1.266572375">
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; refuses a conflict the data does not support, and writes nothing" time="1.153785292">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; joins three disagreeing recollections into ONE conflict, not three pairs" time="0.01918175">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; leaves no path for an agent to close a conflict" time="0.02013925">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; does not report two compatible claims about different places as a contradiction" time="0.01279175">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; loses both the command and its audit row when the write fails" time="0.011957916">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; records a blocked operation, with its reason and the constraint that fired" time="0.010880666">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; records a refusal raised before the database is touched" time="0.012790125">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; stamps the actor from the database, not from what the caller claims" time="0.011272958">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; lets the sequence of what happened be reconstructed in order" time="0.013086875">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/handlers.spec.ts" timestamp="2026-08-30T08:59:42.462Z" hostname="quyn28654s-Mac-mini.local" tests="9" failures="0" errors="0" skipped="0" time="1.257656375">
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; implements every tool the contract advertises" time="1.144720666">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; turns badly typed arguments into a structured error, not a crash" time="0.016038292">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; keeps the fields the descriptor advertises instead of dropping them" time="0.015244667">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; reports the certainty the row actually got, not a hardcoded one" time="0.016327292">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; says a disagreement exists without saying which claim is right" time="0.014185958">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; flag_conflict returns the claims in dispute and no winner" time="0.012653458">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-023 — a story card cannot overstate itself &gt; carries the weakest label among the claims it stands on" time="0.014355209">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-023 — a story card cannot overstate itself &gt; is not swayed by how well the card is written" time="0.011851541">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-023 — a story card cannot overstate itself &gt; refuses to cite a claim that does not exist" time="0.0113215">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/modelContext.spec.ts" timestamp="2026-08-30T08:59:42.463Z" hostname="quyn28654s-Mac-mini.local" tests="5" failures="0" errors="0" skipped="0" time="0.001733333">
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — per-tool fallback &gt; withdraws a tool that is no longer in the set" time="0.000881958">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — per-tool fallback &gt; does not unregister a tool that is still current" time="0.000101125">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — per-tool fallback &gt; survives three successive sets without leaking a stale tool" time="0.00009775">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — whole-set host &gt; hands over exactly the current set, replacing the last one" time="0.000078083">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge — no host at all &gt; still records the set so the manual tool panel can render it" time="0.000067291">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/registry.spec.ts" timestamp="2026-08-30T08:59:42.463Z" hostname="quyn28654s-Mac-mini.local" tests="7" failures="0" errors="0" skipped="0" time="0.002097125">
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; always exposes the five base tools" time="0.000707209">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; does not expose flag_conflict for a subject with no disagreement" time="0.000355792">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; exposes flag_conflict once the open subject has a disagreement" time="0.0001">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; does NOT expose resolve_claim merely because a person is open" time="0.000121958">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; exposes resolve_claim only while that conflict is on screen" time="0.000125166">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; withdraws resolve_claim once the conflict is closed" time="0.000071292">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; drops all three conditional tools on returning to the archive" time="0.000100292">
+        </testcase>
+    </testsuite>
+</testsuites>

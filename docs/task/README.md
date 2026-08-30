@@ -18,8 +18,8 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-007`](TASK-007-seed-archive.md) | Seeded sample archive | C | 1 | `TASK-003`, `TASK-008` | ☑ |
 | [`TASK-008`](TASK-008-command-layer.md) | The command layer | B | 2 | `TASK-003`, `TASK-004` | ☐ |
 | [`TASK-009`](TASK-009-audit-event.md) | Audit logging | B | 2 | `TASK-008` | ☑ |
-| [`TASK-010`](TASK-010-projection-store.md) | Projection and store | B | 2 | `TASK-003`, `TASK-004` | ☐ |
-| [`TASK-011`](TASK-011-mcp-handlers.md) | The eight tool handlers | B | 2 | `TASK-005`, `TASK-008` | ☐ |
+| [`TASK-010`](TASK-010-projection-store.md) | Projection and store | B | 2 | `TASK-003`, `TASK-004` | ☑ |
+| [`TASK-011`](TASK-011-mcp-handlers.md) | The eight tool handlers | B | 2 | `TASK-005`, `TASK-008` | ☑ |
 | [`TASK-012`](TASK-012-static-registry.md) | Static registry | B | 2 | `TASK-006`, `TASK-011` | ☐ |
 | [`TASK-013`](TASK-013-dynamic-registry.md) | Stateful tool registration | B | 3 | `TASK-010`, `TASK-012` | ☑ |
 | [`TASK-014`](TASK-014-conflict-detection.md) | Detect and record conflicts | B | 3 | `TASK-008`, `TASK-013` | ☑ |
@@ -29,9 +29,9 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-018`](TASK-018-tear-conflict.md) | The conflict tear | A | 3 | `TASK-014`, `TASK-016` | ☐ |
 | [`TASK-019`](TASK-019-tear-heal.md) | Healing the tear | A | 3 | `TASK-018` | ☐ |
 | [`TASK-020`](TASK-020-constellation.md) | The relationship constellation | A | 4 | `TASK-016` | ☐ |
-| [`TASK-021`](TASK-021-certainty-badges.md) | Certainty badges | C | 2 | `TASK-004` | ☐ |
+| [`TASK-021`](TASK-021-certainty-badges.md) | Certainty badges | C | 2 | `TASK-004` | ☑ |
 | [`TASK-022`](TASK-022-evidence-panel.md) | The evidence panel | C | 3 | `TASK-010`, `TASK-021` | ☐ |
-| [`TASK-023`](TASK-023-story-card.md) | The bilingual story card | C | 4 | `TASK-010`, `TASK-021` | ☐ |
+| [`TASK-023`](TASK-023-story-card.md) | The bilingual story card | C | 4 | `TASK-010`, `TASK-021` | ☑ |
 | [`TASK-024`](TASK-024-audit-panel.md) | The audit panel | C | 4 | `TASK-009` | ☐ |
 | [`TASK-025`](TASK-025-core-loop-e2e.md) | Demo core running end to end | B | 4 | `TASK-013`, `TASK-014`, `TASK-018`, `TASK-019`, `TASK-022` | ☐ |
 | [`TASK-026`](TASK-026-css-book-fallback.md) | Fallback: the CSS 3D book | A | 4 | `TASK-016` | ☐ |

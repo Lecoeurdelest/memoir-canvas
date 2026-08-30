@@ -9,6 +9,7 @@
  */
 
 import { Suspense, lazy } from 'react';
+import { StoryCard } from './panels/StoryCard';
 import { useStore } from './store/store';
 import type { BootReport } from './bootstrap';
 
@@ -22,6 +23,7 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
   const setUi = useStore((s) => s.setUi);
 
   const conflicts = model?.conflicts.filter((c) => c.status === 'open') ?? [];
+  const cards = model?.cards ?? [];
 
   return (
     <div className="layout">
@@ -94,6 +96,15 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
           </button>
         ))}
       </nav>
+
+      {cards.length > 0 && (
+        <section aria-labelledby="cards-heading">
+          <h2 id="cards-heading">Story cards</h2>
+          {cards.map((c) => (
+            <StoryCard key={c.id} card={c} />
+          ))}
+        </section>
+      )}
 
       <Suspense fallback={<p className="hint">Loading tools…</p>}>
         <ManualToolPanel />

@@ -4,7 +4,7 @@ title: Projection and store
 branch: B
 day: 2
 depends_on: [TASK-003, TASK-004]
-status: todo
+status: done
 ---
 
 # TASK-010 — Projection and store
@@ -32,9 +32,9 @@ status: todo
 
 ## Acceptance criteria
 
-- [ ] The view re-renders correctly after every write
-- [ ] The store holds no state that did not come from the database
-- [ ] The projection is the view's only read path
+- [x] The view re-renders correctly after every write
+- [x] The store holds no state that did not come from the database
+- [x] The projection is the view's only read path
 
 ## Files touched
 
