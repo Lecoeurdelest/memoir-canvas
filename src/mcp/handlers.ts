@@ -87,9 +87,31 @@ export function makeHandlers(ctx: CommandContext): Handlers {
         return { claim_id: id, certainty: 'oral' };
       }),
 
-    link_claim_to_source: () =>
+    link_claim_to_source: (args) =>
       guard(async () => {
-        throw new RefusedError('not implemented yet — see TASK-007');
+        const a = must(args);
+        const src = a.source;
+        if (typeof src !== 'object' || src === null) {
+          throw new RefusedError('missing or invalid "source"');
+        }
+        const s = src as Record<string, unknown>;
+        const { sourceId } = await commands.linkClaimToSource(
+          {
+            claim_id: str(a, 'claim_id'),
+            stance: str(a, 'stance') as never,
+            excerpt: str(a, 'excerpt', false) || undefined,
+            source: {
+              kind: str(s, 'kind') as never,
+              title: str(s, 'title'),
+              uri: str(s, 'uri', false) || undefined,
+              verbatim: str(s, 'verbatim', false) || undefined,
+              contributor_id: str(s, 'contributor_id', false) || undefined,
+            },
+          },
+          ctx,
+        );
+        // Facts, not a verdict: the stance is recorded, never adjudicated.
+        return { source_id: sourceId, stance: a.stance };
       }),
 
     flag_conflict: (args) =>

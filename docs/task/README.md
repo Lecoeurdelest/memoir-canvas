@@ -11,11 +11,11 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 |---|---|---|---|---|---|
 | [`TASK-001`](TASK-001-repo-scaffold.md) | Repository scaffold | B | 1 | — | ☐ |
 | [`TASK-002`](TASK-002-schema-freeze.md) | Freeze the data schema | B | 1 | `TASK-001` | ☑ |
-| [`TASK-003`](TASK-003-pglite-bootstrap.md) | Boot PGlite in a Web Worker | B | 1 | `TASK-002` | ☐ |
+| [`TASK-003`](TASK-003-pglite-bootstrap.md) | Boot PGlite in a Web Worker | B | 1 | `TASK-002` | ☑ |
 | [`TASK-004`](TASK-004-domain-types.md) | Domain types | B | 1 | `TASK-002` | ☐ |
 | [`TASK-005`](TASK-005-tool-descriptors.md) | Freeze the eight tool descriptors | B | 1 | `TASK-004` | ☐ |
 | [`TASK-006`](TASK-006-model-context-shim.md) | The modelContext shim | B | 1 | `TASK-005` | ☐ |
-| [`TASK-007`](TASK-007-seed-archive.md) | Seeded sample archive | C | 1 | `TASK-003`, `TASK-008` | ☐ |
+| [`TASK-007`](TASK-007-seed-archive.md) | Seeded sample archive | C | 1 | `TASK-003`, `TASK-008` | ☑ |
 | [`TASK-008`](TASK-008-command-layer.md) | The command layer | B | 2 | `TASK-003`, `TASK-004` | ☐ |
 | [`TASK-009`](TASK-009-audit-event.md) | Audit logging | B | 2 | `TASK-008` | ☑ |
 | [`TASK-010`](TASK-010-projection-store.md) | Projection and store | B | 2 | `TASK-003`, `TASK-004` | ☐ |

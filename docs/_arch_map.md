@@ -51,7 +51,10 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 
 | File | Purpose | Task |
 |---|---|---|
-| `src/main.tsx` | first frame now; database boot and WebMCP wiring later | `TASK-003`, `TASK-012` |
+| `src/main.tsx` | boot state machine and error boundary only — nothing here may reach `db.ts` | `TASK-003`, `TASK-012` |
+| `src/Archive.tsx` | the shell a person sees once the archive opens; lazily loaded | `TASK-012` |
+| `src/bootstrap.ts` | seed, build the read model, hand the tool set to WebMCP; lazily loaded | `TASK-003`, `TASK-012` |
+| `src/app.css` | the DOM styles that paint the first frame without WebGL | `TASK-012` |
 | `src/domain/schema.sql` | 11 tables, 8 enums, the core constraints, two roles + column grants, the actor-stamping and coherence triggers, the disagreement view | `TASK-002`, `TASK-014` |
 | `src/domain/db.ts` | owns the PGlite connection, schema bootstrap, IndexedDB fallback, and write queue | `TASK-003` |
 | `src/domain/types.ts` | the single source of types, mirroring the schema | `TASK-004` |

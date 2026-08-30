@@ -12,7 +12,7 @@
  */
 
 import { AUDIT_INSERT, auditParams, type AuditInput } from './audit';
-import { transaction, query, type Tx } from './db';
+import { transaction, query, isEphemeral, wasRebuilt, type Tx } from './db';
 import type {
   ActorKind,
   Certainty,
@@ -557,6 +557,14 @@ export async function proposeFollowupQuestion(
 // TASK-023 generate_story_card — same shape as above.
 
 // ──────────────────────────────── resetting the archive ────────────────────────────────
+
+/**
+ * Archive status for the UI. Re-exported through the command layer because R3 lets only this
+ * module and store/projection.ts reach db.ts — every other caller comes through here.
+ */
+export function archiveStatus(): { ephemeral: boolean; rebuilt: boolean } {
+  return { ephemeral: isEphemeral(), rebuilt: wasRebuilt() };
+}
 
 /**
  * True when the archive holds nothing yet. Lives here rather than in src/seed/ because R3 says

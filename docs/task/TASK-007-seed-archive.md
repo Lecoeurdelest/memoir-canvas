@@ -4,7 +4,7 @@ title: Seeded sample archive
 branch: C
 day: 1
 depends_on: [TASK-003, TASK-008]
-status: todo
+status: done
 ---
 
 # TASK-007 — Seeded sample archive
@@ -34,9 +34,9 @@ Fictional data staging the 1972/1974 situation, loaded through the command layer
 
 ## Acceptance criteria
 
-- [ ] Opening the app for the first time shows an archive with content
-- [ ] `v_open_disagreement` returns exactly one row after seeding
-- [ ] Seeding runs through the command layer and no constraint blocks it
+- [x] Opening the app for the first time shows an archive with content
+- [x] `v_open_disagreement` returns exactly one row after seeding
+- [x] Seeding runs through the command layer and no constraint blocks it
 
 ## Files touched
 

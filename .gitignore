@@ -5,3 +5,7 @@ dist/
 .env
 .env.*
 coverage/
+
+# Tooling artefacts, not source
+.playwright-mcp/
+*.png

@@ -4,7 +4,7 @@ title: Boot PGlite in a Web Worker
 branch: B
 day: 1
 depends_on: [TASK-002]
-status: todo
+status: done
 ---
 
 # TASK-003 — Boot PGlite in a Web Worker
@@ -34,10 +34,10 @@ status: todo
 
 ## Acceptance criteria
 
-- [ ] Reloading the page preserves data
-- [ ] Queries do not block the frame
-- [ ] Private browsing: run in memory and tell the user
-- [ ] No module outside `domain/` and `store/projection.ts` can import it
+- [x] Reloading the page preserves data
+- [x] Queries do not block the frame
+- [x] Private browsing: run in memory and tell the user
+- [x] No module outside `domain/` and `store/projection.ts` can import it
 
 ## Files touched
 
@@ -47,6 +47,10 @@ status: todo
 ## Notes
 
 R3 lives here. If this file leaks outward, the architecture stops meaning anything.
+
+> **Amended 2026-08-30.** The title and `src/domain/db.worker.ts` are out of date: `NFR-PERF-03`
+> now specifies the main thread, because the `@electric-sql/pglite/worker` wrapper multiplies
+> per-statement latency ~7x and breaks `NFR-PERF-05`. See `IMPL-TASK-003.md` → Deviations.
 
 ## When it is done
 
