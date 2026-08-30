@@ -1,0 +1,36 @@
+{
+  "name": "memoir-canvas",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Evidence-first family memory canvas built on WebMCP",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:evidence": "node scripts/evidence.mjs",
+    "db:verify": "node scripts/verify-constraints.mjs",
+    "arch:check": "bash scripts/check-invariants.sh"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zustand": "^4.5.5",
+    "three": "^0.169.0",
+    "@react-three/fiber": "^8.17.10",
+    "@react-three/drei": "^9.114.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.9",
+    "vitest": "^2.1.3"
+  }
+}

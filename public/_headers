@@ -1,0 +1,9 @@
+# Cloudflare Pages headers.
+#
+# PGlite persists to IndexedDB, which needs no cross-origin isolation — that is exactly why
+# we did not pick OPFS. Do NOT add COOP/COEP here unless someone deliberately moves storage
+# to OPFS SyncAccessHandle, and then re-test in the ChatGPT in-app browser first.
+
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer

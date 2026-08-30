@@ -1,0 +1,22 @@
+---
+description: Hồi Ký — project rules; the real content lives in .agent/
+globs: ["**/*"]
+alwaysApply: true
+---
+
+The real content lives in `.agent/AGENTS.md`. Read it before doing anything.
+
+The five invariants, in full in `.agent/rules/invariants.md`:
+
+- R1 — Agents enter only through `src/mcp/handlers.ts`. No hidden routes, no globals.
+- R2 — Humans and agents share one write door: `src/domain/commands.ts`.
+- R3 — Only the command layer touches the database. `src/domain/db.ts` is the sole owner.
+- R4 — The registry is a pure function `tools = f(uiState)`, computed only in `src/mcp/registry.ts`.
+- R5 — `src/view/` and `src/panels/` are read-only. They never mutate.
+
+Two frozen files. Changing either requires a task and a heads-up to the team:
+`src/domain/schema.sql`, `src/mcp/descriptors.ts`.
+
+No backend, no API routes, no runtime network calls.
+
+English for code and docs. Product content is bilingual (`*_vi` / `*_en`).

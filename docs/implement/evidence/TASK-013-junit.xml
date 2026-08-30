@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="7" failures="0" errors="0" time="0.207">
+    <testsuite name="tests/registry.spec.ts" timestamp="2026-08-29T16:06:05.360Z" hostname="quyn28654s-Mac-mini.local" tests="7" failures="0" errors="0" skipped="0" time="0.001937291">
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; always exposes the five base tools" time="0.000674875">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; does not expose flag_conflict for a subject with no disagreement" time="0.000351083">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; exposes flag_conflict once the open subject has a disagreement" time="0.000077875">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; does NOT expose resolve_claim merely because a person is open" time="0.000069667">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; exposes resolve_claim only while that conflict is on screen" time="0.000093584">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; withdraws resolve_claim once the conflict is closed" time="0.000121542">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; drops all three conditional tools on returning to the archive" time="0.000101667">
+        </testcase>
+    </testsuite>
+</testsuites>

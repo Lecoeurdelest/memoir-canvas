@@ -1,0 +1,173 @@
+{
+  "project": "memoir-canvas",
+  "description": "Evidence-first family memory canvas built on WebMCP. Agents must cite sources, surface uncertainty, and may never resolve a contradiction on their own.",
+  "agent_entrypoint": ".agent/AGENTS.md",
+  "language_policy": {
+    "code_and_docs": "English",
+    "product_content": "bilingual Vietnamese + English, paired *_vi / *_en columns",
+    "note": "Vietnamese in seed data and demo copy is intentional — the story is Vietnamese."
+  },
+  "authority_order": [
+    ".agent/rules/invariants.md",
+    "docs/ARCHITECTURE.md",
+    "docs/task/TASK-*.md",
+    "existing code"
+  ],
+  "frozen_files": [
+    {
+      "path": "src/domain/schema.sql",
+      "why": "data contract shared by all three branches",
+      "change_process": "open a task, notify the team, update docs/API_SCHEMA.md in the same PR"
+    },
+    {
+      "path": "src/mcp/descriptors.ts",
+      "why": "tool contract exposed to the agent",
+      "change_process": "open a task, notify the team, update docs/API_SCHEMA.md in the same PR"
+    }
+  ],
+  "invariants": [
+    {
+      "id": "R1",
+      "rule": "Agents enter only through mcp/handlers.ts",
+      "check": "grep -rn 'window\\.' src/"
+    },
+    {
+      "id": "R2",
+      "rule": "Humans and agents share one write door: commands.ts",
+      "check": "no SQL strings in src/mcp/handlers.ts"
+    },
+    {
+      "id": "R3",
+      "rule": "Only the command layer touches the database",
+      "check": "grep -rn 'from.*domain/db' src/"
+    },
+    {
+      "id": "R4",
+      "rule": "The registry is a pure function tools = f(uiState)",
+      "check": "provideContext( appears only in src/mcp/registry.ts"
+    },
+    {
+      "id": "R5",
+      "rule": "The view layer is read-only",
+      "check": "no domain state in useState/useRef under src/view, src/panels"
+    }
+  ],
+  "core_constraints": [
+    "claim_confirmed_needs_a_human — certainty='confirmed' requires confirmed_by and confirmed_at",
+    "claim_evidence_backed — document_supported requires evidence with stance='supports'",
+    "conflict_resolution_needs_a_human — resolving a conflict requires a named person"
+  ],
+  "ownership": [
+    {
+      "branch": "A",
+      "owns": [
+        "src/view/"
+      ],
+      "risk": "WebGL may not survive the ChatGPT in-app browser"
+    },
+    {
+      "branch": "B",
+      "owns": [
+        "src/domain/",
+        "src/mcp/",
+        "src/store/"
+      ],
+      "risk": "the WebMCP API name is not settled yet"
+    },
+    {
+      "branch": "C",
+      "owns": [
+        "src/panels/",
+        "src/seed/",
+        "docs/USER_GUIDE.md"
+      ],
+      "risk": "bilingual content takes longer than expected"
+    }
+  ],
+  "layers": [
+    {
+      "name": "view",
+      "path": "src/view/",
+      "reads": [
+        "src/store/"
+      ],
+      "writes": [
+        "src/domain/commands.ts"
+      ]
+    },
+    {
+      "name": "panels",
+      "path": "src/panels/",
+      "reads": [
+        "src/store/"
+      ],
+      "writes": [
+        "src/domain/commands.ts"
+      ]
+    },
+    {
+      "name": "mcp",
+      "path": "src/mcp/",
+      "reads": [
+        "src/store/"
+      ],
+      "writes": [
+        "src/domain/commands.ts"
+      ]
+    },
+    {
+      "name": "store",
+      "path": "src/store/",
+      "reads": [
+        "src/domain/db.ts"
+      ],
+      "writes": []
+    },
+    {
+      "name": "commands",
+      "path": "src/domain/commands.ts",
+      "reads": [
+        "src/domain/db.ts"
+      ],
+      "writes": [
+        "src/domain/db.ts"
+      ]
+    },
+    {
+      "name": "db",
+      "path": "src/domain/db.ts",
+      "reads": [
+        "src/domain/schema.sql"
+      ],
+      "writes": [
+        "PGlite / IndexedDB"
+      ]
+    }
+  ],
+  "docs": {
+    "map": "docs/_arch_map.md",
+    "architecture": "docs/ARCHITECTURE.md",
+    "api_schema": "docs/API_SCHEMA.md",
+    "requirements": "docs/requirements/README.md",
+    "tasks": "docs/task/README.md",
+    "implementation_log": "docs/implement/README.md",
+    "technical": "docs/technical/"
+  },
+  "commands": {
+    "install": "npm install",
+    "dev": "npm run dev",
+    "build": "npm run build",
+    "typecheck": "npm run typecheck",
+    "test": "npm test",
+    "evidence": "npm run test:evidence -- <TASK-ID>",
+    "verify_constraints": "npm run db:verify",
+    "check_invariants": "npm run arch:check"
+  },
+  "deadline": "2026-09-03T13:00:00-07:00",
+  "never": [
+    "add a backend, API route, or any runtime network call",
+    "let an agent set certainty='confirmed' without confirmed_by",
+    "drop or weaken the three core constraints in schema.sql",
+    "commit node_modules, secrets, or real family data"
+  ]
+}
