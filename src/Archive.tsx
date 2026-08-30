@@ -9,7 +9,7 @@
  */
 
 import { Suspense, lazy } from 'react';
-import { CssBook } from './view/CssBook';
+import { BookStage } from './view/BookStage';
 import { AuditTrail } from './panels/AuditTrail';
 import { StoryCard } from './panels/StoryCard';
 import { useStore } from './store/store';
@@ -77,7 +77,7 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
         </p>
       )}
 
-      <CssBook />
+      <BookStage />
 
       {cards.length > 0 && (
         <section aria-labelledby="cards-heading">

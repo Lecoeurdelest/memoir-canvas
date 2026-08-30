@@ -24,11 +24,22 @@ beforeEach(async () => {
 describe('spreads — the spine', () => {
   it('puts the two disputed claims on ONE spread, not two', async () => {
     const m = await buildReadModel();
-    expect(m.spreads).toHaveLength(1);
+    // The disagreement is one station, carrying both years. Everything else stands alone.
     expect(m.spreads[0].claims).toHaveLength(2);
+    expect(m.spreads[0].claims.map((c) => c.year_value)).toEqual([1972, 1974]);
+    expect(m.spreads.slice(1).every((s) => s.claims.length === 1)).toBe(true);
+  });
+
+  it('gives the road somewhere to go', async () => {
+    // A road with one station is not a road. The seed must span years for travel to mean anything.
+    const m = await buildReadModel();
+    expect(m.spreads.length).toBeGreaterThan(1);
+    const years = m.spreads.map((s) => s.claims[0].year_value);
+    expect(Math.max(...(years as number[])) - Math.min(...(years as number[]))).toBeGreaterThan(10);
   });
 
   it('gives a different assertion its own spread', async () => {
+    const before = (await buildReadModel()).spreads.length;
     await commands.addMemoryClaim(
       {
         subject_kind: 'person',
@@ -40,8 +51,13 @@ describe('spreads — the spine', () => {
       HUMAN,
     );
     const m = await buildReadModel();
-    expect(m.spreads).toHaveLength(2);
-    expect(m.spreads.map((s) => s.predicate).sort()).toEqual(['moved_to', 'opened_business']);
+    expect(m.spreads).toHaveLength(before + 1);
+
+    // The seed's own opened_business claim names a PLACE; this one names text. schema.sql:173
+    // says those never group, so this must be its own station rather than a second disagreement.
+    const byText = m.spreads.filter((s) => s.predicate === 'opened_business');
+    expect(byText).toHaveLength(2);
+    expect(byText.every((s) => s.claims.length === 1)).toBe(true);
   });
 
   it('orders the spine by year', async () => {

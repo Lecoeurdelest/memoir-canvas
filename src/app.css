@@ -267,3 +267,99 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
                              color: var(--ink); font-variant-numeric: tabular-nums; }
 .evidence-panel + .evidence-panel { margin-top: 18px; padding-top: 14px;
                                     border-top: 1px solid var(--rule); }
+
+/* ── The road ───────────────────────────────────────────────────────────────────────────────
+   Depth is CSS perspective, not WebGL: no bundle cost, correct Vietnamese shaping for free, and
+   no GL context to lose in an in-app webview.
+
+   You are looking down a lit strip of paper into the dark. The stage carries its own deep ground
+   so the far past dissolves into the same substance the void is made of — and so the road itself
+   reads as LIT rather than as a pale wedge on a pale page. The world is scenery and aria-hidden;
+   every year it draws is also a real button in the spine. */
+
+.road-stage { position: relative; height: clamp(240px, 44vh, 400px); overflow: hidden;
+              margin: 18px 0 0; border-radius: 3px;
+              perspective: 720px; perspective-origin: 50% 40%;
+              background: radial-gradient(120% 80% at 50% 92%, #3b3833 0%, #22211d 45%, #171713 100%); }
+.road-stage:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.road-world { position: absolute; inset: 0; transform-style: preserve-3d;
+              transition: transform 900ms cubic-bezier(.33, .02, .2, 1); }
+
+/* The pages, laid end to end. The repeating rule is what makes travel legible as motion. */
+.road-ground { position: absolute; left: 50%; bottom: -14%; width: 420px; height: 4200px;
+               margin-left: -210px; transform-origin: 50% 100%; transform: rotateX(87deg);
+               background-color: #e8e5db;
+               background-image:
+                 repeating-linear-gradient(to top, rgba(29,35,33,.13) 0 2px, transparent 2px 150px),
+                 linear-gradient(90deg, #cdc8b8 0 10px, transparent 10px calc(100% - 10px),
+                                 #cdc8b8 calc(100% - 10px) 100%);
+               -webkit-mask-image: linear-gradient(to top, #000 0 8%, rgba(0,0,0,.5) 24%, transparent 46%);
+               mask-image: linear-gradient(to top, #000 0 8%, rgba(0,0,0,.5) 24%, transparent 46%); }
+
+/* Verge posts: the cheapest thing in the scene and the largest part of the sensation of speed. */
+.milestone { position: absolute; left: 50%; bottom: 30%; transform-style: preserve-3d;
+             display: flex; flex-direction: column-reverse; align-items: center; gap: 5px; }
+.milestone .post { display: block; width: 3px; height: 30px; background: #b9b2a0; }
+.milestone-year { font-family: "Newsreader", Georgia, serif; font-size: 17px;
+                  font-variant-numeric: tabular-nums; color: #cdc8b8; white-space: nowrap; }
+.milestone.here .post { background: var(--paper); height: 40px; }
+.milestone.here .milestone-year { color: #fff; font-size: 22px; font-weight: 600; }
+.milestone.torn .post { background: var(--lacquer); }
+.milestone.torn .milestone-year { color: #d9705e; }
+
+/* The gap in the paper. Nothing is drawn beneath it — you see the same dark the far past
+   dissolves into, because the past under the road and the past at the horizon are one substance. */
+.chasm { position: absolute; left: -4%; width: 108%; height: 120px; }
+.chasm::before { content: ""; position: absolute; inset: 26px 0; background: #100f0c; }
+.chasm .lip { position: absolute; left: 0; width: 100%; height: 30px; background: #e8e5db; }
+.chasm .lip.near { top: 0; clip-path: polygon(0 0, 100% 0, 100% 42%, 92% 82%, 84% 38%, 73% 88%,
+                                              61% 42%, 52% 94%, 41% 44%, 30% 90%, 19% 40%,
+                                              9% 84%, 0 46%); }
+.chasm .lip.far { bottom: 0; clip-path: polygon(0 56%, 8% 14%, 18% 62%, 29% 10%, 40% 58%,
+                                                51% 6%, 62% 60%, 72% 12%, 83% 64%, 93% 16%,
+                                                100% 60%, 100% 100%, 0 100%); }
+
+/* The lamp that travels with you: the ten metres you occupy are legible, everything beyond is a
+   rumour. One gradient, bolted to the viewport rather than the world. */
+.fog { position: absolute; inset: 0; pointer-events: none;
+       background: radial-gradient(90% 55% at 50% 100%, rgba(255,247,225,.16) 0%,
+                                   rgba(255,247,225,0) 62%),
+                   linear-gradient(to bottom, #171713 0 14%, rgba(23,23,19,0) 46%); }
+
+.road-blocked { position: absolute; left: 0; right: 0; top: 14px; margin: 0; text-align: center;
+                font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+                color: #d9705e; }
+
+.road .controls { margin-top: 12px; }
+.skin-toggle { margin: 10px 0 0; font: inherit; font-size: 12px; padding: 4px 10px;
+               background: none; border: 1px solid var(--rule); border-radius: 3px;
+               color: var(--ink-soft); cursor: pointer; }
+.skin-toggle:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+.vertebra.locked { opacity: .38; cursor: not-allowed; }
+
+/* NFR-A11Y-04 — reduced motion means no MOTION, not no depth. The road keeps its perspective;
+   travel becomes an instant cut. */
+@media (prefers-reduced-motion: reduce) {
+  .road-world { transition: none; }
+}
+
+/* The torn page standing across the road. Ragged along its TOP edge, because that is where the
+   paper gave way; the fibre line is lacquer, the same red the flat book uses for a tear.
+   The polygon is deliberately irregular — an even zigzag reads as bunting, not as torn paper. */
+.roadblock { position: absolute; left: 50%; bottom: 16%; width: 232px; height: 84px;
+             transform-style: preserve-3d; }
+.roadblock .sheet { position: absolute; inset: 0; background: #efece1;
+                    box-shadow: 0 12px 30px rgba(0,0,0,.6);
+                    clip-path: polygon(0 34%, 4% 12%, 9% 30%, 12% 19%, 19% 41%, 24% 8%,
+                                       27% 27%, 34% 15%, 39% 38%, 46% 6%, 51% 24%, 55% 11%,
+                                       62% 36%, 68% 17%, 71% 30%, 78% 9%, 84% 33%, 89% 20%,
+                                       95% 39%, 100% 22%, 100% 100%, 0 100%); }
+.roadblock::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 44%;
+                    background: linear-gradient(to bottom, rgba(140,47,34,.62), rgba(140,47,34,0));
+                    clip-path: polygon(0 34%, 4% 12%, 9% 30%, 12% 19%, 19% 41%, 24% 8%,
+                                       27% 27%, 34% 15%, 39% 38%, 46% 6%, 51% 24%, 55% 11%,
+                                       62% 36%, 68% 17%, 71% 30%, 78% 9%, 84% 33%, 89% 20%,
+                                       95% 39%, 100% 22%, 100% 100%, 0 100%);
+                    pointer-events: none; }

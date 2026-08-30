@@ -38,6 +38,10 @@ export const isEmpty = commands.isArchiveEmpty;
  * The disagreement is left latent in the data for `v_open_disagreement` to notice and for the
  * agent to flag with `flag_conflict` — that is steps 5-6 of the core scenario, and pre-baking
  * it would hollow out the demo.
+ *
+ * The three claims after the disagreement exist so the archive has somewhere to GO. A road with
+ * one station is not a road, and every later claim is dated after 1974 so the disputed `moved_to`
+ * group stays `spreads[0]` — which core-loop.spec.ts and spreads.spec.ts index positionally.
  */
 export async function loadSeed(): Promise<SeededArchive> {
   // ── the family ──────────────────────────────────────────────────────────────
@@ -129,7 +133,56 @@ export async function loadSeed(): Promise<SeededArchive> {
     SEED_CTX,
   );
 
-  void oralAccount;
+  // ── the rest of the road ────────────────────────────────────────────────────
+  // Dated after 1974 on purpose: see the note above about spreads[0].
+  //
+  // These use object_place_id where the spreads test uses object_text for the same predicate.
+  // schema.sql:173 says those two never group together, so the test's own claims stay in their
+  // own spread instead of silently becoming a second disagreement.
+
+  // The shop the oral account already mentions, resting on that same recollection.
+  const shop = await commands.addMemoryClaim(
+    {
+      subject_kind: 'person',
+      subject_id: grandmaId,
+      predicate: 'opened_business',
+      object_place_id: daNangId,
+      year_value: 1976,
+      year_precision: 'circa',
+      certainty: 'oral',
+    },
+    SEED_CTX,
+  );
+
+  await commands.linkClaimToSource(
+    { claim_id: shop, stance: 'supports', excerpt: 'mở một tiệm may', source_id: oralAccount.sourceId },
+    SEED_CTX,
+  );
+
+  // Nothing backs this one. The road should show a station that rests on nobody's word.
+  await commands.addMemoryClaim(
+    {
+      subject_kind: 'person',
+      subject_id: motherId,
+      predicate: 'born_in',
+      object_place_id: daNangId,
+      year_value: 1981,
+    },
+    SEED_CTX,
+  );
+
+  await commands.addMemoryClaim(
+    {
+      subject_kind: 'person',
+      subject_id: uncleId,
+      predicate: 'moved_to',
+      object_place_id: hoiAnId,
+      year_value: 1995,
+      year_precision: 'exact',
+      certainty: 'oral',
+    },
+    SEED_CTX,
+  );
 
   return { grandmaId, uncleId, motherId, daNangId, hoiAnId, claim1972, claim1974 };
 }
