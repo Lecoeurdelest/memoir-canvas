@@ -3,7 +3,7 @@ id: TASK-031
 title: Backstage — one door to the machinery
 branch: C
 day: 5
-depends_on: [TASK-024, TASK-030]
+depends_on: [TASK-024, TASK-030, TASK-033]
 status: todo
 ---
 
@@ -13,7 +13,7 @@ status: todo
 |---|---|
 | **Branch** | C · panels/ |
 | **Planned day** | Day 5 |
-| **Depends on** | `TASK-024`, `TASK-030` |
+| **Depends on** | `TASK-024`, `TASK-030`, `TASK-033` |
 | **Requirements** | [`FR-MCP`](../requirements/functional/FR-MCP-tool-surface.md), [`FR-I18N`](../requirements/functional/FR-I18N-bilingual.md), [`NFR-A11Y`](../requirements/non-functional/NFR-A11Y-accessibility.md), [`NFR-PRIV`](../requirements/non-functional/NFR-PRIV-privacy-local-first.md) |
 
 ## Goal
@@ -60,16 +60,16 @@ If a judge cannot see those, the project's entire argument is unevidenced.
 
 **One drawer, two entrances**, and the second entrance is the point.
 
-**Entrance one — passive.** A single quiet line at the foot of the page: `Hậu trường · Behind the
-page`. Discoverable, never imposed.
+**Entrance one — passive.** A single quiet line at the foot of the page, naming the backstage.
+Discoverable, never imposed.
 
 **Entrance two — the story produces the refusal itself.** On a blocked road, between the two
-competing claims, a control in plain Vietnamese: **"Nhờ trợ lý quyết giùm"** / *"Ask the assistant
-to settle it"* — the question every ordinary person asks of a computer.
+competing claims, a control phrased as the question every ordinary person asks of a computer:
+*ask the assistant to settle it*.
 
 It calls the real agent handler as `app_agent`, is genuinely refused by Postgres, and renders the
-refusal verbatim in place, with the constraint name beneath it and one link: *"Xem chuyện gì vừa
-xảy ra →"*, which opens Backstage at the audit row that attempt just wrote.
+refusal verbatim in place, with the constraint name beneath it and one link — *see what just
+happened* — which opens Backstage at the audit row that attempt just wrote.
 
 A family member presses a button whose meaning is obvious and gets the answer to their own
 question. A judge, standing on the blocked road, is handed the whole thesis without hunting.
@@ -78,10 +78,9 @@ question. A judge, standing on the blocked road, is handed the whole thesis with
 
 - `src/panels/Backstage.tsx` — one `<dialog>`, Esc to close, focus trapped, holding the boot facts, `ManualToolPanel` and `AuditTrail` unchanged
 - the two entrances above
-- the actor toggle **relabelled**, not removed: legend `Chạy lệnh này với vai trò`, options naming the Postgres roles — `Trợ lý AI — app_agent` and `Người trong nhà — app_human`
+- the actor toggle **relabelled**, not removed: the legend says which Postgres role the next call assumes, and each option names its role (`app_agent`, `app_human`) beside the plain-language name. Naming the roles on the radio buttons is the cheapest credibility win in the app — it turns a UI affectation into a visible statement about GRANTs
 - `Spread.tsx` renders a readable sentence, not `subject · predicate`
-- every remaining hard-coded English string moved into a bilingual `COPY` block
-- `lang` initialises from `navigator.language` and persists to `localStorage` — no question asked
+- every string this task introduces or touches goes into the `TASK-033` catalogue, not into a new private `COPY` block
 
 ## Out of scope
 
@@ -95,7 +94,7 @@ question. A judge, standing on the blocked road, is handed the whole thesis with
 - [ ] No English string is shown while `lang` is `'vi'`
 - [ ] No raw database identifier (`moved_to`, `subject_id`, a UUID) appears outside Backstage
 - [ ] Every one of the six judge needs above is reachable within one gesture of first paint
-- [ ] "Nhờ trợ lý quyết giùm" is refused by Postgres, and the refusal is shown verbatim, not paraphrased
+- [ ] The ask-the-assistant control is refused by Postgres, and the refusal is shown verbatim, not paraphrased
 - [ ] That refusal writes an audit row, and the link reaches it
 - [ ] Backstage traps focus, closes on Esc, and returns focus to its opener (`NFR-A11Y-03`)
 - [ ] The actor toggle still exists and still demonstrates the refusal (`FR-MCP`)
@@ -108,11 +107,16 @@ question. A judge, standing on the blocked road, is handed the whole thesis with
 - `src/view/Spread.tsx`
 - `src/panels/ManualToolPanel.tsx`
 - `src/panels/AuditTrail.tsx`
-- `src/store/store.ts`
 - `src/app.css`
 - `tests/backstage.spec.ts` (new)
 
 ## Notes
+
+**Wording is authored in the catalogue, not here.** An earlier draft of this document specified the
+Vietnamese button copy inline, which broke `code-style.md` ("English everywhere ... and
+documentation") and, worse, made a task doc the de-facto string catalogue. `TASK-033` gives those
+strings a home; this document describes what each control must *mean* and leaves the phrasing to
+the catalogue.
 
 `NFR-PRIV-03` bears on the wording: `confirmed_by` is **provenance, not authentication**. Backstage
 must not present a named confirmer as proof of identity.

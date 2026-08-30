@@ -1,6 +1,6 @@
 # Tasks
 
-32 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
+33 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
 inserted in the middle.
 
 Four tasks are **superseded**: the direction changed after the DAY 4 GATE and the book became a
@@ -42,8 +42,9 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-028`](TASK-028-deploy-static.md) | Static deploy | B | 5 | `TASK-027` | ☐ |
 | [`TASK-029`](TASK-029-devpost-submission.md) | Devpost submission and video | C | 6 | `TASK-027`, `TASK-028` | ☐ |
 | [`TASK-030`](TASK-030-the-road.md) | The road | A | 5 | `TASK-010`, `TASK-018`, `TASK-025` | ☑ |
-| [`TASK-031`](TASK-031-backstage.md) | Backstage — one door to the machinery | C | 5 | `TASK-024`, `TASK-030` | ☐ |
+| [`TASK-031`](TASK-031-backstage.md) | Backstage — one door to the machinery | C | 5 | `TASK-024`, `TASK-030`, `TASK-033` | ☐ |
 | [`TASK-032`](TASK-032-photos-on-the-road.md) | Photos on the road, with nothing to configure | C | 5 | `TASK-030` | ☐ |
+| [`TASK-033`](TASK-033-i18n-catalogue.md) | One string catalogue | C | 5 | `TASK-030` | ☐ |
 
 ## Milestones
 
