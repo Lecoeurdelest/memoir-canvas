@@ -67,12 +67,17 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/store/projection.ts` | PGlite → read model | `TASK-010` |
 | `src/store/store.ts` | Zustand, holds the projection only | `TASK-010` |
 | `src/store/uiState.ts` | what the user is looking at — the registry depends on this | `TASK-010` |
-| `src/view/Book.tsx` | R3F scene, book mesh | `TASK-015` |
-| `src/view/Spread.tsx` | the spread, content through `<Html>` | `TASK-016` |
-| `src/view/PageTurn.tsx` | turning pages, spine as timeline | `TASK-017` |
+| `src/view/useSpreadNavigation.ts` | **the single navigation truth** — state, the wedge rule, the R4 `setUi` contract. Both skins consume it | `TASK-030` |
+| `src/view/BookStage.tsx` | picks the skin: the road, or the flat list via `?flat=1` | `TASK-030` |
+| `src/view/BookControls.tsx` | the milestone list and turn controls, shared by both skins — real DOM, outside any transform | `TASK-030` |
+| `src/view/Road.tsx` | the road, in CSS perspective. **No WebGL** | `TASK-030` |
+| `src/view/webgl.ts` | memoised WebGL preflight and the `?flat=1` escape hatch | `TASK-030` |
+| `src/view/Spread.tsx` | one station's content, as ordinary DOM | `TASK-016` (superseded), `TASK-030` |
 | `src/view/Tear.tsx` | the conflict tear and its healing | `TASK-018`, `TASK-019` |
-| `src/view/Constellation.tsx` | the relationship constellation | `TASK-020` |
-| `src/view/CssBook.tsx` | the CSS 3D fallback | `TASK-026` |
+| `src/view/CssBook.tsx` | the flat list — the escape hatch, not a fallback | `TASK-026`, `TASK-030` |
+| `src/view/Book.tsx` | **dead stub** — kept so the supersession stays legible | `TASK-015` (superseded) |
+| `src/view/PageTurn.tsx` | **dead stub** | `TASK-017` (superseded) |
+| `src/view/Constellation.tsx` | **dead stub** | `TASK-020` (superseded) |
 | `src/panels/CertaintyBadge.tsx` | 5 labels, bilingual, not colour-only | `TASK-021` |
 | `src/panels/EvidencePanel.tsx` | sources, excerpts, stance | `TASK-022` |
 | `src/panels/StoryCard.tsx` | the bilingual story card | `TASK-023` |
@@ -152,6 +157,7 @@ PR**. A map pointing the wrong way is worse than no map.
 | `tests/panels.spec.ts` | every tool has a readable sentence; contradicting sources sort first | `TASK-022`, `TASK-024` |
 | `tests/spreads.spec.ts` | the tear exists iff a conflict is open, and healing names a person | `TASK-018`, `TASK-019`, `TASK-026` |
 | `tests/core-loop.spec.ts` | **the demo core end to end**, and that the button and the tool are one function | `TASK-025`, `TASK-008` |
+| `tests/navigation.spec.ts` | the wedge refuses **every** route, including the milestone list | `TASK-030` |
 
 Tests run against a real in-memory PGlite, never a mock: every guarantee they check is enforced
 by SQL, and a mocked database cannot refuse anything.

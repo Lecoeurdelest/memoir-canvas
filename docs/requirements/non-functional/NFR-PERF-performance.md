@@ -47,3 +47,26 @@ a desktop number as though it were a device number.
 - **-05** raised 300 → 400 ms and made the budget name what it actually covers.
 - Acceptance was unsatisfiable as written: no tool anyone has attaches to the ChatGPT in-app
   browser. Self-reporting replaces it.
+
+## Amended 2026-08-30 (second) — the cost of WebGL, measured
+
+`TASK-015`/`016`/`017` assumed a WebGL scene was affordable. It was measured before being
+superseded, with production Vite builds against this repo's own `node_modules`, gzip of emitted JS:
+
+| Bundle | Total | Marginal over baseline |
+|---|---|---|
+| react + react-dom (baseline) | 45.6 kB gz | — |
+| + `three` + `@react-three/fiber` | 263.0 kB gz | **+212.3 kB gz** |
+| + drei `{Html, ScrollControls, Image, Billboard, PerspectiveCamera, AdaptiveDpr, Preload}` | 273.0 kB gz | **+222.1 kB gz** |
+
+`three` **does not tree-shake under R3F**: `@react-three/fiber` does `import * as THREE` and
+`extend(THREE)` to populate its JSX element catalogue, so 212 kB is the floor rather than the
+unshaken figure. Against an entry chunk of 46.97 kB gz, a scene costs 4.7× the app.
+
+One piece of good news, also measured: drei sets `"sideEffects": false`, and a bundle importing
+named helpers from the bare barrel contained **zero** occurrences of `troika` and zero of the
+jsdelivr string. Only `Text` pulls troika in (+33 kB gz, and the CDN URL with it). Deep imports are
+therefore not required to stay CSP-clean — but `Text` must never be imported.
+
+`TASK-030` ships the road in CSS perspective at **0 kB** of added JavaScript. Entry chunk after it:
+145.37 kB / **46.97 kB gz** — byte-identical to before.

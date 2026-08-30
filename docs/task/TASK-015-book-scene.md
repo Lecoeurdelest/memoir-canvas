@@ -4,7 +4,8 @@ title: The 3D book scene
 branch: A
 day: 2
 depends_on: [TASK-001]
-status: todo
+status: superseded
+superseded_by: TASK-030
 ---
 
 # TASK-015 — The 3D book scene
@@ -54,3 +55,18 @@ Branch A starts on day 2 and is blocked by nobody. The largest WebGL risk sits i
 2. `npm run test:evidence -- TASK-015`
 3. Write `docs/implement/IMPL-TASK-015.md` from `docs/implement/TEMPLATE.md`
 4. Walk `.agent/workflows/review-checklist.md`
+
+## Superseded 2026-08-30 — by `TASK-030`
+
+The direction changed after the DAY 4 GATE: the book opens into a **road**, and `TASK-030` builds
+it in CSS perspective rather than WebGL.
+
+Measured before deciding, against this repo's own `node_modules`: `three` + `@react-three/fiber`
+in a production Vite build costs **+212 kB gzipped** over a React-only baseline, ~222 kB with the
+drei helpers a scene needs. `three` does not tree-shake under R3F — R3F does `import * as THREE`
+and `extend(THREE)` — so that is the floor. Against a 47 kB gz entry chunk, and with
+`troika-three-text` blocked by the shipped CSP for hard-coding a jsdelivr font URL, the scene
+would have cost 4.7× the app to deliver worse Vietnamese text.
+
+`src/view/Book.tsx` remains a stub and is now dead. Deleting it is deferred to keep this
+supersession legible in the tree.

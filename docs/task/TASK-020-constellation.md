@@ -4,7 +4,8 @@ title: The relationship constellation
 branch: A
 day: 4
 depends_on: [TASK-016]
-status: todo
+status: superseded
+superseded_by: TASK-030
 ---
 
 # TASK-020 — The relationship constellation
@@ -48,3 +49,14 @@ The first task to cut if the schedule slips. Lovely, but not the core.
 2. `npm run test:evidence -- TASK-020`
 3. Write `docs/implement/IMPL-TASK-020.md` from `docs/implement/TEMPLATE.md`
 4. Walk `.agent/workflows/review-checklist.md`
+
+## Superseded 2026-08-30 — deferred, not cut
+
+This was always the first task to cut if the schedule slipped, and the schedule has slipped into a
+direction change. `FR-BOOK-05` is marked deferred in the second `FR-BOOK` amendment.
+
+The road gives it a better home than the book did — relationship structure belongs on the verge,
+beside the years it spans, rather than floating above a book. Nothing is built and nothing is
+promised.
+
+`src/view/Constellation.tsx` remains a stub.

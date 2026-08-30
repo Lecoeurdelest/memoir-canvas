@@ -47,3 +47,27 @@ Measured this day, which changes what is worth requiring:
   version that can exist.
 - **-06** "day one" has passed with zero commits, and half the requirement never needed a phone.
   Split so the automatable half can be enforced today.
+
+## Amended 2026-08-30 (second) — -01 now holds by construction
+
+`NFR-PORT-01` required the app to paint and stay painted with WebGL unavailable. Until `TASK-030`
+that meant maintaining a fallback and trusting it. The road uses no WebGL at all, so there is no
+GL context to lose, nothing to preflight before the first frame, and no second code path to keep
+in sync — `useSpreadNavigation` is the only navigation truth and both skins consume it.
+
+Verified rather than asserted, Chrome launched with `--disable-3d-apis` against the production
+build with the shipped headers:
+
+| Check | Result |
+|---|---|
+| `canvas.getContext('webgl')` / `('webgl2')` | `null` / `null` |
+| Canvas elements in the document | **0** |
+| Road painted | yes — `perspective: 720px` |
+| Travel | world transform → `translateZ(260px)`, station advances |
+| Page errors | 0 |
+
+A second consequence worth recording: `webglcontextlost` — which mobile browsers fire when a tab is
+backgrounded, and which was the largest retention risk for an in-app webview — cannot occur.
+
+The physical-device check (`TASK-027`) is still outstanding and is the one thing that cannot be
+verified from a development machine.

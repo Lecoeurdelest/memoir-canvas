@@ -4,7 +4,8 @@ title: The page spread
 branch: A
 day: 2
 depends_on: [TASK-010, TASK-015]
-status: todo
+status: superseded
+superseded_by: TASK-030
 ---
 
 # TASK-016 — The page spread
@@ -53,3 +54,12 @@ Each spread is one story card: recollection left, evidence right. Content is DOM
 2. `npm run test:evidence -- TASK-016`
 3. Write `docs/implement/IMPL-TASK-016.md` from `docs/implement/TEMPLATE.md`
 4. Walk `.agent/workflows/review-checklist.md`
+
+## Superseded 2026-08-30 — by `TASK-030`
+
+This task was already annotated as untestable until `TASK-015` existed. `TASK-015` is superseded,
+and the road renders station content as ordinary DOM in the ordinary document — so the criterion
+this task was waiting on, *"diacritics render correctly inside the 3D scene"*, is satisfied by
+construction rather than by test: there is no scene-local text stack to get Vietnamese wrong.
+
+`src/view/Spread.tsx` survives and is used unchanged by both skins.

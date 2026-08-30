@@ -4,7 +4,8 @@ title: Turning pages
 branch: A
 day: 3
 depends_on: [TASK-016]
-status: todo
+status: superseded
+superseded_by: TASK-030
 ---
 
 # TASK-017 — Turning pages
@@ -51,3 +52,13 @@ A rotating hinge with easing is enough for the brain to read it as “turning”
 2. `npm run test:evidence -- TASK-017`
 3. Write `docs/implement/IMPL-TASK-017.md` from `docs/implement/TEMPLATE.md`
 4. Walk `.agent/workflows/review-checklist.md`
+
+## Superseded 2026-08-30 — by `TASK-030`
+
+There is no hinge to rotate. Travel is a rig translating in Z along a road, implemented as a CSS
+`transform` transition on the world with `prefers-reduced-motion` collapsing it to an instant cut.
+
+The two criteria worth keeping were kept: keyboard travel and reduced motion. Both are acceptance
+criteria on `TASK-030` and are covered by `tests/navigation.spec.ts`.
+
+`src/view/PageTurn.tsx` remains a stub and is now dead.

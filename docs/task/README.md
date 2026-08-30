@@ -1,7 +1,10 @@
 # Tasks
 
-29 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
+32 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
 inserted in the middle.
+
+Four tasks are **superseded**: the direction changed after the DAY 4 GATE and the book became a
+road. See the second amendment in [`FR-BOOK`](../requirements/functional/FR-BOOK-book-canvas.md).
 
 How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick-a-task.md)
 
@@ -23,12 +26,12 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-012`](TASK-012-static-registry.md) | Static registry | B | 2 | `TASK-006`, `TASK-011` | ☐ |
 | [`TASK-013`](TASK-013-dynamic-registry.md) | Stateful tool registration | B | 3 | `TASK-010`, `TASK-012` | ☑ |
 | [`TASK-014`](TASK-014-conflict-detection.md) | Detect and record conflicts | B | 3 | `TASK-008`, `TASK-013` | ☑ |
-| [`TASK-015`](TASK-015-book-scene.md) | The 3D book scene | A | 2 | `TASK-001` | ☐ |
-| [`TASK-016`](TASK-016-page-spread.md) | The page spread | A | 2 | `TASK-010`, `TASK-015` | ☐ |
-| [`TASK-017`](TASK-017-page-turn.md) | Turning pages | A | 3 | `TASK-016` | ☐ |
+| [`TASK-015`](TASK-015-book-scene.md) | The 3D book scene | A | 2 | `TASK-001` | ☒ superseded by `TASK-030` |
+| [`TASK-016`](TASK-016-page-spread.md) | The page spread | A | 2 | `TASK-010`, `TASK-015` | ☒ superseded by `TASK-030` |
+| [`TASK-017`](TASK-017-page-turn.md) | Turning pages | A | 3 | `TASK-016` | ☒ superseded by `TASK-030` |
 | [`TASK-018`](TASK-018-tear-conflict.md) | The conflict tear | A | 3 | `TASK-014`, `TASK-016` | ☑ |
 | [`TASK-019`](TASK-019-tear-heal.md) | Healing the tear | A | 3 | `TASK-018` | ☑ |
-| [`TASK-020`](TASK-020-constellation.md) | The relationship constellation | A | 4 | `TASK-016` | ☐ |
+| [`TASK-020`](TASK-020-constellation.md) | The relationship constellation | A | 4 | `TASK-016` | ☒ superseded — deferred |
 | [`TASK-021`](TASK-021-certainty-badges.md) | Certainty badges | C | 2 | `TASK-004` | ☑ |
 | [`TASK-022`](TASK-022-evidence-panel.md) | The evidence panel | C | 3 | `TASK-010`, `TASK-021` | ☑ |
 | [`TASK-023`](TASK-023-story-card.md) | The bilingual story card | C | 4 | `TASK-010`, `TASK-021` | ☑ |
@@ -38,6 +41,9 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-027`](TASK-027-webview-conformance.md) | Confirm behaviour in the in-app browser | B | 5 | `TASK-025` | ☐ |
 | [`TASK-028`](TASK-028-deploy-static.md) | Static deploy | B | 5 | `TASK-027` | ☐ |
 | [`TASK-029`](TASK-029-devpost-submission.md) | Devpost submission and video | C | 6 | `TASK-027`, `TASK-028` | ☐ |
+| [`TASK-030`](TASK-030-the-road.md) | The road | A | 5 | `TASK-010`, `TASK-018`, `TASK-025` | ☑ |
+| [`TASK-031`](TASK-031-backstage.md) | Backstage — one door to the machinery | C | 5 | `TASK-024`, `TASK-030` | ☐ |
+| [`TASK-032`](TASK-032-photos-on-the-road.md) | Photos on the road, with nothing to configure | C | 5 | `TASK-030` | ☐ |
 
 ## Milestones
 

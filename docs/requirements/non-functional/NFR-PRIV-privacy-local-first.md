@@ -51,3 +51,37 @@ once a font is actually rendered.
   reading Vietnamese. There is no CSP and no CI assertion stopping branch A from landing that.
 - **-03** was true as written but invited a misreading: `person.id` plus `confirmed_by` looks like
   an identity system and must not be presented as one.
+
+## Amended 2026-08-30 (second)
+
+**-01 overstated its own enforcement.** It claimed the rule was enforced "by a Content-Security-
+Policy in `public/_headers` **and a network assertion in CI**". There is no CI. `.github/` holds
+only `copilot-instructions.md`; there is no `.github/workflows/` directory, no Playwright or
+Puppeteer in `package.json`, and no test that references `fetch`, the network, or `_headers`.
+
+For a project whose argument is that a system must not claim more than it can prove, a requirement
+that overstates its own enforcement is the worst possible defect. The CSP is real and was measured
+against a production build; the CI assertion is aspiration. Read -01 as: **enforced by the CSP,
+and verified by hand against `dist/` served with the shipped headers.**
+
+Recorded verification for `TASK-030`, production build, shipped headers, Chrome: zero requests to
+any host other than the origin, zero CSP violations, across the whole demo core including the
+agent's refusal. Evidence in `docs/implement/IMPL-TASK-030.md`.
+
+**Google Photos / Calendar integration was investigated and rejected.** Not on privacy taste — on
+three findings, of which the third is decisive and specific to this project:
+
+1. Google removed the broad Photos Library scopes after 2025-03-31; no API at any tier enumerates
+   a user's existing photos any more.
+2. The replacement Picker API requires the user to hand-pick every photo, per session, which is
+   the opposite of the "nothing to configure" the direction asked for.
+3. **Google blocks its OAuth authorization endpoint inside embedded webviews** (`disallowed_useragent`;
+   `WKWebView` named). `NFR-PORT` requires this app to work in the ChatGPT in-app browser, which is
+   WKWebView-backed — so the consent screen would not load on the one platform that matters.
+
+Two claims made during that investigation were **wrong** and are corrected here so nobody repeats
+them: OAuth app verification is *not* required for a Testing-status app, and *no* CSP directive
+governs a top-level navigation or `window.open`. Neither was ever the real blocker.
+
+`TASK-032` carries the alternative, which is a stronger privacy sentence than any integration:
+the family's photographs are read from the device and never leave it.
