@@ -55,6 +55,8 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/Archive.tsx` | the shell a person sees once the archive opens; lazily loaded | `TASK-012` |
 | `src/bootstrap.ts` | seed, build the read model, hand the tool set to WebMCP; lazily loaded | `TASK-003`, `TASK-012` |
 | `src/app.css` | the DOM styles that paint the first frame without WebGL | `TASK-012` |
+| `src/i18n/index.ts` | i18next init — resources bundled, `vi` as fallback, browser detection cached to localStorage | `TASK-033` |
+| `src/i18n/locales/{vi,en}.json` | every interface string. **Not** `question_vi` / `title_vi` / `body_vi` — those are bilingual data columns and stay in Postgres | `TASK-033` |
 | `src/domain/schema.sql` | 11 tables, 8 enums, the core constraints, two roles + column grants, the actor-stamping and coherence triggers, the disagreement view | `TASK-002`, `TASK-014` |
 | `src/domain/db.ts` | owns the PGlite connection, schema bootstrap, IndexedDB fallback, and write queue | `TASK-003` |
 | `src/domain/types.ts` | the single source of types, mirroring the schema | `TASK-004` |
@@ -158,6 +160,7 @@ PR**. A map pointing the wrong way is worse than no map.
 | `tests/spreads.spec.ts` | the tear exists iff a conflict is open, and healing names a person | `TASK-018`, `TASK-019`, `TASK-026` |
 | `tests/core-loop.spec.ts` | **the demo core end to end**, and that the button and the tool are one function | `TASK-025`, `TASK-008` |
 | `tests/navigation.spec.ts` | the wedge refuses **every** route, including the milestone list | `TASK-030` |
+| `tests/i18n.spec.ts` | the two languages cannot drift apart; plurals and interpolation come from i18next | `TASK-033` |
 
 Tests run against a real in-memory PGlite, never a mock: every guarantee they check is enforced
 by SQL, and a mocked database cannot refuse anything.

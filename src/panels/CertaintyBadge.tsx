@@ -8,6 +8,7 @@
  * R5: pure presentation, no store access, no writes.
  */
 
+import { resources } from '../i18n';
 import type { Certainty } from '../domain/types';
 
 type Lang = 'vi' | 'en';
@@ -16,13 +17,31 @@ type Lang = 'vi' | 'en';
  * Ordered weakest to strongest, matching CERTAINTY_ORDER and the SQL enum. The glyphs are a
  * filling scale rather than five unrelated icons, so the ranking reads without the colour.
  */
-export const LABELS: Record<Certainty, { vi: string; en: string; glyph: string }> = {
-  uncertain: { vi: 'Chưa rõ', en: 'Uncertain', glyph: '○' },
-  oral: { vi: 'Lời kể', en: 'Oral recollection', glyph: '◔' },
-  document_supported: { vi: 'Có tài liệu', en: 'Document-supported', glyph: '◑' },
-  conflicting: { vi: 'Mâu thuẫn', en: 'Conflicting', glyph: '◈' },
-  confirmed: { vi: 'Đã xác nhận', en: 'Confirmed', glyph: '●' },
+/**
+ * The glyph is NOT a translation — it is the redundant channel that keeps the ladder legible in
+ * greyscale (NFR-A11Y-02), so it stays in code beside the palette. Only the word moves to i18n.
+ */
+export const GLYPH: Record<Certainty, string> = {
+  uncertain: '○',
+  oral: '◔',
+  document_supported: '◑',
+  conflicting: '◈',
+  confirmed: '●',
 };
+
+/** The five words, in both languages, resolved without React — the contrast test reads this. */
+export const LABELS: Record<Certainty, { vi: string; en: string; glyph: string }> = Object.freeze(
+  Object.fromEntries(
+    (Object.keys(GLYPH) as Certainty[]).map((c) => [
+      c,
+      {
+        vi: resources.vi.translation.certainty[c],
+        en: resources.en.translation.certainty[c],
+        glyph: GLYPH[c],
+      },
+    ]),
+  ) as Record<Certainty, { vi: string; en: string; glyph: string }>,
+);
 
 /**
  * The palette lives here, not in app.css, because NFR-A11Y-05 asks for the ratio to be asserted

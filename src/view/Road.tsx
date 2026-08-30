@@ -22,8 +22,7 @@
 import { useEffect, useRef } from 'react';
 import { BookControls } from './BookControls';
 import { Spread } from './Spread';
-import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
+import { useTranslation } from 'react-i18next';
 import type { SpreadNavigation } from './useSpreadNavigation';
 
 /** World units between stations. Constant, not proportional to elapsed years: a long empty leg
@@ -42,14 +41,8 @@ const GAP = 260;
 const PLANE_ORIGIN = 800;
 const PLANE_GAP = 350;
 
-const COPY = {
-  empty: { vi: 'Kho lưu trữ còn trống.', en: 'The archive is empty.' },
-  road: { vi: 'Con đường của gia đình', en: "The family's road" },
-  blocked: { vi: 'Đường còn dở', en: 'The way is unfinished' },
-} satisfies Record<string, Record<Lang, string>>;
-
 export function Road({ nav }: { nav: SpreadNavigation }): JSX.Element {
-  const lang = useStore((s) => s.lang);
+  const { t } = useTranslation();
   const { spreads, index, spread, wedged, go } = nav;
   const stage = useRef<HTMLDivElement>(null);
 
@@ -68,20 +61,20 @@ export function Road({ nav }: { nav: SpreadNavigation }): JSX.Element {
 
   if (!spread) {
     return (
-      <section className="road" aria-label={COPY.road[lang]}>
-        <p className="hint">{COPY.empty[lang]}</p>
+      <section className="road" aria-label={t('road.name')}>
+        <p className="hint">{t('road.empty')}</p>
       </section>
     );
   }
 
   return (
-    <section className="road" aria-label={COPY.road[lang]}>
+    <section className="road" aria-label={t('road.name')}>
       <div
         className="road-stage"
         ref={stage}
         tabIndex={0}
         role="group"
-        aria-label={COPY.road[lang]}
+        aria-label={t('road.name')}
       >
         {/* Scenery only. Every year drawn here is also a real button in the spine below. */}
         <div className="road-world" style={{ transform: `translateZ(${index * GAP}px)` }} aria-hidden="true">
@@ -143,7 +136,7 @@ export function Road({ nav }: { nav: SpreadNavigation }): JSX.Element {
         </div>
 
         <div className="fog" aria-hidden="true" />
-        {wedged && <p className="road-blocked" aria-hidden="true">{COPY.blocked[lang]}</p>}
+        {wedged && <p className="road-blocked" aria-hidden="true">{t('road.blocked')}</p>}
       </div>
 
       <BookControls nav={nav} />

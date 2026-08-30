@@ -10,17 +10,12 @@
 
 import { EvidencePanel } from '../panels/EvidencePanel';
 import { Tear } from './Tear';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
 import type { Spread as SpreadModel } from '../store/projection';
 
-const COPY = {
-  recollection: { vi: 'Lời kể', en: 'Recollection' },
-  evidence: { vi: 'Bằng chứng', en: 'Evidence' },
-  about: { vi: 'Về', en: 'About' },
-} satisfies Record<string, Record<Lang, string>>;
-
 export function Spread({ spread }: { spread: SpreadModel }): JSX.Element {
+  const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const people = useStore((s) => s.model?.people) ?? [];
   const places = useStore((s) => s.model?.places) ?? [];
@@ -33,7 +28,7 @@ export function Spread({ spread }: { spread: SpreadModel }): JSX.Element {
   return (
     <article className={`spread${spread.conflict ? ' spread-torn' : ''}`}>
       <div className="page page-left">
-        <p className="page-label">{COPY.recollection[lang]}</p>
+        <p className="page-label">{t('spread.recollection')}</p>
         <h3 lang={lang}>
           {subject?.display_name} · {spread.predicate}
         </h3>
@@ -42,7 +37,7 @@ export function Spread({ spread }: { spread: SpreadModel }): JSX.Element {
       </div>
 
       <div className="page page-right">
-        <p className="page-label">{COPY.evidence[lang]}</p>
+        <p className="page-label">{t('spread.evidence')}</p>
         {spread.claims.map((c) => (
           <EvidencePanel key={c.id} claim={c} />
         ))}

@@ -15,38 +15,17 @@
 import { useState } from 'react';
 import * as commands from '../domain/commands';
 import { CertaintyBadge } from '../panels/CertaintyBadge';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
 import type { Spread } from '../store/projection';
 import type { Claim } from '../domain/types';
 
-const COPY = {
-  torn: { vi: 'Trang này rách', en: 'This page is torn' },
-  why: {
-    vi: 'Kho lưu trữ tự mâu thuẫn với chính nó. Không công cụ nào của tác nhân AI khép lại được — chỉ một người mới quyết được.',
-    en: 'The archive disagrees with itself. No tool available to the agent can close this — only a person can decide.',
-  },
-  cannotClose: {
-    vi: 'Sách không gấp lại được ở đây.',
-    en: 'The book will not close here.',
-  },
-  healed: { vi: 'Vết rách đã lành', en: 'The tear has healed' },
-  confirmedBy: { vi: 'Người xác nhận', en: 'Confirmed by' },
-  says: { vi: 'Nguồn nói', en: 'This says' },
-  whoDecides: { vi: 'Ai là người quyết?', en: 'Who is deciding?' },
-  pick: { vi: '— chọn một người —', en: '— choose a person —' },
-  confirm: { vi: 'Xác nhận năm này', en: 'Confirm this year' },
-  needPerson: {
-    vi: 'Phải có tên một người thì mới chốt được. Cơ sở dữ liệu từ chối nếu không.',
-    en: 'A person has to be named. The database refuses the write without one.',
-  },
-  working: { vi: 'đang ghi…', en: 'saving…' },
-} satisfies Record<string, Record<Lang, string>>;
+type Translate = ReturnType<typeof useTranslation>['t'];
 
-function yearOf(claim: Claim, lang: Lang): string {
-  if (claim.year_value === null) return lang === 'vi' ? 'không rõ năm' : 'no year';
+function yearOf(claim: Claim, t: Translate): string {
+  if (claim.year_value === null) return t('tear.noYear');
   return claim.year_precision === 'circa'
-    ? `${lang === 'vi' ? 'khoảng' : 'around'} ${claim.year_value}`
+    ? t('evidence.circa', { year: claim.year_value })
     : String(claim.year_value);
 }
 
@@ -56,15 +35,15 @@ function yearOf(claim: Claim, lang: Lang): string {
  */
 function CompetingClaim({
   claim,
-  lang,
   onConfirm,
   busy,
 }: {
   claim: Claim;
-  lang: Lang;
   onConfirm: (() => void) | null;
   busy: boolean;
 }): JSX.Element {
+  const { t } = useTranslation();
+  const lang = useStore((s) => s.lang);
   const sources = useStore((s) => s.model?.sources) ?? [];
   const evidence = useStore((s) => s.model?.evidence) ?? [];
 
@@ -75,11 +54,11 @@ function CompetingClaim({
 
   return (
     <div className="competing">
-      <p className="year">{yearOf(claim, lang)}</p>
+      <p className="year">{yearOf(claim, t)}</p>
       <CertaintyBadge certainty={claim.certainty} lang={lang} />
       {supporting.map((s) => (
         <p key={s.id} className="says">
-          <span className="says-label">{COPY.says[lang]}</span>
+          <span className="says-label">{t('tear.says')}</span>
           {s.verbatim ?? s.title}
         </p>
       ))}
@@ -87,14 +66,14 @@ function CompetingClaim({
       {/* Both claims get the identical control, enabled on the identical condition. */}
       <button type="button" className="confirm" onClick={onConfirm ?? undefined}
               disabled={onConfirm === null || busy}>
-        {busy ? COPY.working[lang] : COPY.confirm[lang]}
+        {busy ? t('tear.working') : t('tear.confirm')}
       </button>
     </div>
   );
 }
 
 export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
-  const lang = useStore((s) => s.lang);
+  const { t } = useTranslation();
   const people = useStore((s) => s.model?.people) ?? [];
   const refresh = useStore((s) => s.refresh);
 
@@ -126,14 +105,14 @@ export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
   if (spread.conflict) {
     const conflictId = spread.conflict.id;
     return (
-      <div className="tear" role="group" aria-label={COPY.torn[lang]}>
+      <div className="tear" role="group" aria-label={t('tear.torn')}>
         <p className="tear-head">
           <span aria-hidden="true" className="rip">
             ✂
           </span>
-          {COPY.torn[lang]}
+          {t('tear.torn')}
         </p>
-        <p className="tear-why">{COPY.why[lang]}</p>
+        <p className="tear-why">{t('tear.why')}</p>
 
         {/* One grid, equal tracks. Order is by year, which is the data's order, not a ranking. */}
         <div className="competing-grid">
@@ -141,7 +120,6 @@ export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
             <CompetingClaim
               key={c.id}
               claim={c}
-              lang={lang}
               busy={busy}
               onConfirm={decider ? () => void confirm(conflictId, c.id) : null}
             />
@@ -150,9 +128,9 @@ export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
 
         <div className="decider">
           <label>
-            <span>{COPY.whoDecides[lang]}</span>
+            <span>{t('tear.whoDecides')}</span>
             <select value={decider} onChange={(e) => setDecider(e.target.value)}>
-              <option value="">{COPY.pick[lang]}</option>
+              <option value="">{t('tear.pick')}</option>
               {witnesses.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.display_name}
@@ -160,7 +138,7 @@ export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
               ))}
             </select>
           </label>
-          {!decider && <p className="hint">{COPY.needPerson[lang]}</p>}
+          {!decider && <p className="hint">{t('tear.needPerson')}</p>}
           {error && (
             <p className="result refused" role="alert">
               {error}
@@ -168,7 +146,7 @@ export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
           )}
         </div>
 
-        <p className="tear-foot">{COPY.cannotClose[lang]}</p>
+        <p className="tear-foot">{t('tear.cannotClose')}</p>
       </div>
     );
   }
@@ -177,7 +155,7 @@ export function Tear({ spread }: { spread: Spread }): JSX.Element | null {
     // TASK-019 — a human is visible in the result. Without the name this is just a green tick.
     return (
       <p className="healed" role="status">
-        <span aria-hidden="true">✓</span> {COPY.healed[lang]} · {COPY.confirmedBy[lang]}:{' '}
+        <span aria-hidden="true">✓</span> {t('tear.healed')} · {t('tear.confirmedBy')}:{' '}
         <b>{spread.resolvedBy.display_name}</b>
       </p>
     );

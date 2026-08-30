@@ -9,45 +9,10 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import type { Lang } from '../store/store';
 import type { ActorKind, AuditEvent } from '../domain/types';
-
-const ACTOR: Record<ActorKind, Record<Lang, string>> = {
-  agent: { vi: 'Tác nhân AI', en: 'The agent' },
-  human: { vi: 'Một người', en: 'A person' },
-};
-
-/** What each tool did, in a sentence. Deliberately not the tool name. */
-const DID: Record<string, Record<Lang, string>> = {
-  add_person: { vi: 'thêm một người vào kho', en: 'added someone to the archive' },
-  add_place: { vi: 'thêm một địa danh', en: 'added a place' },
-  add_memory_claim: { vi: 'ghi lại một lời kể', en: 'recorded a recollection' },
-  link_claim_to_source: { vi: 'gắn một nguồn vào lời kể', en: 'attached a source to a claim' },
-  flag_conflict: { vi: 'đánh dấu một mâu thuẫn', en: 'flagged a contradiction' },
-  propose_followup_question: { vi: 'đề xuất một câu hỏi', en: 'proposed a question to ask' },
-  resolve_claim: { vi: 'chốt một mâu thuẫn', en: 'settled a contradiction' },
-  generate_story_card: { vi: 'soạn một thẻ chuyện', en: 'composed a story card' },
-  read_memory_graph: { vi: 'đọc kho ký ức', en: 'read the archive' },
-  reset_archive: { vi: 'dựng lại kho từ đầu', en: 'rebuilt the archive from scratch' },
-};
-
-const COPY = {
-  heading: { vi: 'Nhật ký', en: 'Audit trail' },
-  intro: {
-    vi: 'Mọi thao tác đều để lại một dòng — kể cả những lần bị từ chối.',
-    en: 'Every operation leaves a line, including the ones that were refused.',
-  },
-  tried: { vi: 'đã thử', en: 'tried to' },
-  refused: { vi: 'BỊ TỪ CHỐI', en: 'REFUSED' },
-  because: { vi: 'vì', en: 'because' },
-  allActors: { vi: 'Tất cả', en: 'Everyone' },
-  allTools: { vi: 'Mọi thao tác', en: 'All operations' },
-  onlyRefused: { vi: 'Chỉ những lần bị chặn', en: 'Only what was blocked' },
-  context: { vi: 'Có được thao tác này vì', en: 'This was available because' },
-  empty: { vi: 'Chưa có gì xảy ra.', en: 'Nothing has happened yet.' },
-  count: { vi: 'dòng', en: 'entries' },
-} satisfies Record<string, Record<Lang, string>>;
 
 interface Refusal {
   outcome: 'refused';
@@ -70,19 +35,22 @@ function when(iso: string, lang: Lang): string {
 }
 
 function Row({ row, lang }: { row: AuditEvent; lang: Lang }): JSX.Element {
+  const { t } = useTranslation();
   const refusal = refusalOf(row);
-  const did = DID[row.tool_name]?.[lang] ?? row.tool_name;
+  // A tool with no sentence falls back to its raw name — tests/panels.spec.ts forbids that
+  // reaching production, but rendering the name beats rendering an empty cell.
+  const did = t(`audit.did.${row.tool_name}`, row.tool_name);
 
   return (
     <li className={`entry${refusal ? ' entry-refused' : ''}`}>
       <time dateTime={row.occurred_at}>{when(row.occurred_at, lang)}</time>
 
       <p className="what">
-        <span className={`who who-${row.actor}`}>{ACTOR[row.actor][lang]}</span>{' '}
+        <span className={`who who-${row.actor}`}>{t(`audit.actor.${row.actor}`)}</span>{' '}
         {refusal ? (
           <>
-            {COPY.tried[lang]} {did} — <b className="refused">{COPY.refused[lang]}</b>{' '}
-            {COPY.because[lang]} {refusal.reason}
+            {t('audit.tried')} {did} — <b className="refused">{t('audit.refused')}</b>{' '}
+            {t('audit.because')} {refusal.reason}
           </>
         ) : (
           did
@@ -97,13 +65,14 @@ function Row({ row, lang }: { row: AuditEvent; lang: Lang }): JSX.Element {
       )}
 
       <p className="context">
-        {COPY.context[lang]}: {row.registered_because}
+        {t('audit.context')}: {row.registered_because}
       </p>
     </li>
   );
 }
 
 export function AuditTrail(): JSX.Element {
+  const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const audit = useStore((s) => s.model?.audit) ?? [];
 
@@ -122,21 +91,21 @@ export function AuditTrail(): JSX.Element {
 
   return (
     <section className="panel audit" aria-labelledby="audit-heading">
-      <h2 id="audit-heading">{COPY.heading[lang]}</h2>
-      <p className="hint">{COPY.intro[lang]}</p>
+      <h2 id="audit-heading">{t('audit.heading')}</h2>
+      <p className="hint">{t('audit.intro')}</p>
 
       <div className="audit-filters">
         <select value={actor} onChange={(e) => setActor(e.target.value as ActorKind | 'all')}>
-          <option value="all">{COPY.allActors[lang]}</option>
-          <option value="agent">{ACTOR.agent[lang]}</option>
-          <option value="human">{ACTOR.human[lang]}</option>
+          <option value="all">{t('audit.allActors')}</option>
+          <option value="agent">{t('audit.actor.agent')}</option>
+          <option value="human">{t('audit.actor.human')}</option>
         </select>
 
         <select value={tool} onChange={(e) => setTool(e.target.value)}>
-          <option value="all">{COPY.allTools[lang]}</option>
-          {tools.map((t) => (
-            <option key={t} value={t}>
-              {DID[t]?.[lang] ?? t}
+          <option value="all">{t('audit.allTools')}</option>
+          {tools.map((name) => (
+            <option key={name} value={name}>
+              {t(`audit.did.${name}`, name)}
             </option>
           ))}
         </select>
@@ -147,16 +116,16 @@ export function AuditTrail(): JSX.Element {
             checked={refusedOnly}
             onChange={(e) => setRefusedOnly(e.target.checked)}
           />
-          {COPY.onlyRefused[lang]} ({blocked})
+          {t('audit.onlyRefused')} ({blocked})
         </label>
 
         <span className="hint">
-          {rows.length} {COPY.count[lang]}
+          {rows.length} {t('audit.count')}
         </span>
       </div>
 
       {rows.length === 0 ? (
-        <p className="hint">{COPY.empty[lang]}</p>
+        <p className="hint">{t('audit.empty')}</p>
       ) : (
         <ol className="entries">
           {rows.map((r) => (

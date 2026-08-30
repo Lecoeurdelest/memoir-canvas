@@ -7,6 +7,7 @@
  */
 import { describe, expect, it } from 'vitest';
 import { ALL_TOOL_NAMES } from '../src/mcp/descriptors';
+import { resources } from '../src/i18n';
 import auditRaw from '../src/panels/AuditTrail.tsx?raw';
 import evidenceRaw from '../src/panels/EvidencePanel.tsx?raw';
 
@@ -21,25 +22,35 @@ const evidenceSource = stripComments(evidenceRaw);
 const NON_TOOL_WRITERS = ['add_place', 'reset_archive'];
 
 describe('TASK-024 — the audit panel', () => {
+  // Since TASK-033 the phrasing lives in the locale files, so these assert the resources rather
+  // than the component source — which is stricter: it checks the value that actually renders.
   it('has a readable sentence for every tool an agent can call', () => {
     for (const name of ALL_TOOL_NAMES) {
-      expect(auditSource, `no phrasing for ${name}`).toContain(`${name}: {`);
+      expect(resources.vi.translation.audit.did, `no phrasing for ${name}`).toHaveProperty(name);
     }
   });
 
   it('has one for the commands that are not tools but still audit', () => {
     for (const name of NON_TOOL_WRITERS) {
-      expect(auditSource, `no phrasing for ${name}`).toContain(`${name}: {`);
+      expect(resources.vi.translation.audit.did, `no phrasing for ${name}`).toHaveProperty(name);
     }
   });
 
   it('phrases every operation in both languages', () => {
-    const entries = [...auditSource.matchAll(/^\s{2}(\w+): \{ vi: '([^']*)', en: '([^']*)' \}/gm)];
-    expect(entries.length).toBeGreaterThanOrEqual(ALL_TOOL_NAMES.length);
-    for (const [, name, vi, en] of entries) {
-      expect(vi.length, `${name} vi`).toBeGreaterThan(0);
-      expect(en.length, `${name} en`).toBeGreaterThan(0);
-      expect(vi, `${name} must not be phrased as its tool name`).not.toBe(name);
+    const vi = resources.vi.translation.audit.did as Record<string, string>;
+    const en = resources.en.translation.audit.did as Record<string, string>;
+
+    expect(Object.keys(vi).length).toBeGreaterThanOrEqual(ALL_TOOL_NAMES.length);
+    expect(Object.keys(vi).sort(), 'both languages phrase the same operations').toEqual(
+      Object.keys(en).sort(),
+    );
+
+    for (const name of Object.keys(vi)) {
+      expect(vi[name].length, `${name} vi`).toBeGreaterThan(0);
+      expect(en[name].length, `${name} en`).toBeGreaterThan(0);
+      // The whole point of the panel: a sentence, never the tool name.
+      expect(vi[name], `${name} must not be phrased as its tool name`).not.toBe(name);
+      expect(en[name], `${name} must not be phrased as its tool name`).not.toBe(name);
     }
   });
 
@@ -68,11 +79,14 @@ describe('TASK-022 — the evidence panel', () => {
   });
 
   it('labels every stance and source kind in both languages', () => {
-    for (const stance of ['contradicts', 'supports', 'mentions']) {
-      expect(evidenceSource).toContain(`${stance}: {`);
-    }
-    for (const kind of ['oral_account', 'photo', 'document', 'external_record']) {
-      expect(evidenceSource).toContain(`${kind}: {`);
+    for (const lng of ['vi', 'en'] as const) {
+      const ev = resources[lng].translation.evidence;
+      for (const stance of ['contradicts', 'supports', 'mentions']) {
+        expect(ev.stance, `${lng}/${stance}`).toHaveProperty(stance);
+      }
+      for (const kind of ['oral_account', 'photo', 'document', 'external_record']) {
+        expect(ev.kind, `${lng}/${kind}`).toHaveProperty(kind);
+      }
     }
   });
 });

@@ -7,32 +7,16 @@
  * with the canvas gone.
  */
 
-import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
+import { useTranslation } from 'react-i18next';
 import type { SpreadNavigation } from './useSpreadNavigation';
 
-const COPY = {
-  prev: { vi: 'Lùi lại', en: 'Back' },
-  next: { vi: 'Đi tiếp', en: 'Onward' },
-  spine: { vi: 'Các mốc thời gian', en: 'Milestones' },
-  wedged: {
-    vi: 'Không đi tiếp được: chỗ này còn một chỗ chưa khớp.',
-    en: 'The way is blocked: this stretch is still unsettled.',
-  },
-  locked: {
-    vi: 'Chưa tới được: còn một chỗ chưa khớp phía trước.',
-    en: 'Out of reach: something unsettled lies before it.',
-  },
-  at: { vi: 'Chặng', en: 'Stop' },
-} satisfies Record<string, Record<Lang, string>>;
-
 export function BookControls({ nav }: { nav: SpreadNavigation }): JSX.Element {
-  const lang = useStore((s) => s.lang);
+  const { t } = useTranslation();
   const { spreads, index, wedged, lockedFrom, go, jumpTo } = nav;
 
   return (
     <div className="controls">
-      <nav className="spine" aria-label={COPY.spine[lang]}>
+      <nav className="spine" aria-label={t('road.spine')}>
         {spreads.map((s, i) => {
           const locked = i >= lockedFrom;
           const year = s.claims[0].year_value ?? '—';
@@ -43,7 +27,7 @@ export function BookControls({ nav }: { nav: SpreadNavigation }): JSX.Element {
               className={`vertebra${s.conflict ? ' torn' : ''}${locked ? ' locked' : ''}`}
               aria-current={i === index}
               aria-disabled={locked}
-              aria-label={`${year}${locked ? ` — ${COPY.locked[lang]}` : ''}`}
+              aria-label={`${year}${locked ? ` — ${t('road.locked')}` : ''}`}
               onClick={() => jumpTo(i)}
             >
               {year}
@@ -54,10 +38,10 @@ export function BookControls({ nav }: { nav: SpreadNavigation }): JSX.Element {
 
       <div className="turn">
         <button type="button" onClick={() => go(-1)} disabled={index === 0}>
-          ← {COPY.prev[lang]}
+          ← {t('road.prev')}
         </button>
         <span className="folio">
-          {COPY.at[lang]} {index + 1} / {spreads.length}
+          {t('road.at')} {index + 1} / {spreads.length}
         </span>
         <button
           type="button"
@@ -65,13 +49,13 @@ export function BookControls({ nav }: { nav: SpreadNavigation }): JSX.Element {
           disabled={wedged || index >= spreads.length - 1}
           aria-describedby={wedged ? 'wedged' : undefined}
         >
-          {COPY.next[lang]} →
+          {t('road.next')} →
         </button>
       </div>
 
       {wedged && index < spreads.length - 1 && (
         <p id="wedged" className="wedged" role="status">
-          {COPY.wedged[lang]}
+          {t('road.wedged')}
         </p>
       )}
     </div>

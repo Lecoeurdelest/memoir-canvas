@@ -1,13 +1,13 @@
 ---
 id: TASK-033
-title: One string catalogue
+title: Real i18n
 branch: C
 day: 5
 depends_on: [TASK-030]
-status: todo
+status: done
 ---
 
-# TASK-033 — One string catalogue
+# TASK-033 — Real i18n
 
 | | |
 |---|---|
@@ -19,8 +19,17 @@ status: todo
 
 ## Goal
 
-Every interface string lives in one catalogue with one lookup, instead of seventy pairs scattered
-through ten components.
+The app uses a real i18n stack — `i18next` + `react-i18next` — with translations in resource files
+and one lookup, instead of seventy `{vi, en}` pairs scattered through ten components.
+
+**Decision changed on direction.** An earlier draft of this task argued for a hand-rolled typed
+catalogue and against a library. The product owner overruled it: *"Phải dùng i18n vào."* Use the
+standard stack.
+
+The objection that drove the earlier draft was `NFR-PRIV-01`, and it was checked rather than
+assumed: `i18next`, `react-i18next` and `i18next-browser-languagedetector` contain **no** `fetch`,
+`XMLHttpRequest` or `WebSocket` in their shipped builds. Only `i18next-http-backend` fetches, and it
+is deliberately not installed. Resources are bundled, not loaded.
 
 ## Why this comes before `TASK-031`
 
@@ -46,22 +55,28 @@ Roughly 70 chrome pairs across ten files; 12 content fields stay where they are.
 
 ## In scope
 
-- `src/i18n/copy.ts` — the catalogue, grouped by area, typed so a missing key is a compile error
-- `src/i18n/index.ts` — a `useCopy()` hook reading `lang` from the store, and a plain `t()` for non-React callers
-- migrate the ten existing `COPY` / `LABELS` / `STANCE` blocks, with **no wording changes** — a pure move, so any visual diff is a bug
-- `lang` initialises from `navigator.language` and persists to `localStorage` (`store.ts:32` currently hard-codes `'vi'`)
-- a test asserting every key resolves in both languages, so a half-translated key cannot ship
+- `src/i18n/locales/{vi,en}.json` — the translations, namespaced by area
+- `src/i18n/index.ts` — `i18next` init with `initReactI18next`, resources bundled inline, `vi` as fallback
+- `LanguageDetector` for `navigator.language` with `localStorage` caching (`store.ts:32` currently hard-codes `'vi'`, reads neither and remembers nothing)
+- migrate the ten existing `COPY` / `LABELS` / `STANCE` blocks to `useTranslation()`, with **no wording changes** — a pure move, so any visual diff is a bug
+- interpolation where a string is currently assembled by hand, e.g. the circa year in `Tear.tsx`
+- the store's `lang` delegates to `i18n.changeLanguage` so there is one source of truth, not two
+- a test asserting the two resource files have **identical key sets**, so a half-translated key cannot ship
 
 ## Out of scope
 
-- **no** third-party i18n library — this is two languages and one JSON-shaped object; a runtime dependency would cost more than it saves and `NFR-PRIV-01` forbids anything that fetches
-- no pluralisation or date/number formatting engine — nothing in this app needs one
+- **no** `i18next-http-backend` — it fetches, and `NFR-PRIV-01` forbids that. Resources are bundled
+- no language files loaded at runtime, no locale split-chunks — two languages of ~70 strings is smaller than the code that would lazy-load them
+- no pluralisation rules or date/number formatting beyond what the existing copy already does
 - no change to `descriptors.ts` or `schema.sql` (frozen), and no change to any `*_vi` / `*_en` **data** field
 - no new wording — `TASK-031` owns what the interface should say
 
 ## Acceptance criteria
 
 - [ ] No `vi:` / `en:` literal remains under `src/view/` or `src/panels/`
+- [ ] `vi.json` and `en.json` have identical key sets, asserted by a test
+- [ ] No runtime network request is added — verified against the production build with the shipped CSP
+- [ ] The entry chunk does not regress (`NFR-PERF-02`)
 - [ ] Every `*_vi` / `*_en` **data** field is untouched, and `descriptors.ts` is byte-identical
 - [ ] A missing or half-translated key fails `npm run typecheck` or `npm test`, not review
 - [ ] `lang` follows the browser on a first visit and is remembered on the next, with nothing asked
@@ -69,8 +84,10 @@ Roughly 70 chrome pairs across ten files; 12 content fields stay where they are.
 
 ## Files touched
 
-- `src/i18n/copy.ts` (new)
 - `src/i18n/index.ts` (new)
+- `src/i18n/locales/vi.json` (new)
+- `src/i18n/locales/en.json` (new)
+- `src/main.tsx`
 - `src/store/store.ts`
 - `src/view/{Road,Spread,Tear,BookControls,BookStage,CssBook}.tsx`
 - `src/panels/{AuditTrail,EvidencePanel,CertaintyBadge,StoryCard}.tsx`

@@ -1,0 +1,97 @@
+{
+  "road": {
+    "empty": "The archive is empty.",
+    "name": "The family's road",
+    "blocked": "The way is unfinished",
+    "flatView": "List view",
+    "roadView": "Road view",
+    "prev": "Back",
+    "next": "Onward",
+    "spine": "Milestones",
+    "wedged": "The way is blocked: this stretch is still unsettled.",
+    "locked": "Out of reach: something unsettled lies before it.",
+    "at": "Stop"
+  },
+  "spread": {
+    "recollection": "Recollection",
+    "evidence": "Evidence",
+    "about": "About"
+  },
+  "tear": {
+    "torn": "This page is torn",
+    "why": "The archive disagrees with itself. No tool available to the agent can close this — only a person can decide.",
+    "cannotClose": "The book will not close here.",
+    "healed": "The tear has healed",
+    "confirmedBy": "Confirmed by",
+    "says": "This says",
+    "whoDecides": "Who is deciding?",
+    "pick": "— choose a person —",
+    "confirm": "Confirm this year",
+    "needPerson": "A person has to be named. The database refuses the write without one.",
+    "working": "saving…",
+    "noYear": "no year"
+  },
+  "evidence": {
+    "noYear": "No year",
+    "circa": "around {{year}}",
+    "none": "No source has been attached to this claim yet.",
+    "contributor": "Contributed by",
+    "noEvidence": "This claim rests on nothing yet.",
+    "stance": {
+      "contradicts": "Contradicts",
+      "supports": "Supports",
+      "mentions": "Mentions"
+    },
+    "kind": {
+      "oral_account": "Oral account",
+      "photo": "Photograph",
+      "document": "Document",
+      "external_record": "External record"
+    }
+  },
+  "certainty": {
+    "uncertain": "Uncertain",
+    "oral": "Oral recollection",
+    "document_supported": "Document-supported",
+    "conflicting": "Conflicting",
+    "confirmed": "Confirmed"
+  },
+  "audit": {
+    "heading": "Audit trail",
+    "intro": "Every operation leaves a line, including the ones that were refused.",
+    "tried": "tried to",
+    "refused": "REFUSED",
+    "because": "because",
+    "allActors": "Everyone",
+    "allTools": "All operations",
+    "onlyRefused": "Only what was blocked",
+    "context": "This was available because",
+    "empty": "Nothing has happened yet.",
+    "count": "entries",
+    "actor": {
+      "agent": "The agent",
+      "human": "A person"
+    },
+    "did": {
+      "add_person": "added someone to the archive",
+      "add_place": "added a place",
+      "add_memory_claim": "recorded a recollection",
+      "link_claim_to_source": "attached a source to a claim",
+      "flag_conflict": "flagged a contradiction",
+      "propose_followup_question": "proposed a question to ask",
+      "resolve_claim": "settled a contradiction",
+      "generate_story_card": "composed a story card",
+      "read_memory_graph": "read the archive",
+      "reset_archive": "rebuilt the archive from scratch"
+    }
+  },
+  "card": {
+    "citedBy": "Standing on",
+    "claim_one": "claim",
+    "claim_other": "claims",
+    "superseded": "a superseded claim"
+  },
+  "app": {
+    "language": "Language"
+  }
+}

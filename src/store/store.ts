@@ -12,14 +12,22 @@
 import { create } from 'zustand';
 import { buildReadModel, type ReadModel } from './projection';
 import { INITIAL_UI_STATE, type UiState } from './uiState';
+import i18n, { currentLang, type Lang } from '../i18n';
 
 /** The family reads Vietnamese and the judges read English; both are first-class (FR-I18N). */
-export type Lang = 'vi' | 'en';
+export type { Lang };
 
 interface Store {
   model: ReadModel | null;
   ui: UiState;
-  /** A display preference, not domain data — one toggle for every panel rather than each keeping its own. */
+  /**
+   * Which language's DATA column to read — `title_vi` against `title_en`. Interface strings come
+   * from `useTranslation()` instead; this exists because a story card carries two bodies written
+   * by a person, and choosing between them is not translation.
+   *
+   * Mirrors i18next rather than competing with it: `setLang` changes the language there, and the
+   * subscription below follows a change made anywhere else.
+   */
   lang: Lang;
   refresh: () => Promise<void>;
   setUi: (ui: UiState) => void;
@@ -29,8 +37,10 @@ interface Store {
 export const useStore = create<Store>((set) => ({
   model: null,
   ui: INITIAL_UI_STATE,
-  lang: 'vi',
+  lang: currentLang(),
   refresh: async () => set({ model: await buildReadModel() }),
   setUi: (ui) => set({ ui }),
-  setLang: (lang) => set({ lang }),
+  setLang: (lang) => void i18n.changeLanguage(lang),
 }));
+
+i18n.on('languageChanged', () => useStore.setState({ lang: currentLang() }));

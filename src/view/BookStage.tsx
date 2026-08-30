@@ -15,16 +15,10 @@ import { CssBook } from './CssBook';
 import { Road } from './Road';
 import { useSpreadNavigation } from './useSpreadNavigation';
 import { flatRequested } from './webgl';
-import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
-
-const COPY = {
-  flat: { vi: 'Xem dạng danh sách', en: 'List view' },
-  road: { vi: 'Xem dạng con đường', en: 'Road view' },
-} satisfies Record<string, Record<Lang, string>>;
+import { useTranslation } from 'react-i18next';
 
 export function BookStage(): JSX.Element {
-  const lang = useStore((s) => s.lang);
+  const { t } = useTranslation();
   const nav = useSpreadNavigation();
   const [flat, setFlat] = useState(flatRequested);
 
@@ -42,7 +36,7 @@ export function BookStage(): JSX.Element {
     <>
       {flat ? <CssBook nav={nav} /> : <Road nav={nav} />}
       <button type="button" className="skin-toggle" onClick={toggle}>
-        {flat ? COPY.road[lang] : COPY.flat[lang]}
+        {t(flat ? 'road.roadView' : 'road.flatView')}
       </button>
     </>
   );

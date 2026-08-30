@@ -12,6 +12,7 @@ import { Suspense, lazy } from 'react';
 import { BookStage } from './view/BookStage';
 import { AuditTrail } from './panels/AuditTrail';
 import { StoryCard } from './panels/StoryCard';
+import { useTranslation } from 'react-i18next';
 import { useStore } from './store/store';
 import type { BootReport } from './bootstrap';
 
@@ -20,6 +21,7 @@ const ManualToolPanel = lazy(async () => ({
 }));
 
 export function Archive({ report }: { report: BootReport }): JSX.Element {
+  const { t } = useTranslation();
   const model = useStore((s) => s.model);
   const lang = useStore((s) => s.lang);
   const setLang = useStore((s) => s.setLang);
@@ -32,7 +34,7 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
       <header>
         <div className="title-row">
           <h1>Memoir Canvas</h1>
-          <div className="lang" role="group" aria-label={lang === 'vi' ? 'Ngôn ngữ' : 'Language'}>
+          <div className="lang" role="group" aria-label={t('app.language')}>
             {(['vi', 'en'] as const).map((l) => (
               <button key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}>
                 {l === 'vi' ? 'Tiếng Việt' : 'English'}

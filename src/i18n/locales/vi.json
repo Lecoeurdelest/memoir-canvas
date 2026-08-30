@@ -1,0 +1,96 @@
+{
+  "road": {
+    "empty": "Kho lưu trữ còn trống.",
+    "name": "Con đường của gia đình",
+    "blocked": "Đường còn dở",
+    "flatView": "Xem dạng danh sách",
+    "roadView": "Xem dạng con đường",
+    "prev": "Lùi lại",
+    "next": "Đi tiếp",
+    "spine": "Các mốc thời gian",
+    "wedged": "Không đi tiếp được: chỗ này còn một chỗ chưa khớp.",
+    "locked": "Chưa tới được: còn một chỗ chưa khớp phía trước.",
+    "at": "Chặng"
+  },
+  "spread": {
+    "recollection": "Lời kể",
+    "evidence": "Bằng chứng",
+    "about": "Về"
+  },
+  "tear": {
+    "torn": "Trang này rách",
+    "why": "Kho lưu trữ tự mâu thuẫn với chính nó. Không công cụ nào của tác nhân AI khép lại được — chỉ một người mới quyết được.",
+    "cannotClose": "Sách không gấp lại được ở đây.",
+    "healed": "Vết rách đã lành",
+    "confirmedBy": "Người xác nhận",
+    "says": "Nguồn nói",
+    "whoDecides": "Ai là người quyết?",
+    "pick": "— chọn một người —",
+    "confirm": "Xác nhận năm này",
+    "needPerson": "Phải có tên một người thì mới chốt được. Cơ sở dữ liệu từ chối nếu không.",
+    "working": "đang ghi…",
+    "noYear": "không rõ năm"
+  },
+  "evidence": {
+    "noYear": "Không rõ năm",
+    "circa": "khoảng {{year}}",
+    "none": "Chưa có nguồn nào cho lời kể này.",
+    "contributor": "Người kể",
+    "noEvidence": "Lời kể này chưa dựa trên nguồn nào.",
+    "stance": {
+      "contradicts": "Mâu thuẫn với",
+      "supports": "Ủng hộ",
+      "mentions": "Có nhắc tới"
+    },
+    "kind": {
+      "oral_account": "Lời kể",
+      "photo": "Ảnh",
+      "document": "Tài liệu",
+      "external_record": "Hồ sơ bên ngoài"
+    }
+  },
+  "certainty": {
+    "uncertain": "Chưa rõ",
+    "oral": "Lời kể",
+    "document_supported": "Có tài liệu",
+    "conflicting": "Mâu thuẫn",
+    "confirmed": "Đã xác nhận"
+  },
+  "audit": {
+    "heading": "Nhật ký",
+    "intro": "Mọi thao tác đều để lại một dòng — kể cả những lần bị từ chối.",
+    "tried": "đã thử",
+    "refused": "BỊ TỪ CHỐI",
+    "because": "vì",
+    "allActors": "Tất cả",
+    "allTools": "Mọi thao tác",
+    "onlyRefused": "Chỉ những lần bị chặn",
+    "context": "Có được thao tác này vì",
+    "empty": "Chưa có gì xảy ra.",
+    "count": "dòng",
+    "actor": {
+      "agent": "Tác nhân AI",
+      "human": "Một người"
+    },
+    "did": {
+      "add_person": "thêm một người vào kho",
+      "add_place": "thêm một địa danh",
+      "add_memory_claim": "ghi lại một lời kể",
+      "link_claim_to_source": "gắn một nguồn vào lời kể",
+      "flag_conflict": "đánh dấu một mâu thuẫn",
+      "propose_followup_question": "đề xuất một câu hỏi",
+      "resolve_claim": "chốt một mâu thuẫn",
+      "generate_story_card": "soạn một thẻ chuyện",
+      "read_memory_graph": "đọc kho ký ức",
+      "reset_archive": "dựng lại kho từ đầu"
+    }
+  },
+  "card": {
+    "citedBy": "Dựa trên",
+    "claim_other": "lời kể",
+    "superseded": "lời kể đã bị thay thế"
+  },
+  "app": {
+    "language": "Ngôn ngữ"
+  }
+}

@@ -10,21 +10,16 @@
 
 import { BookControls } from './BookControls';
 import { Spread } from './Spread';
-import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
+import { useTranslation } from 'react-i18next';
 import type { SpreadNavigation } from './useSpreadNavigation';
 
-const COPY = {
-  empty: { vi: 'Kho lưu trữ còn trống.', en: 'The archive is empty.' },
-} satisfies Record<string, Record<Lang, string>>;
-
 export function CssBook({ nav }: { nav: SpreadNavigation }): JSX.Element {
-  const lang = useStore((s) => s.lang);
+  const { t } = useTranslation();
 
   if (!nav.spread) {
     return (
       <section className="book" aria-label="Book">
-        <p className="hint">{COPY.empty[lang]}</p>
+        <p className="hint">{t('road.empty')}</p>
       </section>
     );
   }

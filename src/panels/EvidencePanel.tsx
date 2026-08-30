@@ -10,32 +10,9 @@
  */
 
 import { CertaintyBadge } from './CertaintyBadge';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
 import type { Claim, Evidence, Source, Stance } from '../domain/types';
-
-const STANCE: Record<Stance, { vi: string; en: string }> = {
-  contradicts: { vi: 'Mâu thuẫn với', en: 'Contradicts' },
-  supports: { vi: 'Ủng hộ', en: 'Supports' },
-  mentions: { vi: 'Có nhắc tới', en: 'Mentions' },
-};
-
-const KIND: Record<Source['kind'], { vi: string; en: string }> = {
-  oral_account: { vi: 'Lời kể', en: 'Oral account' },
-  photo: { vi: 'Ảnh', en: 'Photograph' },
-  document: { vi: 'Tài liệu', en: 'Document' },
-  external_record: { vi: 'Hồ sơ bên ngoài', en: 'External record' },
-};
-
-const COPY = {
-  noYear: { vi: 'Không rõ năm', en: 'No year' },
-  none: { vi: 'Chưa có nguồn nào cho lời kể này.', en: 'No source has been attached to this claim yet.' },
-  contributor: { vi: 'Người kể', en: 'Contributed by' },
-  noEvidence: {
-    vi: 'Lời kể này chưa dựa trên nguồn nào.',
-    en: 'This claim rests on nothing yet.',
-  },
-} satisfies Record<string, Record<Lang, string>>;
 
 /** contradicts first, then supports, then mentions — the disagreement is never below the fold. */
 const STANCE_ORDER: Stance[] = ['contradicts', 'supports', 'mentions'];
@@ -43,24 +20,23 @@ const STANCE_ORDER: Stance[] = ['contradicts', 'supports', 'mentions'];
 function SourceRow({
   evidence,
   source,
-  lang,
 }: {
   evidence: Evidence;
   source: Source | undefined;
-  lang: Lang;
 }): JSX.Element {
+  const { t } = useTranslation();
   const people = useStore((s) => s.model?.people);
   const contributor = people?.find((p) => p.id === source?.contributor_id);
 
   if (!source) {
-    return <li className="evidence missing">{COPY.none[lang]}</li>;
+    return <li className="evidence missing">{t('evidence.none')}</li>;
   }
 
   return (
     <li className={`evidence stance-${evidence.stance}`}>
       <p className="evidence-head">
-        <span className="stance">{STANCE[evidence.stance][lang]}</span>
-        <span className="kind">{KIND[source.kind][lang]}</span>
+        <span className="stance">{t(`evidence.stance.${evidence.stance}`)}</span>
+        <span className="kind">{t(`evidence.kind.${source.kind}`)}</span>
         <span className="title">{source.title}</span>
       </p>
 
@@ -73,7 +49,7 @@ function SourceRow({
 
       {contributor && (
         <p className="contributor">
-          {COPY.contributor[lang]}: {contributor.display_name}
+          {t('evidence.contributor')}: {contributor.display_name}
         </p>
       )}
     </li>
@@ -81,6 +57,7 @@ function SourceRow({
 }
 
 export function EvidencePanel({ claim }: { claim: Claim }): JSX.Element {
+  const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const allEvidence = useStore((s) => s.model?.evidence) ?? [];
   const sources = useStore((s) => s.model?.sources) ?? [];
@@ -96,16 +73,16 @@ export function EvidencePanel({ claim }: { claim: Claim }): JSX.Element {
       <h4 id={`ev-${claim.id}`}>
         <span className="ev-for">
           {claim.year_value === null
-            ? COPY.noYear[lang]
+            ? t('evidence.noYear')
             : claim.year_precision === 'circa'
-              ? `${lang === 'vi' ? 'khoảng' : 'around'} ${claim.year_value}`
+              ? t('evidence.circa', { year: claim.year_value })
               : claim.year_value}
         </span>
         <CertaintyBadge certainty={claim.certainty} lang={lang} />
       </h4>
 
       {rows.length === 0 ? (
-        <p className="hint">{COPY.noEvidence[lang]}</p>
+        <p className="hint">{t('evidence.noEvidence')}</p>
       ) : (
         <ul className="evidence-list">
           {rows.map((e) => (
@@ -113,7 +90,6 @@ export function EvidencePanel({ claim }: { claim: Claim }): JSX.Element {
               key={`${e.claim_id}-${e.source_id}-${e.stance}`}
               evidence={e}
               source={sources.find((s) => s.id === e.source_id)}
-              lang={lang}
             />
           ))}
         </ul>

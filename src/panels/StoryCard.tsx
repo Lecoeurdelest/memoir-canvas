@@ -10,24 +10,19 @@
 
 import { CertaintyBadge } from './CertaintyBadge';
 import { EvidencePanel } from './EvidencePanel';
+import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
-import type { Lang } from '../store/store';
 import type { Certainty, StoryCard as Card } from '../domain/types';
 
-const CITED_BY: Record<Lang, string> = { vi: 'Dựa trên', en: 'Standing on' };
-const CLAIM_WORD: Record<Lang, [string, string]> = {
-  vi: ['lời kể', 'lời kể'],
-  en: ['claim', 'claims'],
-};
-
-function ClaimLine({ id, lang }: { id: string; lang: Lang }): JSX.Element {
+function ClaimLine({ id }: { id: string }): JSX.Element {
+  const { t } = useTranslation();
   const claim = useStore((s) => s.model?.claims.find((c) => c.id === id));
   const places = useStore((s) => s.model?.places);
 
   if (!claim) {
     return (
       <li className="cited missing">
-        {lang === 'vi' ? 'lời kể đã bị thay thế' : 'a superseded claim'}
+        {t('card.superseded')}
       </li>
     );
   }
@@ -36,7 +31,7 @@ function ClaimLine({ id, lang }: { id: string; lang: Lang }): JSX.Element {
   const object = place ?? claim.object_text ?? '';
   const year = claim.year_value
     ? claim.year_precision === 'circa'
-      ? `${lang === 'vi' ? 'khoảng' : 'around'} ${claim.year_value}`
+      ? t('evidence.circa', { year: claim.year_value })
       : String(claim.year_value)
     : '';
 
@@ -53,12 +48,12 @@ function ClaimLine({ id, lang }: { id: string; lang: Lang }): JSX.Element {
 }
 
 export function StoryCard({ card }: { card: Card }): JSX.Element {
+  const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const subject = useStore((s) => s.model?.people.find((p) => p.id === card.subject_person_id));
 
   const title = lang === 'vi' ? card.title_vi : card.title_en;
   const body = lang === 'vi' ? card.body_vi : card.body_en;
-  const [one, many] = CLAIM_WORD[lang];
   const n = card.claim_ids.length;
 
   return (
@@ -75,11 +70,11 @@ export function StoryCard({ card }: { card: Card }): JSX.Element {
       </p>
 
       <p className="cited-head">
-        {CITED_BY[lang]} {n} {n === 1 ? one : many}
+        {t('card.citedBy')} {n} {t('card.claim', { count: n })}
       </p>
       <ul className="cited-list">
         {card.claim_ids.map((id) => (
-          <ClaimLine key={id} id={id} lang={lang} />
+          <ClaimLine key={id} id={id} />
         ))}
       </ul>
     </article>
