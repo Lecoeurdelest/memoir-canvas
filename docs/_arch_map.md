@@ -52,11 +52,11 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | File | Purpose | Task |
 |---|---|---|
 | `src/main.tsx` | first frame now; database boot and WebMCP wiring later | `TASK-003`, `TASK-012` |
-| `src/domain/schema.sql` | 10 tables, 8 enums, 3 core constraints, the disagreement view | `TASK-002` |
+| `src/domain/schema.sql` | 11 tables, 8 enums, the core constraints, two roles + column grants, the actor-stamping and coherence triggers, the disagreement view | `TASK-002`, `TASK-014` |
 | `src/domain/db.ts` | owns the PGlite connection, schema bootstrap, IndexedDB fallback, and write queue | `TASK-003` |
 | `src/domain/types.ts` | the single source of types, mirroring the schema | `TASK-004` |
 | `src/domain/commands.ts` | **the single write door**; every command in a transaction | `TASK-008` |
-| `src/domain/audit.ts` | writes `audit_event` in that same transaction | `TASK-009` |
+| `src/domain/audit.ts` | writes `audit_event` in that same transaction; refusals get their own | `TASK-009` |
 | `src/mcp/descriptors.ts` | 8 tools: name, description, `inputSchema` | `TASK-005` |
 | `src/mcp/modelContext.ts` | feature-detecting API shim | `TASK-006` |
 | `src/mcp/handlers.ts` | validate, then delegate — **no SQL** | `TASK-011` |
@@ -136,3 +136,14 @@ Still unclear: **stop and ask a human.** Six days is not enough to go the wrong 
 
 Adding or removing a file under `src/` means updating the "File by file" table **in the same
 PR**. A map pointing the wrong way is worse than no map.
+
+## `tests/`
+
+| File | What it pins down | Task |
+|---|---|---|
+| `tests/registry.spec.ts` | `toolsFor(uiState)` switches tools on and off again | `TASK-013` |
+| `tests/modelContext.spec.ts` | a withdrawn tool is actually gone from the host, on both API shapes | `TASK-006` |
+| `tests/conflict.spec.ts` | conflict detection and the audit trail, against a real PGlite | `TASK-009`, `TASK-014` |
+
+Tests run against a real in-memory PGlite, never a mock: every guarantee they check is enforced
+by SQL, and a mocked database cannot refuse anything.

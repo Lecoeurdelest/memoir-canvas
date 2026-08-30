@@ -16,7 +16,9 @@ Fastest path: `npm run arch:check`. Or by hand:
 
 - [ ] There is no path by which an agent sets `certainty='confirmed'` without a `confirmed_by`
 - [ ] No `DROP`, no `ALTER … DROP CONSTRAINT`, nothing weakening the three core constraints
-- [ ] Every write records an `audit_event` **in the same transaction**
+- [ ] Every **successful** write records an `audit_event` in the same transaction
+- [ ] Every **refusal** records one too, in its own transaction after the rollback — it cannot
+      live in the transaction that failed (`NFR-OBS-02`)
 - [ ] Values returned to the agent carry facts and certainty, never a verdict
 
 ## Quality

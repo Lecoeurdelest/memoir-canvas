@@ -17,12 +17,12 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-006`](TASK-006-model-context-shim.md) | The modelContext shim | B | 1 | `TASK-005` | ☐ |
 | [`TASK-007`](TASK-007-seed-archive.md) | Seeded sample archive | C | 1 | `TASK-003`, `TASK-008` | ☐ |
 | [`TASK-008`](TASK-008-command-layer.md) | The command layer | B | 2 | `TASK-003`, `TASK-004` | ☐ |
-| [`TASK-009`](TASK-009-audit-event.md) | Audit logging | B | 2 | `TASK-008` | ☐ |
+| [`TASK-009`](TASK-009-audit-event.md) | Audit logging | B | 2 | `TASK-008` | ☑ |
 | [`TASK-010`](TASK-010-projection-store.md) | Projection and store | B | 2 | `TASK-003`, `TASK-004` | ☐ |
 | [`TASK-011`](TASK-011-mcp-handlers.md) | The eight tool handlers | B | 2 | `TASK-005`, `TASK-008` | ☐ |
 | [`TASK-012`](TASK-012-static-registry.md) | Static registry | B | 2 | `TASK-006`, `TASK-011` | ☐ |
 | [`TASK-013`](TASK-013-dynamic-registry.md) | Stateful tool registration | B | 3 | `TASK-010`, `TASK-012` | ☑ |
-| [`TASK-014`](TASK-014-conflict-detection.md) | Detect and record conflicts | B | 3 | `TASK-008`, `TASK-013` | ☐ |
+| [`TASK-014`](TASK-014-conflict-detection.md) | Detect and record conflicts | B | 3 | `TASK-008`, `TASK-013` | ☑ |
 | [`TASK-015`](TASK-015-book-scene.md) | The 3D book scene | A | 2 | `TASK-001` | ☐ |
 | [`TASK-016`](TASK-016-page-spread.md) | The page spread | A | 2 | `TASK-010`, `TASK-015` | ☐ |
 | [`TASK-017`](TASK-017-page-turn.md) | Turning pages | A | 3 | `TASK-016` | ☐ |

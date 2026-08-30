@@ -4,7 +4,7 @@ title: Detect and record conflicts
 branch: B
 day: 3
 depends_on: [TASK-008, TASK-013]
-status: todo
+status: done
 ---
 
 # TASK-014 — Detect and record conflicts
@@ -32,9 +32,9 @@ status: todo
 
 ## Acceptance criteria
 
-- [ ] No row in the view → throw and **write nothing**
-- [ ] Three disagreeing recollections join one conflict, not three pairs
-- [ ] No path exists for an agent to close a conflict
+- [x] No row in the view → throw and **write nothing**
+- [x] Three disagreeing recollections join one conflict, not three pairs
+- [x] No path exists for an agent to close a conflict
 
 ## Files touched
 

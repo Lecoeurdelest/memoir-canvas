@@ -4,7 +4,7 @@ title: Audit logging
 branch: B
 day: 2
 depends_on: [TASK-008]
-status: todo
+status: done
 ---
 
 # TASK-009 — Audit logging
@@ -33,9 +33,9 @@ Every write leaves exactly one `audit_event`, including writes that were refused
 
 ## Acceptance criteria
 
-- [ ] A rollback loses both the command and the audit row — no orphaned audit
-- [ ] An operation blocked by a constraint still leaves a trace
-- [ ] The sequence of what happened can be reconstructed from the audit table
+- [x] A rollback loses both the command and the audit row — no orphaned audit
+- [x] An operation blocked by a constraint still leaves a trace
+- [x] The sequence of what happened can be reconstructed from the audit table
 
 ## Files touched
 
