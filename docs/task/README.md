@@ -16,7 +16,7 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-005`](TASK-005-tool-descriptors.md) | Freeze the eight tool descriptors | B | 1 | `TASK-004` | ☐ |
 | [`TASK-006`](TASK-006-model-context-shim.md) | The modelContext shim | B | 1 | `TASK-005` | ☐ |
 | [`TASK-007`](TASK-007-seed-archive.md) | Seeded sample archive | C | 1 | `TASK-003`, `TASK-008` | ☑ |
-| [`TASK-008`](TASK-008-command-layer.md) | The command layer | B | 2 | `TASK-003`, `TASK-004` | ☐ |
+| [`TASK-008`](TASK-008-command-layer.md) | The command layer | B | 2 | `TASK-003`, `TASK-004` | ☑ |
 | [`TASK-009`](TASK-009-audit-event.md) | Audit logging | B | 2 | `TASK-008` | ☑ |
 | [`TASK-010`](TASK-010-projection-store.md) | Projection and store | B | 2 | `TASK-003`, `TASK-004` | ☑ |
 | [`TASK-011`](TASK-011-mcp-handlers.md) | The eight tool handlers | B | 2 | `TASK-005`, `TASK-008` | ☑ |
@@ -33,7 +33,7 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-022`](TASK-022-evidence-panel.md) | The evidence panel | C | 3 | `TASK-010`, `TASK-021` | ☑ |
 | [`TASK-023`](TASK-023-story-card.md) | The bilingual story card | C | 4 | `TASK-010`, `TASK-021` | ☑ |
 | [`TASK-024`](TASK-024-audit-panel.md) | The audit panel | C | 4 | `TASK-009` | ☑ |
-| [`TASK-025`](TASK-025-core-loop-e2e.md) | Demo core running end to end | B | 4 | `TASK-013`, `TASK-014`, `TASK-018`, `TASK-019`, `TASK-022` | ☐ |
+| [`TASK-025`](TASK-025-core-loop-e2e.md) | Demo core running end to end | B | 4 | `TASK-013`, `TASK-014`, `TASK-018`, `TASK-019`, `TASK-022` | ☑ |
 | [`TASK-026`](TASK-026-css-book-fallback.md) | Fallback: the CSS 3D book | A | 4 | `TASK-016` | ☑ |
 | [`TASK-027`](TASK-027-webview-conformance.md) | Confirm behaviour in the in-app browser | B | 5 | `TASK-025` | ☐ |
 | [`TASK-028`](TASK-028-deploy-static.md) | Static deploy | B | 5 | `TASK-027` | ☐ |

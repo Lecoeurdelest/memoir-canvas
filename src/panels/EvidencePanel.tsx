@@ -28,7 +28,7 @@ const KIND: Record<Source['kind'], { vi: string; en: string }> = {
 };
 
 const COPY = {
-  heading: { vi: 'Bằng chứng', en: 'Evidence' },
+  noYear: { vi: 'Không rõ năm', en: 'No year' },
   none: { vi: 'Chưa có nguồn nào cho lời kể này.', en: 'No source has been attached to this claim yet.' },
   contributor: { vi: 'Người kể', en: 'Contributed by' },
   noEvidence: {
@@ -91,8 +91,16 @@ export function EvidencePanel({ claim }: { claim: Claim }): JSX.Element {
 
   return (
     <section className="evidence-panel" aria-labelledby={`ev-${claim.id}`}>
+      {/* Headed by the claim it belongs to, not by the word "Evidence" — the page is already
+          labelled that, and a reader needs to know WHICH claim these sources bear on. */}
       <h4 id={`ev-${claim.id}`}>
-        {COPY.heading[lang]}
+        <span className="ev-for">
+          {claim.year_value === null
+            ? COPY.noYear[lang]
+            : claim.year_precision === 'circa'
+              ? `${lang === 'vi' ? 'khoảng' : 'around'} ${claim.year_value}`
+              : claim.year_value}
+        </span>
         <CertaintyBadge certainty={claim.certainty} lang={lang} />
       </h4>
 

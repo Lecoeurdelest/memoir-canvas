@@ -9,3 +9,5 @@ coverage/
 # Tooling artefacts, not source
 .playwright-mcp/
 *.png
+# ...but the demo-core stills ARE evidence (TASK-025)
+!docs/implement/evidence/takes/*.png

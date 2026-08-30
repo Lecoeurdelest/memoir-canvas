@@ -248,3 +248,22 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 @media (max-width: 640px) { .spread { grid-template-columns: 1fr; }
                             .page-left { border-right: 0; border-bottom: 1px solid var(--rule); }
                             .spread-torn .page-left { border-right: 0; border-bottom: 2px dashed var(--lacquer); } }
+
+/* The Confirm control: identical on every competing claim, so the choice is the reader's. */
+.competing .confirm { display: block; width: 100%; margin-top: 10px; font: inherit; font-size: 12px;
+                      padding: 6px 10px; cursor: pointer; background: var(--ok); color: #fff;
+                      border: 0; border-radius: 3px; }
+.competing .confirm:disabled { background: #cfd3d0; color: #6a6f6c; cursor: not-allowed; }
+
+.decider { margin-top: 12px; }
+.decider label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+.decider select { font: inherit; font-size: 13px; padding: 4px 8px; background: #fff;
+                  border: 1px solid var(--rule); border-radius: 3px; }
+.decider .hint { margin: 5px 0 0; max-width: 48ch; }
+.decider .result { margin-top: 8px; }
+
+.evidence-panel h4 .ev-for { font-family: "Newsreader", Georgia, serif; font-size: 16px;
+                             font-weight: 600; letter-spacing: 0; text-transform: none;
+                             color: var(--ink); font-variant-numeric: tabular-nums; }
+.evidence-panel + .evidence-panel { margin-top: 18px; padding-top: 14px;
+                                    border-top: 1px solid var(--rule); }

@@ -4,7 +4,7 @@ title: The command layer
 branch: B
 day: 2
 depends_on: [TASK-003, TASK-004]
-status: todo
+status: done
 ---
 
 # TASK-008 — The command layer
@@ -34,9 +34,9 @@ status: todo
 
 ## Acceptance criteria
 
-- [ ] No SQL exists outside this file and `projection.ts`
-- [ ] A failing command rolls back cleanly, leaving no half state
-- [ ] `resolveClaim` called from the UI button and from the tool handler behaves identically
+- [x] No SQL exists outside this file and `projection.ts`
+- [x] A failing command rolls back cleanly, leaving no half state
+- [x] `resolveClaim` called from the UI button and from the tool handler behaves identically
 
 ## Files touched
 

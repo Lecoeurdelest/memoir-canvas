@@ -4,7 +4,7 @@ title: Demo core running end to end
 branch: B
 day: 4
 depends_on: [TASK-013, TASK-014, TASK-018, TASK-019, TASK-022]
-status: todo
+status: done
 ---
 
 # TASK-025 — Demo core running end to end
@@ -32,10 +32,10 @@ The core chain runs in one unbroken pass: `flag_conflict` → torn page → `pro
 
 ## Acceptance criteria
 
-- [ ] The e2e test is green
-- [ ] **The whole chain can be screen-recorded in one unbroken take**
-- [ ] `resolve_claim` is absent before the conflict page is opened and after it is closed
-- [ ] The audit log records the full chain with `registered_because`
+- [x] The e2e test is green
+- [x] **The whole chain can be screen-recorded in one unbroken take**
+- [x] `resolve_claim` is absent before the conflict page is opened and after it is closed
+- [x] The audit log records the full chain with `registered_because`
 
 ## Files touched
 
