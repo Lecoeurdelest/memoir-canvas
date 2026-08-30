@@ -1,6 +1,6 @@
 # AGENTS.md — the working contract for every agent
 
-You are working on **Hồi Ký**, a WebMCP app. This document is the **single source of truth**
+You are working on **Memoir Canvas**, a WebMCP app. This document is the **single source of truth**
 for every agent (Claude Code, Codex, Cursor, Copilot, anything else). The `CLAUDE.md` and
 `AGENTS.md` at the repo root, `.cursor/rules/`, and `.github/copilot-instructions.md` are all
 thin shims pointing here — **do not add rules there, add them here.**
@@ -24,7 +24,7 @@ what you need.
 
 ## 1. What this project argues — do not erode it
 
-Hồi Ký is a family memory canvas. Its entire value is one sentence:
+Memoir Canvas is a family memory canvas. Its entire value is one sentence:
 
 > **An AI must not turn a guess into a fact.**
 

@@ -1,8 +1,8 @@
-# Using Hồi Ký
+# Using Memoir Canvas
 
 > Status: outline. Write it out in `TASK-029`, alongside the Devpost submission text.
 
-Hồi Ký is a book. You tell family stories, an agent writes them down — but it records
+Memoir Canvas is a book. You tell family stories, an agent writes them down — but it records
 **recollections**, not **facts**, and it tells you where it is unsure.
 
 ## Opening it for the first time
@@ -37,7 +37,7 @@ You add a photograph with 1974 written on the back. The book **tears along that 
 The agent will **not** pick a year for you. Instead it proposes a specific question for a
 specific person: *"Ask Uncle Ba: was the photo taken before or after the move?"*
 
-This is what makes Hồi Ký different. An AI that guesses hands you a tidy answer; Hồi Ký hands
+This is what makes Memoir Canvas different. An AI that guesses hands you a tidy answer; Memoir Canvas hands
 you the right question.
 
 ## Closing a disagreement

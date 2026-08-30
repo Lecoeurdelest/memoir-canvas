@@ -1,4 +1,4 @@
-# What Hồi Ký is
+# What Memoir Canvas is
 
 A family memory canvas where people and an AI agent **together** reconstruct family history
 from oral accounts, old photographs and documents — under one condition: the agent must cite
@@ -6,7 +6,7 @@ its sources, must show where it is unsure, and **may never resolve a contradicti
 
 Entry for **The WebMCP Challenge** (Devpost, hosted by OpenAI). Deadline **2026-09-03, 1PM PDT**.
 
-The project name is Vietnamese — *hồi ký* means "memoir". Keep it.
+The project is titled in English, **Memoir Canvas**.
 
 ## The core scenario — know this by heart
 

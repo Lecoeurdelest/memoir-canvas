@@ -1,4 +1,4 @@
-# Hồi Ký
+# Memoir Canvas
 
 **A family memory canvas where the AI is not allowed to turn a guess into a fact.**
 
@@ -9,8 +9,6 @@ contradiction on its own**.
 
 The 3D book on screen *is* the memory graph rendered. When two sources disagree, the page
 **tears along a red line and will not close** — until a person decides.
-
-*Hồi ký* is Vietnamese for "memoir".
 
 ---
 

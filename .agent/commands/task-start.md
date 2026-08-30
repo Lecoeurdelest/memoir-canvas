@@ -4,7 +4,7 @@
 
 ---
 
-You are about to work on `<TASK-ID>` in the Hồi Ký repo.
+You are about to work on `<TASK-ID>` in the Memoir Canvas repo.
 
 Before writing a single line of code, do the following and **report back to me**:
 

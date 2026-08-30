@@ -4,7 +4,7 @@
 
 ---
 
-Review the architecture of the Hồi Ký repo. Write the results into `docs/_arch_review.md`
+Review the architecture of the Memoir Canvas repo. Write the results into `docs/_arch_review.md`
 (append a new dated section at the top, keep the old ones).
 
 ## 1. Check the invariants mechanically

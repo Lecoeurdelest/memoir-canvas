@@ -1,6 +1,6 @@
 # Architecture
 
-Hồi Ký runs entirely inside one browser tab. No server, no API, no runtime network calls.
+Memoir Canvas runs entirely inside one browser tab. No server, no API, no runtime network calls.
 People and agents look at the same canvas and **push the same door to write**.
 
 File map: [`_arch_map.md`](_arch_map.md) · Full rules:

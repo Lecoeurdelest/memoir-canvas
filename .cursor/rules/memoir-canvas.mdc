@@ -1,5 +1,5 @@
 ---
-description: Hồi Ký — project rules; the real content lives in .agent/
+description: Memoir Canvas — project rules; the real content lives in .agent/
 globs: ["**/*"]
 alwaysApply: true
 ---

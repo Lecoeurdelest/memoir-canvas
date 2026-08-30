@@ -1,4 +1,4 @@
-# Hồi Ký — agent instructions
+# Memoir Canvas — agent instructions
 
 **The real content lives in [`.agent/AGENTS.md`](.agent/AGENTS.md). Read that file.**
 
