@@ -8,12 +8,11 @@
  * R5: read from src/store/, never mutate.
  */
 
-import { useState } from 'react';
 import { CertaintyBadge } from './CertaintyBadge';
+import { EvidencePanel } from './EvidencePanel';
 import { useStore } from '../store/store';
+import type { Lang } from '../store/store';
 import type { Certainty, StoryCard as Card } from '../domain/types';
-
-type Lang = 'vi' | 'en';
 
 const CITED_BY: Record<Lang, string> = { vi: 'Dựa trên', en: 'Standing on' };
 const CLAIM_WORD: Record<Lang, [string, string]> = {
@@ -43,16 +42,18 @@ function ClaimLine({ id, lang }: { id: string; lang: Lang }): JSX.Element {
 
   return (
     <li className="cited">
-      <span className="predicate">{claim.predicate}</span>
-      {object && <span> · {object}</span>}
-      {year && <span> · {year}</span>}
-      <CertaintyBadge certainty={claim.certainty} lang={lang} />
+      <div className="cited-line">
+        <span className="predicate">{claim.predicate}</span>
+        {object && <span> · {object}</span>}
+        {year && <span> · {year}</span>}
+      </div>
+      <EvidencePanel claim={claim} />
     </li>
   );
 }
 
 export function StoryCard({ card }: { card: Card }): JSX.Element {
-  const [lang, setLang] = useState<Lang>('vi');
+  const lang = useStore((s) => s.lang);
   const subject = useStore((s) => s.model?.people.find((p) => p.id === card.subject_person_id));
 
   const title = lang === 'vi' ? card.title_vi : card.title_en;
@@ -65,18 +66,6 @@ export function StoryCard({ card }: { card: Card }): JSX.Element {
       <div className="card-head">
         {/* Above the prose, deliberately. A reader meets the label before the story. */}
         <CertaintyBadge certainty={card.floor_certainty} lang={lang} prominent />
-        <div className="lang" role="group" aria-label={lang === 'vi' ? 'Ngôn ngữ' : 'Language'}>
-          {(['vi', 'en'] as const).map((l) => (
-            <button
-              key={l}
-              type="button"
-              aria-pressed={lang === l}
-              onClick={() => setLang(l)}
-            >
-              {l === 'vi' ? 'Tiếng Việt' : 'English'}
-            </button>
-          ))}
-        </div>
       </div>
 
       <h3 lang={lang}>{title}</h3>

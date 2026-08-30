@@ -4,7 +4,7 @@ title: The audit panel
 branch: C
 day: 4
 depends_on: [TASK-009]
-status: todo
+status: done
 ---
 
 # TASK-024 — The audit panel
@@ -32,9 +32,9 @@ A chronological log, readable by a non-technical person, filterable by tool.
 
 ## Acceptance criteria
 
-- [ ] Someone who does not write code can read it
-- [ ] Blocked operations appear clearly with their reason
-- [ ] The sequence of events can be reconstructed after the demo
+- [x] Someone who does not write code can read it
+- [x] Blocked operations appear clearly with their reason
+- [x] The sequence of events can be reconstructed after the demo
 
 ## Files touched
 

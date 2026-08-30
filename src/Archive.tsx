@@ -9,6 +9,7 @@
  */
 
 import { Suspense, lazy } from 'react';
+import { AuditTrail } from './panels/AuditTrail';
 import { StoryCard } from './panels/StoryCard';
 import { useStore } from './store/store';
 import type { BootReport } from './bootstrap';
@@ -21,6 +22,8 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
   const model = useStore((s) => s.model);
   const ui = useStore((s) => s.ui);
   const setUi = useStore((s) => s.setUi);
+  const lang = useStore((s) => s.lang);
+  const setLang = useStore((s) => s.setLang);
 
   const conflicts = model?.conflicts.filter((c) => c.status === 'open') ?? [];
   const cards = model?.cards ?? [];
@@ -28,7 +31,16 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
   return (
     <div className="layout">
       <header>
-        <h1>Memoir Canvas</h1>
+        <div className="title-row">
+          <h1>Memoir Canvas</h1>
+          <div className="lang" role="group" aria-label={lang === 'vi' ? 'Ngôn ngữ' : 'Language'}>
+            {(['vi', 'en'] as const).map((l) => (
+              <button key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}>
+                {l === 'vi' ? 'Tiếng Việt' : 'English'}
+              </button>
+            ))}
+          </div>
+        </div>
         <p className="tagline">
           An evidence-first family archive. The agent may find a contradiction; it may not settle
           one.
@@ -109,6 +121,8 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
       <Suspense fallback={<p className="hint">Loading tools…</p>}>
         <ManualToolPanel />
       </Suspense>
+
+      <AuditTrail />
     </div>
   );
 }

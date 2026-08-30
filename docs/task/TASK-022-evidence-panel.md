@@ -4,7 +4,7 @@ title: The evidence panel
 branch: C
 day: 3
 depends_on: [TASK-010, TASK-021]
-status: todo
+status: done
 ---
 
 # TASK-022 — The evidence panel
@@ -32,8 +32,8 @@ The right-hand page of each spread: sources, excerpts, stance, label.
 
 ## Acceptance criteria
 
-- [ ] A `contradicts` source appears clearly and is never hidden
-- [ ] `verbatim` is shown exactly, never summarised
+- [x] A `contradicts` source appears clearly and is never hidden
+- [x] `verbatim` is shown exactly, never summarised
 
 ## Files touched
 

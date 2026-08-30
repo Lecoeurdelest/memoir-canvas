@@ -10,11 +10,13 @@
 
 import { query } from '../domain/db';
 import type {
+  AuditEvent,
   Claim,
   Conflict,
   OpenDisagreement,
   Person,
   Place,
+  Evidence,
   Source,
   StoryCard,
 } from '../domain/types';
@@ -27,13 +29,17 @@ export interface ReadModel {
   conflicts: Conflict[];
   disagreements: OpenDisagreement[];
   cards: StoryCard[];
+  evidence: Evidence[];
+  /** Newest first, capped: the panel is a timeline to read, not an export. */
+  audit: AuditEvent[];
   /** Derived, and what the registry (R4) consumes. */
   subjectsWithDisagreement: Set<string>;
   openConflictIds: Set<string>;
 }
 
 export async function buildReadModel(): Promise<ReadModel> {
-  const [people, places, claims, sources, conflicts, disagreements, cards] = await Promise.all([
+  const [people, places, claims, sources, conflicts, disagreements, cards, evidence, audit] =
+    await Promise.all([
     query<Person>('SELECT * FROM person ORDER BY created_at'),
     query<Place>('SELECT * FROM place ORDER BY created_at'),
     query<Claim>("SELECT * FROM claim WHERE status = 'active' ORDER BY created_at"),
@@ -41,6 +47,8 @@ export async function buildReadModel(): Promise<ReadModel> {
     query<Conflict>('SELECT * FROM conflict ORDER BY detected_at'),
     query<OpenDisagreement>('SELECT * FROM v_open_disagreement'),
     query<StoryCard>('SELECT * FROM story_card ORDER BY generated_at DESC'),
+    query<Evidence>('SELECT * FROM evidence ORDER BY created_at'),
+    query<AuditEvent>('SELECT * FROM audit_event ORDER BY id DESC LIMIT 200'),
   ]);
 
   return {
@@ -51,6 +59,8 @@ export async function buildReadModel(): Promise<ReadModel> {
     conflicts,
     disagreements,
     cards,
+    evidence,
+    audit,
     subjectsWithDisagreement: new Set(disagreements.map((d) => d.subject_id)),
     openConflictIds: new Set(conflicts.filter((c) => c.status === 'open').map((c) => c.id)),
   };

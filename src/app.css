@@ -128,3 +128,63 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
          color: var(--ink-soft); }
 .cited .predicate { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 12px; }
 .cited.missing { font-style: italic; }
+
+.title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px;
+             flex-wrap: wrap; }
+
+/* ── evidence (TASK-022) ────────────────────────────────────────────────────────────────────
+   A contradicting source is listed first and marked. Burying what disagrees is the failure the
+   project exists to prevent. */
+.evidence-panel { margin: 8px 0 0 0; }
+.evidence-panel h4 { font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase;
+                     color: var(--ink-soft); margin: 0 0 6px; display: flex; align-items: center;
+                     gap: 8px; font-weight: 500; }
+.evidence-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.evidence { border-left: 3px solid var(--rule); padding: 6px 0 6px 12px; }
+.evidence.stance-contradicts { border-left-color: var(--lacquer); }
+.evidence.stance-supports    { border-left-color: var(--ok); }
+.evidence.missing { font-style: italic; color: var(--ink-soft); border-left-style: dashed; }
+
+.evidence-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; margin: 0 0 4px;
+                 font-size: 13px; }
+.evidence-head .stance { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;
+                         font-weight: 600; }
+.stance-contradicts .stance { color: var(--lacquer); }
+.stance-supports .stance    { color: var(--ok); }
+.evidence-head .kind { color: var(--ink-soft); font-size: 12px; }
+.evidence-head .title { font-weight: 600; }
+
+/* Shown whole: this is testimony, and clipping it is paraphrasing it. */
+.verbatim { margin: 4px 0; padding: 0; font-family: "Newsreader", Georgia, serif;
+            font-size: 15px; font-style: italic; color: var(--ink); max-width: 60ch; }
+.verbatim::before { content: '“'; } .verbatim::after { content: '”'; }
+.excerpt { margin: 3px 0 0; font-size: 13px; color: var(--ink-soft); }
+.contributor { margin: 3px 0 0; font-size: 12px; color: var(--ink-soft); }
+
+.cited { display: block; }
+.cited-line { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; font-size: 13px;
+              color: var(--ink-soft); }
+
+/* ── audit trail (TASK-024) ─────────────────────────────────────────────────────────────────
+   Sentences, not JSON. A judge opens this panel. */
+.audit { margin-top: 32px; }
+.audit-filters { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center;
+                 margin: 0 0 14px; }
+.audit-filters select { font: inherit; font-size: 13px; padding: 4px 8px;
+                        border: 1px solid var(--rule); border-radius: 3px; background: #fff; }
+.refused-only { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer; }
+
+.entries { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.entry { border-left: 3px solid var(--rule); padding: 8px 0 8px 12px; margin-bottom: 2px; }
+.entry-refused { border-left-color: var(--lacquer); background: #faf1ef; }
+
+.entry time { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 11px;
+              color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.entry .what { margin: 2px 0 0; font-size: 14px; max-width: 72ch; }
+.entry .who { font-weight: 600; }
+.who-agent { color: #2a5566; }
+.who-human { color: var(--ok); }
+.entry .refused { color: var(--lacquer); font-size: 11px; letter-spacing: 0.06em; }
+.entry .constraint { margin: 3px 0 0; }
+.entry .constraint code { font-size: 11px; }
+.entry .context { margin: 2px 0 0; font-size: 12px; color: var(--ink-soft); }
