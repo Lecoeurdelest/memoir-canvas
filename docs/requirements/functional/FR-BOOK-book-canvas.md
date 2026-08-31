@@ -80,3 +80,38 @@ CSS perspective costs nothing, shapes ổ ữ ậ ằ correctly because it is or
 context to lose when a phone backgrounds the tab.
 
 `FR-BOOK-05` remains the first thing to cut if anything slips, as it always was.
+
+## Amended 2026-08-31 (third) — the road becomes a forest and a book
+
+Approved by the product owner after a seven-round design review. The canvas of record is
+`docs/design/` (published design canvas). This amendment supersedes parts of the second one.
+
+**What changed, and why it is a simplification rather than a pivot.** The second amendment made
+the archive a road, because travelling forward was travelling through time. The book then gained
+real page-turning — at which point **turning a page IS travelling through time**, and the road was
+a second metaphor competing for the same job. It is cut. Seven views became six, and all six live
+in one world.
+
+| ID | Now reads |
+|---|---|
+| `FR-BOOK-01` | The archive opens as a **forest of fireflies**: one light per memory. Brightness and hue carry certainty, so the state of the whole archive reads at a glance, before a word. An unlit ring marks a gap the family has not filled. |
+| `FR-BOOK-02` | A light opens into a **bound volume** with a title on its cover, and the volume opens onto a spread: recollection left, evidence right. |
+| `FR-BOOK-03` | An open conflict is **a page that will not turn**. It lifts and springs back, torn along the gutter. Forward travel is refused by every route until a person settles it. |
+| `FR-BOOK-04` | Unchanged. |
+| `FR-BOOK-05` | Superseded by `FR-BOOK-01` — the forest is the relationship view the constellation was meant to be. |
+| `FR-BOOK-06` | Unchanged, and stronger: the refusal is rendered from `spread.conflict`, so it cannot appear without one. |
+| `FR-BOOK-07` | Superseded in the second amendment; still no WebGL, still ordinary DOM. |
+| `FR-BOOK-08` | **New. No visible navigation controls.** Travel is by pointer gesture — drag a page edge to turn, drag the fore-edge to reach a year, drag down to close. `NFR-A11Y-03` is satisfied by the keyboard path it already names (ArrowLeft/ArrowRight), not by an on-screen button; a control that is invisible to the pointer user must still be reachable and named for assistive technology. |
+
+### The rule that governs every view
+
+**What must be read is never tilted; what is tilted never needs to be read.** The book's own body
+text is texture; the memory that must be legible sits on a near-frontal plane. This was learned by
+building the opposite first and finding it unreadable.
+
+### Measured before committing
+
+The dark palette this direction needs was checked rather than assumed: firefly and label colours
+score **6.25–13.32** against the forest ground, and book-spine text **6.70–7.50** against its
+fill — every value clears WCAG AA. `PALETTE` in `CertaintyBadge.tsx` is light-only today, so
+adopting this costs a dark set and an extension to `tests/certainty.spec.ts`.

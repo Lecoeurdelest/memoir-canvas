@@ -5,7 +5,8 @@ branch: A
 day: 5
 depends_on: [TASK-010, TASK-018, TASK-025]
 supersedes: [TASK-015, TASK-016, TASK-017]
-status: done
+status: superseded
+superseded_by: TASK-035
 ---
 
 # TASK-030 — The road
@@ -83,3 +84,17 @@ New claims must be dated **after 1974**, because `core-loop.spec.ts` and `spread
 2. `npm run test:evidence -- TASK-030`
 3. Write `docs/implement/IMPL-TASK-030.md` from `docs/implement/TEMPLATE.md`
 4. Walk `.agent/workflows/review-checklist.md`
+
+## Superseded 2026-08-31 — by `TASK-035`
+
+The road was the metaphor for travelling forward through time. Once the book turned pages, turning
+a page *became* that, and two metaphors were competing for one job. The road is cut; the book wins.
+
+**What survives, and it is the valuable half:** `useSpreadNavigation` — the state, the wedge rule
+and the `R4` `setUi` contract. None of it was ever about the road, and `tests/navigation.spec.ts`
+keeps passing unchanged across the whole rewrite. That is what "one truth, two skins" bought: the
+skin was replaceable without touching the truth.
+
+`src/view/Road.tsx` and `src/view/BookControls.tsx` are removed by `TASK-035`. The seed change this
+task made — four stops instead of one — is kept and is now what the forest and the fore-edge index
+both need.

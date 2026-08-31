@@ -71,8 +71,11 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/store/uiState.ts` | what the user is looking at — the registry depends on this | `TASK-010` |
 | `src/view/useSpreadNavigation.ts` | **the single navigation truth** — state, the wedge rule, the R4 `setUi` contract. Both skins consume it | `TASK-030` |
 | `src/view/BookStage.tsx` | picks the skin: the road, or the flat list via `?flat=1` | `TASK-030` |
-| `src/view/BookControls.tsx` | the milestone list and turn controls, shared by both skins — real DOM, outside any transform | `TASK-030` |
-| `src/view/Road.tsx` | the road, in CSS perspective. **No WebGL** | `TASK-030` |
+| `src/view/Forest.tsx` | the entry view — one firefly per memory, brightness is certainty | `TASK-034` |
+| `src/view/Volume.tsx` | the spread, turned by hand. **No WebGL, no buttons** | `TASK-035` |
+| `src/view/Cover.tsx` | the closed volume, its title, the way in from the forest | `TASK-035` |
+| `src/view/usePageDrag.ts` | pointer gesture → a committed page turn | `TASK-035` |
+| `src/view/RefusedPage.tsx` | the page that will not turn — **the project's argument, rendered** | `TASK-036` |
 | `src/view/webgl.ts` | memoised WebGL preflight and the `?flat=1` escape hatch | `TASK-030` |
 | `src/view/Spread.tsx` | one station's content, as ordinary DOM | `TASK-016` (superseded), `TASK-030` |
 | `src/view/Tear.tsx` | the conflict tear and its healing | `TASK-018`, `TASK-019` |
