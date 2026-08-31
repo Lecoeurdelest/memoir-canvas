@@ -4,7 +4,7 @@ title: Backstage — one door to the machinery
 branch: C
 day: 5
 depends_on: [TASK-024, TASK-030, TASK-033]
-status: todo
+status: done
 ---
 
 # TASK-031 — Backstage: one door to the machinery
@@ -90,14 +90,14 @@ question. A judge, standing on the blocked road, is handed the whole thesis with
 
 ## Acceptance criteria
 
-- [ ] First paint shows the wordmark, one Vietnamese sentence, the road, and the station — nothing else
-- [ ] No English string is shown while `lang` is `'vi'`
-- [ ] No raw database identifier (`moved_to`, `subject_id`, a UUID) appears outside Backstage
-- [ ] Every one of the six judge needs above is reachable within one gesture of first paint
-- [ ] The ask-the-assistant control is refused by Postgres, and the refusal is shown verbatim, not paraphrased
-- [ ] That refusal writes an audit row, and the link reaches it
-- [ ] Backstage traps focus, closes on Esc, and returns focus to its opener (`NFR-A11Y-03`)
-- [ ] The actor toggle still exists and still demonstrates the refusal (`FR-MCP`)
+- [~] First paint shows one Vietnamese sentence and the forest — the wordmark moved below the fold when `FR-BOOK-09` landed; see IMPL Deviations
+- [x] No English string is shown while `lang` is `'vi'`
+- [x] No raw database identifier (`moved_to`, `subject_id`, a UUID) appears outside Backstage
+- [x] Every one of the six judge needs above is reachable within one gesture of first paint
+- [x] The ask-the-assistant control is refused by Postgres, and the refusal is shown verbatim, not paraphrased
+- [x] That refusal writes an audit row, and the link reaches it
+- [x] Backstage traps focus, closes on Esc, and returns focus to its opener (`NFR-A11Y-03`)
+- [x] The actor toggle still exists and still demonstrates the refusal (`FR-MCP`)
 
 ## Files touched
 

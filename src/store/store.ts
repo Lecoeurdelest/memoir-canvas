@@ -29,18 +29,29 @@ interface Store {
    * subscription below follows a change made anywhere else.
    */
   lang: Lang;
+  /**
+   * Whether the machinery drawer is open. UI state of the same kind as `ui` — about what the
+   * person is looking at, not about what is true — and it lives here rather than being drilled
+   * from Archive through BookStage and Volume to reach the one button on the refused page that
+   * needs it. It is deliberately NOT part of `ui`: the registry is a pure function of that, and
+   * opening a drawer must not change which tools an agent holds.
+   */
+  backstage: boolean;
   refresh: () => Promise<void>;
   setUi: (ui: UiState) => void;
   setLang: (lang: Lang) => void;
+  setBackstage: (open: boolean) => void;
 }
 
 export const useStore = create<Store>((set) => ({
   model: null,
   ui: INITIAL_UI_STATE,
   lang: currentLang(),
+  backstage: false,
   refresh: async () => set({ model: await buildReadModel() }),
   setUi: (ui) => set({ ui }),
   setLang: (lang) => void i18n.changeLanguage(lang),
+  setBackstage: (backstage) => set({ backstage }),
 }));
 
 i18n.on('languageChanged', () => useStore.setState({ lang: currentLang() }));

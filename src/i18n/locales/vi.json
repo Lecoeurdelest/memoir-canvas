@@ -42,7 +42,33 @@
     "heading": "Trang này không lật được",
     "cannotTurn": "Sách dừng ở đây cho tới khi có người quyết.",
     "putNameOn": "Đặt tên {{name}} vào năm {{year}}",
-    "pickFirst": "Chọn tên một người trước"
+    "pickFirst": "Chọn tên một người trước",
+    "ask": "Nhờ trợ lý quyết hộ",
+    "asking": "đang hỏi…",
+    "assistantRefused": "Cơ sở dữ liệu từ chối tác nhân AI:",
+    "seeWhatHappened": "Xem chuyện vừa xảy ra"
+  },
+  "predicate": {
+    "moved_to": "chuyển tới",
+    "born_in": "sinh ra ở",
+    "opened_business": "mở tiệm ở"
+  },
+  "backstage": {
+    "open": "Hậu trường",
+    "title": "Hậu trường",
+    "intro": "Máy móc bên dưới kho ký ức: công cụ tác nhân AI đang cầm, và mọi thao tác đã xảy ra.",
+    "close": "Đóng",
+    "absent": "trình duyệt này chưa có",
+    "ready": "kho mở trong",
+    "claims": "lời kể",
+    "openConflicts": "mâu thuẫn còn mở",
+    "noServer": "Không có máy chủ. Toàn bộ Postgres chạy trong tab này, lưu trong trình duyệt của bạn.",
+    "tools": "Công cụ",
+    "toolsWhy": "Cùng những handler mà tác nhân AI gọi qua WebMCP. Công cụ hiện ra và biến mất theo thứ bạn đang mở — đó chính là điều muốn chứng minh.",
+    "actingAs": "Gọi với vai",
+    "actorWhy": "Không phải trang trí: cơ sở dữ liệu nhận một vai khác nhau cho mỗi bên, và vai của tác nhân AI không có quyền xác nhận hay khép mâu thuẫn.",
+    "roleAgent": "Tác nhân AI",
+    "roleHuman": "Một người"
   },
   "evidence": {
     "noYear": "Không rõ năm",
@@ -104,6 +130,10 @@
     "superseded": "lời kể đã bị thay thế"
   },
   "app": {
-    "language": "Ngôn ngữ"
+    "language": "Ngôn ngữ",
+    "tagline": "Kho ký ức gia đình dựa trên bằng chứng. Tác nhân AI có thể tìm ra mâu thuẫn; nó không được quyền khép lại.",
+    "cards": "Thẻ chuyện",
+    "ephemeral": "Chế độ riêng tư: kho này chỉ nằm trong bộ nhớ và sẽ mất khi bạn đóng tab.",
+    "rebuilt": "Kho đã được dựng lại do cập nhật cấu trúc. Nội dung cũ đã bị bỏ."
   }
 }

@@ -49,6 +49,7 @@ export function RefusedPage({
   const { t } = useTranslation();
   const people = useStore((s) => s.model?.people) ?? [];
   const refresh = useStore((s) => s.refresh);
+  const setBackstage = useStore((s) => s.setBackstage);
 
   // Only people a human entered may sign for a fact — the same rule the database enforces in
   // claim_confirmed_by_a_human. Offering the others would be offering a refusal.
@@ -58,6 +59,39 @@ export function RefusedPage({
   const [over, setOver] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [asking, setAsking] = useState(false);
+  const [refusal, setRefusal] = useState<string | null>(null);
+
+  /**
+   * TASK-031, the second entrance — and the more important one. This is the question every
+   * ordinary person asks of a computer, so the answer arrives without anyone hunting for it.
+   *
+   * It calls the SAME function the person's own button calls, with `actor: 'agent'`. Postgres
+   * refuses it because `app_agent` holds no grant to close a conflict, and the message is shown
+   * exactly as the database wrote it. Softening it into "the assistant cannot do that" would be
+   * the same act this project exists to refuse.
+   */
+  async function askTheAssistant(): Promise<void> {
+    setAsking(true);
+    setRefusal(null);
+    try {
+      await commands.resolveClaim(
+        {
+          conflict_id: conflict.id,
+          winning_claim_id: spread.claims[0].id,
+          resolved_by: witnesses[0]?.id ?? '',
+        },
+        { actor: 'agent', registeredBecause: 'a reader asked the assistant to settle it' },
+      );
+      // Reaching here would mean the grant leaked. Say so rather than showing nothing.
+      setRefusal('the agent was NOT refused — check the GRANTs');
+    } catch (err) {
+      setRefusal(err instanceof Error ? err.message : String(err));
+    } finally {
+      setAsking(false);
+      await refresh();
+    }
+  }
 
   async function settle(winningClaimId: string, decidedBy: string): Promise<void> {
     setBusy(true);
@@ -160,6 +194,25 @@ export function RefusedPage({
           {error}
         </p>
       )}
+
+      {/* Entrance two. A family member presses a button whose meaning is obvious; a judge standing
+          on the refusal is handed the whole thesis without hunting for it. */}
+      <div className="ask-assistant">
+        <button type="button" className="ask" onClick={() => void askTheAssistant()} disabled={asking}>
+          {asking ? t('refused.asking') : t('refused.ask')}
+        </button>
+
+        {refusal && (
+          <div className="assistant-refusal" role="status">
+            <p className="assistant-said">{t('refused.assistantRefused')}</p>
+            {/* Verbatim. Never paraphrased — the message IS the evidence. */}
+            <code>{refusal}</code>
+            <button type="button" className="see-what" onClick={() => setBackstage(true)}>
+              {t('refused.seeWhatHappened')}
+            </button>
+          </div>
+        )}
+      </div>
 
       <p className="refused-foot">{t('refused.cannotTurn')}</p>
     </article>

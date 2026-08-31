@@ -10,6 +10,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { invokeTool, toolsOnOffer } from '../bootstrap';
 import type { ToolDescriptor, ToolName } from '../mcp/descriptors';
 import type { ActorKind } from '../domain/types';
@@ -120,6 +121,7 @@ function ToolForm({ tool, actor }: { tool: ToolDescriptor; actor: ActorKind }): 
 }
 
 export function ManualToolPanel(): JSX.Element {
+  const { t } = useTranslation();
   const [actor, setActor] = useState<ActorKind>('agent');
   const ui = useStore((s) => s.ui);
   const model = useStore((s) => s.model);
@@ -131,14 +133,16 @@ export function ManualToolPanel(): JSX.Element {
 
   return (
     <section className="panel" aria-labelledby="tools-heading">
-      <h2 id="tools-heading">Tools ({tools.length})</h2>
-      <p className="hint">
-        The same handlers an agent reaches over WebMCP. Tools appear and disappear with what you
-        have open — that is the point.
-      </p>
+      <h2 id="tools-heading">
+        {t('backstage.tools')} ({tools.length})
+      </h2>
+      <p className="hint">{t('backstage.toolsWhy')}</p>
 
+      {/* TASK-031 — the Postgres role is named on the radio itself. It is the cheapest credibility
+          win in the app: it turns what reads as a UI affectation into a visible statement about
+          GRANTs, which is the thing actually doing the work. */}
       <fieldset className="actor">
-        <legend>Acting as</legend>
+        <legend>{t('backstage.actingAs')}</legend>
         {(['agent', 'human'] as const).map((a) => (
           <label key={a}>
             <input
@@ -148,13 +152,11 @@ export function ManualToolPanel(): JSX.Element {
               checked={actor === a}
               onChange={() => setActor(a)}
             />
-            {a === 'agent' ? 'the agent' : 'a person'}
+            {a === 'agent' ? t('backstage.roleAgent') : t('backstage.roleHuman')}{' '}
+            <code>{a === 'agent' ? 'app_agent' : 'app_human'}</code>
           </label>
         ))}
-        <span className="hint">
-          Not cosmetic: the database assumes a different role for each, and the agent's holds no
-          privilege to confirm a claim or close a conflict. Try `resolve_claim` as both.
-        </span>
+        <span className="hint">{t('backstage.actorWhy')}</span>
       </fieldset>
 
       {tools.map((t) => (

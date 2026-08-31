@@ -51,7 +51,7 @@ export function Volume({ nav }: { nav: SpreadNavigation }): JSX.Element {
   return (
     <section className="volume" aria-label={t('volume.name')}>
       <div
-        className={`book-body${refused ? ' refusing' : ''}`}
+        className={`book-body${refused ? ' refusing' : ''}${spread.conflict ? ' torn' : ''}`}
         ref={stage}
         tabIndex={0}
         role="group"

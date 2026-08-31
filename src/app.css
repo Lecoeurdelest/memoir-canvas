@@ -557,6 +557,10 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 .book-body .spread { position: relative; z-index: 1; }
 
+/* A torn page has no clean fold. The gutter shadow is replaced by the tear itself, which also
+   stops it painting across the refusal panel below the facing pages. */
+.book-body.torn .gutter { display: none; }
+
 /* The leaf under the reader's hand. Blank by construction. */
 .turning-leaf {
   position: absolute;
@@ -833,4 +837,106 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
       linear-gradient(-42deg, transparent 0 46%, var(--lacquer) 46% 54%, transparent 54%) 0 0 / 13px 7px repeat-x,
       linear-gradient(42deg, transparent 0 46%, var(--lacquer) 46% 54%, transparent 54%) 0 7px / 13px 7px repeat-x;
   }
+}
+
+/* ── TASK-031 · Backstage ───────────────────────────────────────────────────────
+   The machinery did not go away, it went into a drawer. Nothing here softens a
+   Postgres refusal — the verbatim message is the evidence.                       */
+
+.backstage-door { margin: 26px 0 0; }
+.backstage-door button {
+  font: inherit;
+  font-size: 13px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  background: none;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.backstage-door button:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+.backstage {
+  width: min(880px, 94vw);
+  max-height: 88dvh;
+  padding: 26px 28px 32px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  overflow: auto;
+}
+.backstage::backdrop { background: rgba(7, 19, 25, 0.62); }
+
+.backstage-head { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
+.backstage-head h2 { font-size: 20px; }
+.backstage-close {
+  font: inherit;
+  font-size: 13px;
+  padding: 5px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+  cursor: pointer;
+}
+.backstage .no-server { margin: -8px 0 20px; }
+
+/* The banner has to be seen without putting anything above the forest (FR-BOOK-09). */
+.banner.floating {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 40;
+  transform: translateX(-50%);
+  max-width: min(560px, 92vw);
+  box-shadow: 0 6px 22px rgba(29, 35, 33, 0.24);
+}
+
+/* ── The second entrance: the reader asks, and Postgres answers ─────────────── */
+
+.ask-assistant { margin: 22px 0 0; }
+
+.ask {
+  font: inherit;
+  font-size: 14px;
+  padding: 8px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+.ask:hover { border-color: var(--ink-soft); }
+.ask:disabled { opacity: 0.6; cursor: progress; }
+
+.assistant-refusal {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border-left: 3px solid var(--lacquer);
+  background: #f6e3e0;
+}
+.assistant-said { margin: 0 0 8px; font-size: 13px; color: var(--lacquer); font-weight: 600; }
+.assistant-refusal code {
+  display: block;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6b241a;
+  word-break: break-word;
+}
+.see-what {
+  margin: 12px 0 0;
+  font: inherit;
+  font-size: 13px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid rgba(140, 47, 34, 0.5);
+  background: none;
+  color: var(--lacquer);
+  cursor: pointer;
+}
+
+.actor code { font-size: 12px; color: var(--ink-soft); }
+
+@media (max-width: 700px) {
+  .backstage { padding: 18px 16px 24px; max-height: 92dvh; }
 }

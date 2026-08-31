@@ -76,7 +76,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/view/Volume.tsx` | the spread, turned by hand. **No WebGL, no buttons** | `TASK-035` |
 | `src/view/Cover.tsx` | the closed volume, its title, the way in from the forest | `TASK-035` |
 | `src/view/usePageDrag.ts` | pointer gesture → a committed page turn | `TASK-035` |
-| `src/view/RefusedPage.tsx` | the page that will not turn — **the project's argument, rendered** | `TASK-036` |
+| `src/view/RefusedPage.tsx` | the page that will not turn — **the project's argument, rendered** | `TASK-036`, `TASK-031` |
 | `src/view/webgl.ts` | memoised WebGL preflight and the `?flat=1` escape hatch | `TASK-030` |
 | `src/view/Spread.tsx` | one station's content, as ordinary DOM | `TASK-016` (superseded), `TASK-030` |
 | `src/view/Tear.tsx` | the healing, and the name of whoever signed it | `TASK-019`, `TASK-036` |
@@ -88,7 +88,8 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/panels/EvidencePanel.tsx` | sources, excerpts, stance | `TASK-022` |
 | `src/panels/StoryCard.tsx` | the bilingual story card | `TASK-023` |
 | `src/panels/AuditTrail.tsx` | the readable audit log | `TASK-024` |
-| `src/panels/ManualToolPanel.tsx` | invoke tools by hand when the API is absent | `TASK-006` |
+| `src/panels/Backstage.tsx` | one drawer for the machinery — boot facts, tools, audit | `TASK-031` |
+| `src/panels/ManualToolPanel.tsx` | invoke tools by hand; the Postgres role is named on the toggle | `TASK-006`, `TASK-031` |
 | `src/seed/family.sql` | the fictional archive staging 1972/1974 | `TASK-007` |
 | `src/seed/loadSeed.ts` | loads the seed **through the command layer** | `TASK-007` |
 

@@ -42,7 +42,7 @@ export function CssBook({ nav }: { nav: SpreadNavigation }): JSX.Element {
           return (
             <article key={spread.key} className="spread spread-locked" aria-disabled="true">
               <p className="page-label">{year}</p>
-              <h3>{subject} · {spread.predicate}</h3>
+              <h3>{subject} {t(`predicate.${spread.predicate}`, spread.predicate)}</h3>
               <p className="hint">{t('road.locked')}</p>
             </article>
           );

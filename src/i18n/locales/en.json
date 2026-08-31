@@ -42,7 +42,33 @@
     "heading": "This page will not turn",
     "cannotTurn": "The book stops here until a person settles it.",
     "putNameOn": "Put {{name}}'s name on {{year}}",
-    "pickFirst": "Choose a person first"
+    "pickFirst": "Choose a person first",
+    "ask": "Ask the assistant to settle it",
+    "asking": "asking…",
+    "assistantRefused": "The database refused the agent:",
+    "seeWhatHappened": "See what just happened"
+  },
+  "predicate": {
+    "moved_to": "moved to",
+    "born_in": "was born in",
+    "opened_business": "opened a shop in"
+  },
+  "backstage": {
+    "open": "Backstage",
+    "title": "Backstage",
+    "intro": "The machinery under the archive: the tools the agent is holding, and every operation that has happened.",
+    "close": "Close",
+    "absent": "not offered by this browser",
+    "ready": "archive ready in",
+    "claims": "claims",
+    "openConflicts": "open conflicts",
+    "noServer": "No server. The whole of Postgres runs in this tab and is stored in your browser.",
+    "tools": "Tools",
+    "toolsWhy": "The same handlers an agent reaches over WebMCP. Tools appear and disappear with what you have open — that is the point.",
+    "actingAs": "Calling as",
+    "actorWhy": "Not cosmetic: the database assumes a different role for each, and the agent’s holds no privilege to confirm a claim or close a conflict.",
+    "roleAgent": "The agent",
+    "roleHuman": "A person"
   },
   "evidence": {
     "noYear": "No year",
@@ -105,6 +131,10 @@
     "superseded": "a superseded claim"
   },
   "app": {
-    "language": "Language"
+    "language": "Language",
+    "tagline": "An evidence-first family archive. The agent may find a contradiction; it may not settle one.",
+    "cards": "Story cards",
+    "ephemeral": "Private browsing: this archive lives in memory only and will be gone when you close the tab.",
+    "rebuilt": "The archive was rebuilt for a schema update. Previous contents were discarded."
   }
 }

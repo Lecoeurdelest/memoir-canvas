@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="118" failures="0" errors="0" time="30.650629666">
+    <testsuite name="tests/backstage.spec.ts" timestamp="2026-08-31T11:02:01.126Z" hostname="quyn28654s-Mac-mini.local" tests="6" failures="0" errors="0" skipped="0" time="3.80605725">
+        <testcase classname="tests/backstage.spec.ts" name="the second entrance &gt; is refused by Postgres in Postgres’ own words, not in ours" time="3.484157666">
+        </testcase>
+        <testcase classname="tests/backstage.spec.ts" name="the second entrance &gt; writes the attempt into the audit, marked refused and stamped agent" time="0.052542458">
+        </testcase>
+        <testcase classname="tests/backstage.spec.ts" name="what the drawer must still contain &gt; offers every tool the contract advertises, so nothing was lost in the move" time="0.139521667">
+        </testcase>
+        <testcase classname="tests/backstage.spec.ts" name="what the drawer must still contain &gt; names both Postgres roles somewhere a judge can read them" time="0.032153083">
+        </testcase>
+        <testcase classname="tests/backstage.spec.ts" name="what a family member reads &gt; has a word for every predicate the seeded archive uses" time="0.054331375">
+        </testcase>
+        <testcase classname="tests/backstage.spec.ts" name="what a family member reads &gt; says what the archive is in both languages, not only in English" time="0.042261708">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/certainty.spec.ts" timestamp="2026-08-31T11:02:01.127Z" hostname="quyn28654s-Mac-mini.local" tests="8" failures="0" errors="0" skipped="0" time="0.005990167">
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; has a label for every rung of the ladder, in ladder order" time="0.00122225">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; matches the glossary word for word" time="0.000765792">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; does not rely on colour alone — every label carries a word and a distinct glyph" time="0.001006333">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; meets WCAG AA against its own background and against the page" time="0.000608417">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-021 — certainty badges &gt; keeps the ladder distinguishable without colour, by luminance order" time="0.000167542">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-034 — the same ladder after dark &gt; meets WCAG AA against the forest ground" time="0.00034075">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-034 — the same ladder after dark &gt; keeps the rungs apart in greyscale here too" time="0.00014825">
+        </testcase>
+        <testcase classname="tests/certainty.spec.ts" name="TASK-034 — the same ladder after dark &gt; covers the same five rungs as the light palette, and no more" time="0.000565667">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/conflict.spec.ts" timestamp="2026-08-31T11:02:01.127Z" hostname="quyn28654s-Mac-mini.local" tests="9" failures="0" errors="0" skipped="0" time="3.790445583">
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; refuses a conflict the data does not support, and writes nothing" time="3.254422042">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; joins three disagreeing recollections into ONE conflict, not three pairs" time="0.219516834">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; leaves no path for an agent to close a conflict" time="0.02034075">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-014 — detecting and recording conflicts &gt; does not report two compatible claims about different places as a contradiction" time="0.02776875">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; loses both the command and its audit row when the write fails" time="0.076420875">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; records a blocked operation, with its reason and the constraint that fired" time="0.048333292">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; records a refusal raised before the database is touched" time="0.042359667">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; stamps the actor from the database, not from what the caller claims" time="0.049836958">
+        </testcase>
+        <testcase classname="tests/conflict.spec.ts" name="TASK-009 — the audit trail &gt; lets the sequence of what happened be reconstructed in order" time="0.040981">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/core-loop.spec.ts" timestamp="2026-08-31T11:02:01.128Z" hostname="quyn28654s-Mac-mini.local" tests="4" failures="0" errors="0" skipped="0" time="3.696751208">
+        <testcase classname="tests/core-loop.spec.ts" name="TASK-025 — the demo core in one pass &gt; runs the whole chain, and resolve_claim exists only in the middle of it" time="3.4567295">
+        </testcase>
+        <testcase classname="tests/core-loop.spec.ts" name="TASK-025 — the demo core in one pass &gt; records the full chain in the audit trail, with registered_because" time="0.051304667">
+        </testcase>
+        <testcase classname="tests/core-loop.spec.ts" name="TASK-008 — the button and the tool are the same function &gt; refuses a non-member claim identically down both paths" time="0.134039167">
+        </testcase>
+        <testcase classname="tests/core-loop.spec.ts" name="TASK-008 — the button and the tool are the same function &gt; leaves no half state when a command fails" time="0.053465167">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/forest.spec.ts" timestamp="2026-08-31T11:02:01.128Z" hostname="quyn28654s-Mac-mini.local" tests="23" failures="0" errors="0" skipped="0" time="4.037249458">
+        <testcase classname="tests/forest.spec.ts" name="one light per memory &gt; draws every spread and nothing else" time="3.453857208">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="one light per memory &gt; keeps a light in the same place across renders" time="0.039933708">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="one light per memory &gt; lays the memories out in the order the family lived them" time="0.073715625">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="one light per memory &gt; keeps every light inside the picture" time="0.059622459">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="colour carries certainty &gt; takes the weakest claim holding a memory up" time="0.048454958">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="colour carries certainty &gt; an open contradiction outranks whatever the claims said" time="0.053387083">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="colour carries certainty &gt; makes the contradiction findable without reading: it flickers faster than anything else" time="0.029032">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the forest is a route, so the wedge holds in it too &gt; lets a reader reach anything while nothing is torn" time="0.048211708">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the forest is a route, so the wedge holds in it too &gt; darkens everything behind an open contradiction" time="0.019540875">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the forest is a route, so the wedge holds in it too &gt; never darkens a memory already behind the reader" time="0.025975625">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the forest is a route, so the wedge holds in it too &gt; lights up again once a person settles it" time="0.027255916">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the unlit rings are the gaps &gt; draws nothing while nobody has asked anything" time="0.021666917">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the unlit rings are the gaps &gt; appears the moment the agent asks instead of deciding" time="0.015541833">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the unlit rings are the gaps &gt; an answered question is no longer a gap" time="0.015920959">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the budget stated before building &gt; spends fewer lights and one glow layer on a phone" time="0.011645583">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the budget stated before building &gt; plants fewer trees on a phone" time="0.013045375">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="depth &gt; moves the near plane visibly further than the far one" time="0.010921208">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="depth &gt; moves the scene against the pointer" time="0.01102825">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the summary line &gt; reports the years the archive actually covers" time="0.012477208">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="the summary line &gt; says nothing rather than guessing when no year is known" time="0.0116085">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="placement &gt; hashes into the unit interval" time="0.010628458">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="TASK-037 — the forest explains itself, or not at all &gt; carries no instruction copy in either language" time="0.010097833">
+        </testcase>
+        <testcase classname="tests/forest.spec.ts" name="TASK-037 — the forest explains itself, or not at all &gt; still names every light for someone who cannot see it" time="0.012017417">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/handlers.spec.ts" timestamp="2026-08-31T11:02:01.129Z" hostname="quyn28654s-Mac-mini.local" tests="9" failures="0" errors="0" skipped="0" time="3.909339417">
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; implements every tool the contract advertises" time="3.659534375">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; turns badly typed arguments into a structured error, not a crash" time="0.04850025">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; keeps the fields the descriptor advertises instead of dropping them" time="0.054656375">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; reports the certainty the row actually got, not a hardcoded one" time="0.015510917">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; says a disagreement exists without saying which claim is right" time="0.027536875">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-011 — the eight handlers &gt; flag_conflict returns the claims in dispute and no winner" time="0.038191375">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-023 — a story card cannot overstate itself &gt; carries the weakest label among the claims it stands on" time="0.017445708">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-023 — a story card cannot overstate itself &gt; is not swayed by how well the card is written" time="0.025644667">
+        </testcase>
+        <testcase classname="tests/handlers.spec.ts" name="TASK-023 — a story card cannot overstate itself &gt; refuses to cite a claim that does not exist" time="0.021127875">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/i18n.spec.ts" timestamp="2026-08-31T11:02:01.129Z" hostname="quyn28654s-Mac-mini.local" tests="8" failures="0" errors="0" skipped="0" time="0.006633416">
+        <testcase classname="tests/i18n.spec.ts" name="the resource files &gt; carry the same keys in both languages" time="0.000911458">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="the resource files &gt; has no empty string anywhere" time="0.002605458">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="the resource files &gt; translates the same key differently in the two languages" time="0.000201416">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="i18next itself &gt; resolves a key in both languages" time="0.000983834">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="i18next itself &gt; interpolates the circa year rather than concatenating it by hand" time="0.00031075">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="i18next itself &gt; uses real plural rules, not a hand-written pair" time="0.000582625">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="i18next itself &gt; falls back to Vietnamese, because English is the translation here" time="0.000345917">
+        </testcase>
+        <testcase classname="tests/i18n.spec.ts" name="i18next itself &gt; narrows a regional tag to a supported language" time="0.000167083">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/modelContext.spec.ts" timestamp="2026-08-31T11:02:01.129Z" hostname="quyn28654s-Mac-mini.local" tests="5" failures="0" errors="0" skipped="0" time="0.001701542">
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — per-tool fallback &gt; withdraws a tool that is no longer in the set" time="0.000841583">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — per-tool fallback &gt; does not unregister a tool that is still current" time="0.0000875">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — per-tool fallback &gt; survives three successive sets without leaking a stale tool" time="0.000103083">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge.provide — whole-set host &gt; hands over exactly the current set, replacing the last one" time="0.0000745">
+        </testcase>
+        <testcase classname="tests/modelContext.spec.ts" name="ModelContextBridge — no host at all &gt; still records the set so the manual tool panel can render it" time="0.000072709">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/navigation.spec.ts" timestamp="2026-08-31T11:02:01.130Z" hostname="quyn28654s-Mac-mini.local" tests="6" failures="0" errors="0" skipped="0" time="3.622958625">
+        <testcase classname="tests/navigation.spec.ts" name="the road has somewhere to go &gt; offers more than one station before anything is torn" time="3.178393042">
+        </testcase>
+        <testcase classname="tests/navigation.spec.ts" name="the road has somewhere to go &gt; travels forward station by station while the way is clear" time="0.109859667">
+        </testcase>
+        <testcase classname="tests/navigation.spec.ts" name="the wedge refuses every route &gt; stops forward travel at the tear" time="0.105897125">
+        </testcase>
+        <testcase classname="tests/navigation.spec.ts" name="the wedge refuses every route &gt; stops the SPINE at the tear too — the bug this file exists for" time="0.035950458">
+        </testcase>
+        <testcase classname="tests/navigation.spec.ts" name="the wedge refuses every route &gt; never traps the reader — backward is always allowed" time="0.131936334">
+        </testcase>
+        <testcase classname="tests/navigation.spec.ts" name="the wedge refuses every route &gt; opens the way again once a person settles it" time="0.058215125">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/pageturn.spec.ts" timestamp="2026-08-31T11:02:01.130Z" hostname="quyn28654s-Mac-mini.local" tests="11" failures="0" errors="0" skipped="0" time="0.001790834">
+        <testcase classname="tests/pageturn.spec.ts" name="how far the page has been pulled &gt; is a full turn at half the width, in either direction" time="0.000537708">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="how far the page has been pulled &gt; never runs past a full turn, however far the hand goes" time="0.000068584">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="how far the page has been pulled &gt; is nothing at all before the hand has moved" time="0.0000485">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="how far the page has been pulled &gt; refuses to divide by a book with no width" time="0.000085708">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="when a pull becomes a turn &gt; commits past the threshold and springs back below it" time="0.0001225">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="when a pull becomes a turn &gt; asks for more than a third of the page, so a scroll is never a turn" time="0.000123959">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="when a pull becomes a turn &gt; reads a leftward pull as going forward, the way a right-hand page does" time="0.0000585">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="the lifted leaf &gt; lies flat at rest" time="0.000066084">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="the lifted leaf &gt; opens away from the reader when pulled forward, and towards them when pulled back" time="0.000057916">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="the lifted leaf &gt; stops short of flat against the other page, so the fold stays visible" time="0.000044167">
+        </testcase>
+        <testcase classname="tests/pageturn.spec.ts" name="the lifted leaf &gt; tracks the hand rather than snapping" time="0.000035375">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/panels.spec.ts" timestamp="2026-08-31T11:02:01.130Z" hostname="quyn28654s-Mac-mini.local" tests="7" failures="0" errors="0" skipped="0" time="0.008933875">
+        <testcase classname="tests/panels.spec.ts" name="TASK-024 — the audit panel &gt; has a readable sentence for every tool an agent can call" time="0.002294459">
+        </testcase>
+        <testcase classname="tests/panels.spec.ts" name="TASK-024 — the audit panel &gt; has one for the commands that are not tools but still audit" time="0.000244833">
+        </testcase>
+        <testcase classname="tests/panels.spec.ts" name="TASK-024 — the audit panel &gt; phrases every operation in both languages" time="0.003382667">
+        </testcase>
+        <testcase classname="tests/panels.spec.ts" name="TASK-024 — the audit panel &gt; never renders the raw args object into the sentence" time="0.000495209">
+        </testcase>
+        <testcase classname="tests/panels.spec.ts" name="TASK-022 — the evidence panel &gt; orders a contradicting source before a supporting one" time="0.000562042">
+        </testcase>
+        <testcase classname="tests/panels.spec.ts" name="TASK-022 — the evidence panel &gt; renders verbatim as its own node, with nothing that could clip it" time="0.000109459">
+        </testcase>
+        <testcase classname="tests/panels.spec.ts" name="TASK-022 — the evidence panel &gt; labels every stance and source kind in both languages" time="0.000273917">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/refusal.spec.ts" timestamp="2026-08-31T11:02:01.131Z" hostname="quyn28654s-Mac-mini.local" tests="7" failures="0" errors="0" skipped="0" time="3.9693515">
+        <testcase classname="tests/refusal.spec.ts" name="the refusal is a consequence of state, never a decoration &gt; does not exist until a conflict is open" time="3.74804725">
+        </testcase>
+        <testcase classname="tests/refusal.spec.ts" name="the refusal is a consequence of state, never a decoration &gt; appears the moment one is flagged, on that spread and no other" time="0.036786333">
+        </testcase>
+        <testcase classname="tests/refusal.spec.ts" name="the refusal is a consequence of state, never a decoration &gt; is gone the moment a person settles it" time="0.073646291">
+        </testcase>
+        <testcase classname="tests/refusal.spec.ts" name="neither claim is favoured &gt; puts both on the page with nothing marking a winner" time="0.021705417">
+        </testcase>
+        <testcase classname="tests/refusal.spec.ts" name="the button a person presses &gt; reaches a function the agent is refused at, and the refusal is recorded" time="0.045180209">
+        </testcase>
+        <testcase classname="tests/refusal.spec.ts" name="the button a person presses &gt; succeeds for a person, and writes the name into the record" time="0.030069166">
+        </testcase>
+        <testcase classname="tests/refusal.spec.ts" name="what the page says &gt; names the refusal and the gesture in both languages" time="0.013154375">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/registry.spec.ts" timestamp="2026-08-31T11:02:01.131Z" hostname="quyn28654s-Mac-mini.local" tests="7" failures="0" errors="0" skipped="0" time="0.006523208">
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; always exposes the five base tools" time="0.002015">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; does not expose flag_conflict for a subject with no disagreement" time="0.000475084">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; exposes flag_conflict once the open subject has a disagreement" time="0.000165167">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; does NOT expose resolve_claim merely because a person is open" time="0.000256958">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; exposes resolve_claim only while that conflict is on screen" time="0.000263042">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; withdraws resolve_claim once the conflict is closed" time="0.000894541">
+        </testcase>
+        <testcase classname="tests/registry.spec.ts" name="toolsFor(uiState) &gt; drops all three conditional tools on returning to the archive" time="0.000409666">
+        </testcase>
+    </testsuite>
+    <testsuite name="tests/spreads.spec.ts" timestamp="2026-08-31T11:02:01.131Z" hostname="quyn28654s-Mac-mini.local" tests="8" failures="0" errors="0" skipped="0" time="3.786903583">
+        <testcase classname="tests/spreads.spec.ts" name="spreads — the spine &gt; puts the two disputed claims on ONE spread, not two" time="3.317052916">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="spreads — the spine &gt; gives the road somewhere to go" time="0.03508775">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="spreads — the spine &gt; gives a different assertion its own spread" time="0.1236785">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="spreads — the spine &gt; orders the spine by year" time="0.047381125">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="TASK-018 — the tear appears if and only if a conflict is open &gt; is absent while the disagreement is merely latent" time="0.104350542">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="TASK-018 — the tear appears if and only if a conflict is open &gt; appears once the conflict is recorded" time="0.029001125">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="TASK-018 — the tear appears if and only if a conflict is open &gt; shows both competing claims, with no winner marked in the data" time="0.0756715">
+        </testcase>
+        <testcase classname="tests/spreads.spec.ts" name="TASK-019 — healing &gt; heals only once the conflict is resolved, and names the person" time="0.05362125">
+        </testcase>
+    </testsuite>
+</testsuites>

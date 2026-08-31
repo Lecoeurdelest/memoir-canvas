@@ -67,6 +67,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const people = useStore((s) => s.model?.people) ?? [];
+  const places = useStore((s) => s.model?.places) ?? [];
   const questions = useStore((s) => s.model?.questions) ?? [];
 
   const { spreads, index, openAt } = nav;
@@ -82,11 +83,15 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const woods = useMemo(() => PLANE_INDEXES.map((p) => trees(p, width)), [width]);
   const years = span(spreads);
 
+  // A whole sentence, because "moved to · 1972" names no destination and reads as a fragment.
   const nameOf = (spreadIndex: number): string => {
     const spread = spreads[spreadIndex];
+    const lead = spread.claims[0];
     const subject = people.find((p) => p.id === spread.subjectId)?.display_name ?? '';
-    const year = spread.claims[0]?.year_value;
-    return `${subject} · ${spread.predicate}${year ? ` · ${year}` : ''}`;
+    const object = places.find((p) => p.id === lead?.object_place_id)?.name ?? lead?.object_text ?? '';
+    const verb = t(`predicate.${spread.predicate}`, spread.predicate);
+    const year = lead?.year_value;
+    return [`${subject} ${verb}${object ? ` ${object}` : ''}`, year].filter(Boolean).join(' · ');
   };
 
   // Arrow keys walk the forest in the order the family lived it. The lights are scattered across

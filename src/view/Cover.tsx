@@ -29,14 +29,14 @@ export function Cover({ spread, onOpen }: { spread: Spread; onOpen: () => void }
         type="button"
         className={`cover${spread.conflict ? ' cover-torn' : ''}`}
         onClick={onOpen}
-        aria-label={`${subject} · ${spread.predicate}${year ? ` · ${year}` : ''} — ${t('volume.openIt')}`}
+        aria-label={`${subject} ${t(`predicate.${spread.predicate}`, spread.predicate)}${year ? ` · ${year}` : ''} — ${t('volume.openIt')}`}
         lang={lang}
       >
         <span className="cover-board" aria-hidden="true">
           <span className="cover-spine" />
           <span className="cover-rule" />
           <span className="cover-title">{subject}</span>
-          <span className="cover-sub">{spread.predicate}</span>
+          <span className="cover-sub">{t(`predicate.${spread.predicate}`, spread.predicate)}</span>
           {year !== null && year !== undefined && <span className="cover-year">{year}</span>}
         </span>
       </button>

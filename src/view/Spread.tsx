@@ -29,10 +29,13 @@ export function Spread({ spread }: { spread: SpreadModel }): JSX.Element {
     <article className={`spread${spread.conflict ? ' spread-torn' : ''}`}>
       <div className="page page-left">
         <p className="page-label">{t('spread.recollection')}</p>
+        {/* A sentence, not `subject · predicate`. The raw column name is a fact about the
+            database, and TASK-031 keeps those behind Backstage. An unknown predicate falls back
+            to its own name rather than to an empty gap. */}
         <h3 lang={lang}>
-          {subject?.display_name} · {spread.predicate}
+          {subject?.display_name} {t(`predicate.${spread.predicate}`, spread.predicate)}
+          {object ? ` ${object}` : ''}
         </h3>
-        {object && <p className="object">{object}</p>}
         <Tear spread={spread} />
       </div>
 
