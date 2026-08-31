@@ -14,6 +14,7 @@ import type {
   Claim,
   Conflict,
   OpenDisagreement,
+  FollowupQuestion,
   Person,
   Place,
   Evidence,
@@ -45,6 +46,11 @@ export interface ReadModel {
   disagreements: OpenDisagreement[];
   cards: StoryCard[];
   evidence: Evidence[];
+  /**
+   * The gaps. An open question is something the family has not answered yet, and the forest
+   * draws one unlit ring for each — so a doubt the agent raised is visible without being a fact.
+   */
+  questions: FollowupQuestion[];
   /** Newest first, capped: the panel is a timeline to read, not an export. */
   audit: AuditEvent[];
   /** One spread per thing-being-said-about-someone. The spine is these, in time order. */
@@ -55,7 +61,7 @@ export interface ReadModel {
 }
 
 export async function buildReadModel(): Promise<ReadModel> {
-  const [people, places, claims, sources, conflicts, disagreements, cards, evidence, audit] =
+  const [people, places, claims, sources, conflicts, disagreements, cards, evidence, questions, audit] =
     await Promise.all([
     query<Person>('SELECT * FROM person ORDER BY created_at'),
     query<Place>('SELECT * FROM place ORDER BY created_at'),
@@ -65,6 +71,7 @@ export async function buildReadModel(): Promise<ReadModel> {
     query<OpenDisagreement>('SELECT * FROM v_open_disagreement'),
     query<StoryCard>('SELECT * FROM story_card ORDER BY generated_at DESC'),
     query<Evidence>('SELECT * FROM evidence ORDER BY created_at'),
+    query<FollowupQuestion>('SELECT * FROM followup_question ORDER BY created_at'),
     query<AuditEvent>('SELECT * FROM audit_event ORDER BY id DESC LIMIT 200'),
   ]);
 
@@ -80,6 +87,7 @@ export async function buildReadModel(): Promise<ReadModel> {
     disagreements,
     cards,
     evidence,
+    questions,
     audit,
     subjectsWithDisagreement: new Set(disagreements.map((d) => d.subject_id)),
     openConflictIds: new Set(conflicts.filter((c) => c.status === 'open').map((c) => c.id)),

@@ -5,7 +5,7 @@ branch: A
 day: 6
 depends_on: [TASK-010, TASK-033]
 supersedes: [TASK-020]
-status: todo
+status: done
 ---
 
 # TASK-034 — The firefly forest
@@ -42,19 +42,23 @@ sees first, and it renders the project's thesis as an image rather than a senten
 
 ## Acceptance criteria
 
-- [ ] Every spread in the read model is one light; the count matches
-- [ ] Certainty is legible from colour alone at a glance, and the conflicting one is findable without reading
-- [ ] Pointer travel moves the layers at visibly different rates
-- [ ] Clicking a light sets `uiState` and opens that spread — the `R4` contract is unchanged
-- [ ] Keyboard: the lights are reachable and named; arrow keys move between them
-- [ ] `prefers-reduced-motion` stops all blinking and drifting, and the lights stay legible
-- [ ] The light count is reduced on narrow viewports (see Notes)
-- [ ] No runtime network request; entry chunk does not regress
+- [x] Every spread in the read model is one light; the count matches
+- [x] Certainty is legible from colour alone at a glance, and the conflicting one is findable without reading
+- [x] Pointer travel moves the layers at visibly different rates
+- [x] Clicking a light sets `uiState` and opens that spread — the `R4` contract is unchanged
+- [x] Keyboard: the lights are reachable and named; arrow keys move between them
+- [x] `prefers-reduced-motion` stops all blinking and drifting, and the lights stay legible
+- [x] The light count is reduced on narrow viewports (see Notes)
+- [x] No runtime network request; entry chunk does not regress
 
 ## Files touched
 
 - `src/view/Forest.tsx` (new)
+- `src/view/forestLayout.ts` (new)
 - `src/view/BookStage.tsx`
+- `src/view/useSpreadNavigation.ts` (not planned — see IMPL Deviations)
+- `src/store/projection.ts` (not planned — see IMPL Deviations)
+- `src/i18n/locales/vi.json`, `src/i18n/locales/en.json`
 - `src/panels/CertaintyBadge.tsx` — a dark palette beside the light one
 - `src/app.css`
 - `tests/forest.spec.ts` (new)

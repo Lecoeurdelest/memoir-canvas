@@ -66,12 +66,13 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/mcp/modelContext.ts` | feature-detecting API shim | `TASK-006` |
 | `src/mcp/handlers.ts` | validate, then delegate — **no SQL** | `TASK-011` |
 | `src/mcp/registry.ts` | `toolsFor(uiState)`, a pure function | `TASK-012`, `TASK-013` |
-| `src/store/projection.ts` | PGlite → read model | `TASK-010` |
+| `src/store/projection.ts` | PGlite → read model | `TASK-010`, `TASK-034` |
 | `src/store/store.ts` | Zustand, holds the projection only | `TASK-010` |
 | `src/store/uiState.ts` | what the user is looking at — the registry depends on this | `TASK-010` |
-| `src/view/useSpreadNavigation.ts` | **the single navigation truth** — state, the wedge rule, the R4 `setUi` contract. Both skins consume it | `TASK-030` |
-| `src/view/BookStage.tsx` | picks the skin: the road, or the flat list via `?flat=1` | `TASK-030` |
+| `src/view/useSpreadNavigation.ts` | **the single navigation truth** — state, the wedge rule, whether a book is open at all, the R4 `setUi` contract | `TASK-030`, `TASK-034` |
+| `src/view/BookStage.tsx` | the door: the forest until a light is picked, then a book skin | `TASK-030`, `TASK-034` |
 | `src/view/Forest.tsx` | the entry view — one firefly per memory, brightness is certainty | `TASK-034` |
+| `src/view/forestLayout.ts` | where every light goes and why — pure, so it tests without a DOM | `TASK-034` |
 | `src/view/Volume.tsx` | the spread, turned by hand. **No WebGL, no buttons** | `TASK-035` |
 | `src/view/Cover.tsx` | the closed volume, its title, the way in from the forest | `TASK-035` |
 | `src/view/usePageDrag.ts` | pointer gesture → a committed page turn | `TASK-035` |
@@ -83,7 +84,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/view/Book.tsx` | **dead stub** — kept so the supersession stays legible | `TASK-015` (superseded) |
 | `src/view/PageTurn.tsx` | **dead stub** | `TASK-017` (superseded) |
 | `src/view/Constellation.tsx` | **dead stub** | `TASK-020` (superseded) |
-| `src/panels/CertaintyBadge.tsx` | 5 labels, bilingual, not colour-only | `TASK-021` |
+| `src/panels/CertaintyBadge.tsx` | 5 labels, bilingual, not colour-only; both palettes, light and night | `TASK-021`, `TASK-034` |
 | `src/panels/EvidencePanel.tsx` | sources, excerpts, stance | `TASK-022` |
 | `src/panels/StoryCard.tsx` | the bilingual story card | `TASK-023` |
 | `src/panels/AuditTrail.tsx` | the readable audit log | `TASK-024` |

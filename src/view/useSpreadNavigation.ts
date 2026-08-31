@@ -8,6 +8,9 @@
  *
  *   The R4 contract. Arriving at a spread sets the UI state, and the tool registry is a pure
  *   function of that — landing on a torn spread is what puts `resolve_claim` in the agent's hands.
+ *   Which is exactly why `open` lives here too: while the reader is standing in the forest they
+ *   have no spread open, the UI state must say `archive`, and the agent must NOT be holding
+ *   `resolve_claim` for a conflict nobody has looked at yet.
  *
  *   The wedge. You cannot travel FORWARD past an open conflict, by any route. Going back is
  *   always allowed, so a reader is never trapped.
@@ -48,12 +51,17 @@ export interface SpreadNavigation {
   spreads: Spread[];
   index: number;
   spread: Spread | undefined;
+  /** True once a reader has opened a memory. False is the forest. */
+  open: boolean;
   /** True when the current spread holds an open conflict, so forward travel is refused. */
   wedged: boolean;
   /** First index the wedge puts out of reach, or spreads.length when nothing blocks. */
   lockedFrom: number;
   go: (direction: 1 | -1) => void;
   jumpTo: (index: number) => void;
+  /** Open a memory from the forest. Refused, silently, for anything behind an open conflict. */
+  openAt: (index: number) => void;
+  close: () => void;
 }
 
 export function useSpreadNavigation(): SpreadNavigation {
@@ -61,19 +69,20 @@ export function useSpreadNavigation(): SpreadNavigation {
   const setUi = useStore((s) => s.setUi);
 
   const [at, setAt] = useState(0);
+  const [open, setOpen] = useState(false);
   const index = Math.min(at, Math.max(spreads.length - 1, 0));
   const spread = spreads[index];
 
   const limit = useMemo(() => reachLimit(spreads), [spreads]);
 
   useEffect(() => {
-    if (!spread) return setUi({ view: 'archive' });
+    if (!open || !spread) return setUi({ view: 'archive' });
     if (spread.conflict) {
       setUi({ view: 'conflict', conflictId: spread.conflict.id, subjectId: spread.subjectId });
     } else {
       setUi({ view: 'person', personId: spread.subjectId });
     }
-  }, [spread?.key, spread?.conflict?.id, setUi, spread]);
+  }, [open, spread?.key, spread?.conflict?.id, setUi, spread]);
 
   const go = useCallback(
     (direction: 1 | -1) => setAt((a) => nextIndex(spreads, a, direction)),
@@ -87,13 +96,27 @@ export function useSpreadNavigation(): SpreadNavigation {
     [spreads],
   );
 
+  const openAt = useCallback(
+    (target: number) => {
+      if (jumpTarget(spreads, index, target) !== target) return;
+      setAt(target);
+      setOpen(true);
+    },
+    [spreads, index],
+  );
+
+  const close = useCallback(() => setOpen(false), []);
+
   return {
     spreads,
     index,
     spread,
+    open,
     wedged: spread?.conflict != null,
     lockedFrom: limit + 1,
     go,
     jumpTo,
+    openAt,
+    close,
   };
 }

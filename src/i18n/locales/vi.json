@@ -12,6 +12,15 @@
     "locked": "Chưa tới được: còn một chỗ chưa khớp phía trước.",
     "at": "Chặng"
   },
+  "forest": {
+    "name": "Rừng ký ức",
+    "empty": "Rừng còn tối. Chưa có ký ức nào được kể.",
+    "summary": "{{memories}} mẩu ký ức · {{gaps}} chỗ còn trống · {{from}}–{{to}}",
+    "invite": "Rê để đi trong rừng. Bấm một đốm sáng, nó mở ra thành quyển sổ.",
+    "unanswered": "Chưa ai kể",
+    "locked": "chưa tới được, còn một chỗ chưa khớp phía trước",
+    "back": "Về rừng"
+  },
   "spread": {
     "recollection": "Lời kể",
     "evidence": "Bằng chứng",

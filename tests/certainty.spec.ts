@@ -8,7 +8,14 @@
  */
 import { describe, expect, it } from 'vitest';
 import { CERTAINTY_ORDER } from '../src/domain/types';
-import { LABELS, PALETTE, PAPER } from '../src/panels/CertaintyBadge';
+import {
+  LABELS,
+  NIGHT,
+  NIGHT_PALETTE,
+  NIGHT_UNLIT,
+  PALETTE,
+  PAPER,
+} from '../src/panels/CertaintyBadge';
 // ?raw, the same way db.ts loads schema.sql — the glossary IS the fixture here.
 import glossary from '../.agent/context/glossary.md?raw';
 
@@ -66,5 +73,28 @@ describe('TASK-021 — certainty badges', () => {
     // the glyph is doing all the work. They should still separate.
     const greys = CERTAINTY_ORDER.map((c) => luminance(PALETTE[c].ink));
     expect(new Set(greys.map((g) => g.toFixed(3))).size).toBe(CERTAINTY_ORDER.length);
+  });
+});
+
+describe('TASK-034 — the same ladder after dark', () => {
+  it('meets WCAG AA against the forest ground', () => {
+    for (const certainty of CERTAINTY_ORDER) {
+      const light = NIGHT_PALETTE[certainty];
+      expect(light, certainty).toBeDefined();
+      expect(contrast(light, NIGHT), `${certainty} on the forest`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrast(NIGHT_UNLIT, NIGHT), 'an unlit ring').toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('keeps the rungs apart in greyscale here too', () => {
+    // A firefly has no room for a glyph, so in the forest colour is doing more work than it does
+    // on a badge. If two rungs collapse to the same grey the forest lies to a colour-blind reader
+    // even with the legend beside it.
+    const greys = CERTAINTY_ORDER.map((c) => luminance(NIGHT_PALETTE[c]));
+    expect(new Set(greys.map((g) => g.toFixed(3))).size).toBe(CERTAINTY_ORDER.length);
+  });
+
+  it('covers the same five rungs as the light palette, and no more', () => {
+    expect(Object.keys(NIGHT_PALETTE).sort()).toEqual(Object.keys(PALETTE).sort());
   });
 });

@@ -363,3 +363,232 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
                                        62% 36%, 68% 17%, 71% 30%, 78% 9%, 84% 33%, 89% 20%,
                                        95% 39%, 100% 22%, 100% 100%, 0 100%);
                     pointer-events: none; }
+
+/* ── TASK-034 · the forest ──────────────────────────────────────────────────────
+   The one dark surface in a light app. Colours that carry meaning are NOT set here:
+   they come from NIGHT_PALETTE in CertaintyBadge.tsx, because that is the only place
+   a test can measure their contrast (NFR-A11Y-05).                                */
+
+.forest {
+  margin: 0 0 24px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #071319;
+}
+
+.forest-stage {
+  position: relative;
+  height: min(74vh, 620px);
+  overflow: hidden;
+  cursor: crosshair;
+  background:
+    radial-gradient(40% 38% at 32% 16%, #1c4653 0%, #102b34 34%, #0a1c23 60%, #071319 80%),
+    radial-gradient(34% 34% at 74% 12%, #17414c 0%, #0d242c 36%, #071319 68%),
+    /* A wide, weak lift through the middle band. Without something behind them the trunks are
+       a silhouette against their own colour, which is no silhouette at all. */
+    radial-gradient(90% 60% at 50% 78%, #0c2029 0%, #081820 48%, #071319 100%);
+  touch-action: pan-y;
+}
+
+/* Oversized on purpose: the planes slide by up to 750px, and a plane the size of the
+   stage would drag its own edge into view. */
+.forest-plane {
+  position: absolute;
+  left: -70%;
+  top: -8%;
+  width: 240%;
+  height: 116%;
+  transition: transform 520ms cubic-bezier(0.18, 0.72, 0.28, 1);
+  will-change: transform;
+}
+.forest-plane.plane-1 { left: -80%; top: -10%; width: 260%; height: 120%; }
+.forest-plane.plane-2 { left: -95%; top: -14%; width: 290%; height: 128%; }
+
+.forest-trees, .forest-ambient { position: absolute; inset: 0; }
+
+/* Sized to the stage, unlike the scenery planes: a per-cent here is a per-cent of what the
+   reader can actually see, which is the only way a light stays clickable. */
+.forest-lights {
+  position: absolute;
+  inset: 0;
+  transition: transform 520ms cubic-bezier(0.18, 0.72, 0.28, 1);
+  will-change: transform;
+}
+
+/* A silhouette, so DARKER than the ground it stands on. Built the other way first and the
+   forest came out looking like a barcode of pale vertical bars. */
+.trunk {
+  position: absolute;
+  bottom: -2%;
+  transform-origin: 50% 100%;
+  border-radius: 5px 5px 0 0;
+  background: linear-gradient(to top, #010609 0%, #04121a 52%, rgba(16, 44, 53, 0.16) 100%);
+}
+
+/* Distance, done the cheap way: the far trees are faint and slightly out of focus. */
+.plane-0 .forest-trees { opacity: 0.45; filter: blur(1.6px); }
+.plane-1 .forest-trees { opacity: 0.72; filter: blur(0.7px); }
+.plane-2 .forest-trees { opacity: 1; }
+
+/* The floor. Without it the trunks hang in the air. */
+.forest-stage::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0;
+  height: 20%;
+  background: linear-gradient(to top, rgba(2, 7, 11, 0.92) 0%, rgba(3, 9, 13, 0.45) 48%, transparent 100%);
+  pointer-events: none;
+}
+
+.fly, .memory, .ring { position: absolute; border-radius: 50%; }
+
+.fly {
+  opacity: 0.28;
+  animation-name: blink;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 0.16; transform: scale(0.7); }
+  38%      { opacity: 1;    transform: scale(1.14); }
+  62%      { opacity: 0.5;  transform: scale(0.92); }
+}
+
+/* An absence, drawn as an absence: an outline with nothing inside it. */
+.ring {
+  background: transparent;
+  border: 1px solid;
+  animation-name: waiting;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes waiting {
+  0%, 100% { opacity: 0.22; transform: scale(0.9); }
+  50%      { opacity: 0.62; transform: scale(1.08); }
+}
+
+.memory {
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  animation-name: breathe;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+/* Ambient fireflies blink out to almost nothing; a memory only breathes. It is a thing to
+   click, and a target that disappears for half a second is a target you cannot hit. */
+@keyframes breathe {
+  0%, 100% { opacity: 0.72; transform: scale(0.92); }
+  50%      { opacity: 1;    transform: scale(1.1); }
+}
+
+/* Out of time with everything else, so the eye finds it without reading a word. */
+.memory.flickering { animation-name: flicker; }
+
+@keyframes flicker {
+  0%   { opacity: 1;    transform: scale(1.24); }
+  9%   { opacity: 0.42; transform: scale(0.86); }
+  17%  { opacity: 1;    transform: scale(1.12); }
+  23%  { opacity: 0.5;  transform: scale(0.92); }
+  46%  { opacity: 1;    transform: scale(1.28); }
+  55%  { opacity: 0.44; transform: scale(0.84); }
+  100% { opacity: 0.95; transform: scale(1.06); }
+}
+
+/* The wedge, drawn: what lies behind an open contradiction is still there, and still
+   dark, until a person settles it. */
+.memory.out-of-reach {
+  cursor: not-allowed;
+  opacity: 0.22;
+  animation: none;
+  box-shadow: none !important;
+  filter: grayscale(1);
+}
+
+.memory:focus-visible {
+  outline: 2px solid #fffce8;
+  outline-offset: 4px;
+  animation: none;
+  opacity: 1;
+}
+
+/* No text on a light at rest — the forest is a picture until you point at it. */
+.memory-name {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: rgba(4, 13, 18, 0.9);
+  color: #cfdcd7;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 160ms ease;
+}
+.memory:hover .memory-name, .memory:focus-visible .memory-name { opacity: 1; }
+
+.forest-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 20px 24px 18px;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.forest-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  color: #fffce8;
+  font-family: Newsreader, Georgia, serif;
+}
+.forest-count { margin: 4px 0 0; font-size: 12px; color: #7e9a9a; font-variant-numeric: tabular-nums; }
+
+.forest-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 10px 0 0;
+  padding: 0;
+  font-size: 11px;
+}
+.forest-legend li { display: inline-flex; align-items: center; gap: 5px; }
+.forest-legend .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.forest-legend .dot.hollow { background: transparent; border: 1px solid currentColor; }
+.forest-legend .glyph { font-size: 12px; }
+
+.forest-invite {
+  margin: auto 0 0;
+  max-width: 46ch;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 16px;
+  color: #cfdcd7;
+}
+
+.forest-empty { margin: 0; padding: 48px 24px; color: #cfdcd7; text-align: center; }
+
+.stage-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fly, .ring, .memory { animation: none; opacity: 0.85; }
+  .memory { opacity: 1; }
+  .memory.out-of-reach { opacity: 0.22; }
+  .forest-plane, .forest-lights { transition: none; }
+}
+
+/* A phone gets a shorter stage and no hover label — there is no pointer to hover with. */
+@media (max-width: 700px) {
+  .forest-stage { height: min(62vh, 420px); }
+  .forest-invite { font-size: 14px; }
+  .memory-name { display: none; }
+}

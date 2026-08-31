@@ -58,6 +58,27 @@ export const PALETTE: Record<Certainty, { ink: string; bg: string }> = {
   confirmed: { ink: '#2f6b4f', bg: '#e2eee7' },
 };
 
+/**
+ * The same ladder after dark. The forest is a night scene and the light badge palette is
+ * unreadable on it, so the rungs get a second set of colours — measured against NIGHT, not
+ * eyeballed, and asserted in tests/certainty.spec.ts exactly like the light one.
+ *
+ * A firefly is a colour with no word beside it, which would break NFR-A11Y-02 on its own. The
+ * forest pays that back with a legend that spells every rung out, and with a hover name.
+ */
+export const NIGHT = '#071319';
+
+export const NIGHT_PALETTE: Record<Certainty, string> = {
+  uncertain: '#9fb4ae',
+  oral: '#e8d46a',
+  document_supported: '#8fd6e0',
+  conflicting: '#ff9a76',
+  confirmed: '#b8e878',
+};
+
+/** An unlit ring: a question nobody has answered. Deliberately colourless — it is an absence. */
+export const NIGHT_UNLIT = '#cfdcd7';
+
 export function CertaintyBadge({
   certainty,
   lang = 'vi',
