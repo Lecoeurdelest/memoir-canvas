@@ -5,19 +5,20 @@
  * content; `commands.resolveClaim` holds the write. No skin owns any of it, so there is nothing
  * to keep in sync and every existing test still exercises the real thing.
  *
- * The forest is the door. Nothing is open until a reader picks a light, and while the forest is
- * showing the UI state says `archive` — which is the whole point of putting `open` in the
- * navigation truth rather than here: the agent must not be handed `resolve_claim` for a
- * contradiction nobody has looked at yet.
+ * The path is forest → cover → spread. The cover is a beat, not a state worth putting in the
+ * navigation truth: by the time it shows, the reader HAS chosen that memory, and the UI state
+ * already says so. What `open` gates is the thing that matters — while the forest is showing,
+ * nothing is open and the agent is not handed tools for a page nobody looked at.
  *
- * The flat book is not a failure mode — it is the escape hatch, reachable with `?flat=1` or the
+ * The flat list is not a failure mode — it is the escape hatch, reachable with `?flat=1` or the
  * toggle, and it is what NFR-PORT-01 guarantees is always there.
  */
 
 import { useEffect, useState } from 'react';
+import { Cover } from './Cover';
 import { CssBook } from './CssBook';
 import { Forest } from './Forest';
-import { Road } from './Road';
+import { Volume } from './Volume';
 import { useSpreadNavigation } from './useSpreadNavigation';
 import { flatRequested } from './webgl';
 import { useTranslation } from 'react-i18next';
@@ -26,11 +27,16 @@ export function BookStage(): JSX.Element {
   const { t } = useTranslation();
   const nav = useSpreadNavigation();
   const [flat, setFlat] = useState(flatRequested);
-  const { open, close } = nav;
+  const [bound, setBound] = useState(true);
+  const { open, close, spread } = nav;
 
-  // Escape closes the book from anywhere inside it. FR-BOOK-08 wants the pointer gesture to be
-  // a drag, which is TASK-035; the keyboard route is the one NFR-A11Y-03 actually requires and
-  // it should not wait for the animation.
+  // Every trip out of the forest starts at the closed book again.
+  useEffect(() => {
+    if (open) setBound(true);
+  }, [open]);
+
+  // Escape closes from anywhere inside. FR-BOOK-08 wants the pointer route to be a drag; the
+  // keyboard route is the one NFR-A11Y-03 actually requires.
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent): void => {
@@ -54,13 +60,19 @@ export function BookStage(): JSX.Element {
 
   return (
     <div className="reading">
-      {flat ? <CssBook nav={nav} /> : <Road nav={nav} />}
+      {flat ? (
+        <CssBook nav={nav} />
+      ) : bound && spread ? (
+        <Cover spread={spread} onOpen={() => setBound(false)} />
+      ) : (
+        <Volume nav={nav} />
+      )}
       <div className="stage-controls">
         <button type="button" className="skin-toggle" onClick={close}>
           {t('forest.back')}
         </button>
         <button type="button" className="skin-toggle" onClick={toggle}>
-          {t(flat ? 'road.roadView' : 'road.flatView')}
+          {t(flat ? 'volume.bookView' : 'volume.listView')}
         </button>
       </div>
     </div>

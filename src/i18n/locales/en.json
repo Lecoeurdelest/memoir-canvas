@@ -1,16 +1,8 @@
 {
   "road": {
     "empty": "The archive is empty.",
-    "name": "The family's road",
-    "blocked": "The way is unfinished",
-    "flatView": "List view",
-    "roadView": "Road view",
-    "prev": "Back",
-    "next": "Onward",
-    "spine": "Milestones",
     "wedged": "The way is blocked: this stretch is still unsettled.",
-    "locked": "Out of reach: something unsettled lies before it.",
-    "at": "Stop"
+    "locked": "Out of reach: something unsettled lies before it."
   },
   "forest": {
     "name": "The forest of memories",
@@ -19,6 +11,13 @@
     "unanswered": "Nobody has told it",
     "locked": "out of reach, something ahead does not add up",
     "back": "Back to the forest"
+  },
+  "volume": {
+    "name": "The book",
+    "fore": "The fore-edge — the years",
+    "openIt": "open it",
+    "bookView": "Book view",
+    "listView": "List view"
   },
   "spread": {
     "recollection": "Recollection",

@@ -5,7 +5,7 @@ branch: A
 day: 6
 depends_on: [TASK-034]
 supersedes: [TASK-030]
-status: todo
+status: done
 ---
 
 # TASK-035 — The book, turned by hand
@@ -45,13 +45,13 @@ road, and they carry over exactly.
 
 ## Acceptance criteria
 
-- [ ] A spread reads at rest with no text distorted by perspective
-- [ ] Dragging a page edge turns the page; releasing below the threshold springs it back
-- [ ] Dragging the fore-edge reaches any spread; a tab's colour is its certainty
-- [ ] **No visible navigation button exists anywhere in the view**
-- [ ] ArrowLeft/ArrowRight still turn pages (`NFR-A11Y-03`), and every page control has an accessible name
-- [ ] The wedge rule still refuses forward travel by every route, gesture included
-- [ ] `prefers-reduced-motion` turns pages instantly
+- [x] A spread reads at rest with no text distorted by perspective
+- [x] Dragging a page edge turns the page; releasing below the threshold springs it back
+- [x] Dragging the fore-edge reaches any spread; a tab's colour is its certainty
+- [x] **No visible navigation button exists anywhere in the view**
+- [x] ArrowLeft/ArrowRight still turn pages (`NFR-A11Y-03`), and every page control has an accessible name
+- [x] The wedge rule still refuses forward travel by every route, gesture included
+- [x] `prefers-reduced-motion` turns pages instantly
 
 ## Files touched
 
@@ -62,7 +62,9 @@ road, and they carry over exactly.
 - `src/view/BookControls.tsx` (removed)
 - `src/view/Road.tsx` (removed)
 - `src/app.css`
-- `tests/navigation.spec.ts`
+- `tests/pageturn.spec.ts` (new — `navigation.spec.ts` passed untouched, see IMPL)
+- `src/view/CssBook.tsx`
+- `src/i18n/locales/vi.json`, `src/i18n/locales/en.json`
 
 ## Notes
 

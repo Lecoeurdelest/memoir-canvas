@@ -1,16 +1,8 @@
 {
   "road": {
     "empty": "Kho lưu trữ còn trống.",
-    "name": "Con đường của gia đình",
-    "blocked": "Đường còn dở",
-    "flatView": "Xem dạng danh sách",
-    "roadView": "Xem dạng con đường",
-    "prev": "Lùi lại",
-    "next": "Đi tiếp",
-    "spine": "Các mốc thời gian",
     "wedged": "Không đi tiếp được: chỗ này còn một chỗ chưa khớp.",
-    "locked": "Chưa tới được: còn một chỗ chưa khớp phía trước.",
-    "at": "Chặng"
+    "locked": "Chưa tới được: còn một chỗ chưa khớp phía trước."
   },
   "forest": {
     "name": "Rừng ký ức",
@@ -19,6 +11,13 @@
     "unanswered": "Chưa ai kể",
     "locked": "chưa tới được, còn một chỗ chưa khớp phía trước",
     "back": "Về rừng"
+  },
+  "volume": {
+    "name": "Quyển sổ",
+    "fore": "Mép sách — các năm",
+    "openIt": "mở ra",
+    "bookView": "Xem dạng quyển sổ",
+    "listView": "Xem dạng danh sách"
   },
   "spread": {
     "recollection": "Lời kể",

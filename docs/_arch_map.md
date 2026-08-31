@@ -70,7 +70,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/store/store.ts` | Zustand, holds the projection only | `TASK-010` |
 | `src/store/uiState.ts` | what the user is looking at — the registry depends on this | `TASK-010` |
 | `src/view/useSpreadNavigation.ts` | **the single navigation truth** — state, the wedge rule, whether a book is open at all, the R4 `setUi` contract | `TASK-030`, `TASK-034` |
-| `src/view/BookStage.tsx` | the door: the forest until a light is picked, then a book skin | `TASK-030`, `TASK-034` |
+| `src/view/BookStage.tsx` | the door: forest → cover → spread | `TASK-034`, `TASK-035`, `TASK-037` |
 | `src/view/Forest.tsx` | the entry view — one firefly per memory, brightness is certainty | `TASK-034` |
 | `src/view/forestLayout.ts` | where every light goes and why — pure, so it tests without a DOM | `TASK-034` |
 | `src/view/Volume.tsx` | the spread, turned by hand. **No WebGL, no buttons** | `TASK-035` |
@@ -80,7 +80,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/view/webgl.ts` | memoised WebGL preflight and the `?flat=1` escape hatch | `TASK-030` |
 | `src/view/Spread.tsx` | one station's content, as ordinary DOM | `TASK-016` (superseded), `TASK-030` |
 | `src/view/Tear.tsx` | the conflict tear and its healing | `TASK-018`, `TASK-019` |
-| `src/view/CssBook.tsx` | the flat list — the escape hatch, not a fallback | `TASK-026`, `TASK-030` |
+| `src/view/CssBook.tsx` | the flat list — the escape hatch, and it honours the wedge | `TASK-026`, `TASK-035` |
 | `src/view/Book.tsx` | **dead stub** — kept so the supersession stays legible | `TASK-015` (superseded) |
 | `src/view/PageTurn.tsx` | **dead stub** | `TASK-017` (superseded) |
 | `src/view/Constellation.tsx` | **dead stub** | `TASK-020` (superseded) |

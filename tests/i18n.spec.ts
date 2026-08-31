@@ -65,10 +65,12 @@ describe('the resource files', () => {
 
 describe('i18next itself', () => {
   it('resolves a key in both languages', async () => {
+    // Was `road.next` until TASK-035 removed the turn buttons and the key with them. Any real
+    // key does this job; this one is a label the book cannot lose.
     await i18n.changeLanguage('vi');
-    expect(i18n.t('road.next')).toBe('Đi tiếp');
+    expect(i18n.t('volume.name')).toBe('Quyển sổ');
     await i18n.changeLanguage('en');
-    expect(i18n.t('road.next')).toBe('Onward');
+    expect(i18n.t('volume.name')).toBe('The book');
   });
 
   it('interpolates the circa year rather than concatenating it by hand', async () => {

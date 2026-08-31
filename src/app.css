@@ -268,102 +268,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .evidence-panel + .evidence-panel { margin-top: 18px; padding-top: 14px;
                                     border-top: 1px solid var(--rule); }
 
-/* ── The road ───────────────────────────────────────────────────────────────────────────────
-   Depth is CSS perspective, not WebGL: no bundle cost, correct Vietnamese shaping for free, and
-   no GL context to lose in an in-app webview.
-
-   You are looking down a lit strip of paper into the dark. The stage carries its own deep ground
-   so the far past dissolves into the same substance the void is made of — and so the road itself
-   reads as LIT rather than as a pale wedge on a pale page. The world is scenery and aria-hidden;
-   every year it draws is also a real button in the spine. */
-
-.road-stage { position: relative; height: clamp(240px, 44vh, 400px); overflow: hidden;
-              margin: 18px 0 0; border-radius: 3px;
-              perspective: 720px; perspective-origin: 50% 40%;
-              background: radial-gradient(120% 80% at 50% 92%, #3b3833 0%, #22211d 45%, #171713 100%); }
-.road-stage:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-
-.road-world { position: absolute; inset: 0; transform-style: preserve-3d;
-              transition: transform 900ms cubic-bezier(.33, .02, .2, 1); }
-
-/* The pages, laid end to end. The repeating rule is what makes travel legible as motion. */
-.road-ground { position: absolute; left: 50%; bottom: -14%; width: 420px; height: 4200px;
-               margin-left: -210px; transform-origin: 50% 100%; transform: rotateX(87deg);
-               background-color: #e8e5db;
-               background-image:
-                 repeating-linear-gradient(to top, rgba(29,35,33,.13) 0 2px, transparent 2px 150px),
-                 linear-gradient(90deg, #cdc8b8 0 10px, transparent 10px calc(100% - 10px),
-                                 #cdc8b8 calc(100% - 10px) 100%);
-               -webkit-mask-image: linear-gradient(to top, #000 0 8%, rgba(0,0,0,.5) 24%, transparent 46%);
-               mask-image: linear-gradient(to top, #000 0 8%, rgba(0,0,0,.5) 24%, transparent 46%); }
-
-/* Verge posts: the cheapest thing in the scene and the largest part of the sensation of speed. */
-.milestone { position: absolute; left: 50%; bottom: 30%; transform-style: preserve-3d;
-             display: flex; flex-direction: column-reverse; align-items: center; gap: 5px; }
-.milestone .post { display: block; width: 3px; height: 30px; background: #b9b2a0; }
-.milestone-year { font-family: "Newsreader", Georgia, serif; font-size: 17px;
-                  font-variant-numeric: tabular-nums; color: #cdc8b8; white-space: nowrap; }
-.milestone.here .post { background: var(--paper); height: 40px; }
-.milestone.here .milestone-year { color: #fff; font-size: 22px; font-weight: 600; }
-.milestone.torn .post { background: var(--lacquer); }
-.milestone.torn .milestone-year { color: #d9705e; }
-
-/* The gap in the paper. Nothing is drawn beneath it — you see the same dark the far past
-   dissolves into, because the past under the road and the past at the horizon are one substance. */
-.chasm { position: absolute; left: -4%; width: 108%; height: 120px; }
-.chasm::before { content: ""; position: absolute; inset: 26px 0; background: #100f0c; }
-.chasm .lip { position: absolute; left: 0; width: 100%; height: 30px; background: #e8e5db; }
-.chasm .lip.near { top: 0; clip-path: polygon(0 0, 100% 0, 100% 42%, 92% 82%, 84% 38%, 73% 88%,
-                                              61% 42%, 52% 94%, 41% 44%, 30% 90%, 19% 40%,
-                                              9% 84%, 0 46%); }
-.chasm .lip.far { bottom: 0; clip-path: polygon(0 56%, 8% 14%, 18% 62%, 29% 10%, 40% 58%,
-                                                51% 6%, 62% 60%, 72% 12%, 83% 64%, 93% 16%,
-                                                100% 60%, 100% 100%, 0 100%); }
-
-/* The lamp that travels with you: the ten metres you occupy are legible, everything beyond is a
-   rumour. One gradient, bolted to the viewport rather than the world. */
-.fog { position: absolute; inset: 0; pointer-events: none;
-       background: radial-gradient(90% 55% at 50% 100%, rgba(255,247,225,.16) 0%,
-                                   rgba(255,247,225,0) 62%),
-                   linear-gradient(to bottom, #171713 0 14%, rgba(23,23,19,0) 46%); }
-
-.road-blocked { position: absolute; left: 0; right: 0; top: 14px; margin: 0; text-align: center;
-                font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
-                color: #d9705e; }
-
-.road .controls { margin-top: 12px; }
-.skin-toggle { margin: 10px 0 0; font: inherit; font-size: 12px; padding: 4px 10px;
-               background: none; border: 1px solid var(--rule); border-radius: 3px;
-               color: var(--ink-soft); cursor: pointer; }
-.skin-toggle:hover { color: var(--ink); border-color: var(--ink-soft); }
-
-.vertebra.locked { opacity: .38; cursor: not-allowed; }
-
-/* NFR-A11Y-04 — reduced motion means no MOTION, not no depth. The road keeps its perspective;
-   travel becomes an instant cut. */
-@media (prefers-reduced-motion: reduce) {
-  .road-world { transition: none; }
-}
-
-/* The torn page standing across the road. Ragged along its TOP edge, because that is where the
-   paper gave way; the fibre line is lacquer, the same red the flat book uses for a tear.
-   The polygon is deliberately irregular — an even zigzag reads as bunting, not as torn paper. */
-.roadblock { position: absolute; left: 50%; bottom: 16%; width: 232px; height: 84px;
-             transform-style: preserve-3d; }
-.roadblock .sheet { position: absolute; inset: 0; background: #efece1;
-                    box-shadow: 0 12px 30px rgba(0,0,0,.6);
-                    clip-path: polygon(0 34%, 4% 12%, 9% 30%, 12% 19%, 19% 41%, 24% 8%,
-                                       27% 27%, 34% 15%, 39% 38%, 46% 6%, 51% 24%, 55% 11%,
-                                       62% 36%, 68% 17%, 71% 30%, 78% 9%, 84% 33%, 89% 20%,
-                                       95% 39%, 100% 22%, 100% 100%, 0 100%); }
-.roadblock::after { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 44%;
-                    background: linear-gradient(to bottom, rgba(140,47,34,.62), rgba(140,47,34,0));
-                    clip-path: polygon(0 34%, 4% 12%, 9% 30%, 12% 19%, 19% 41%, 24% 8%,
-                                       27% 27%, 34% 15%, 39% 38%, 46% 6%, 51% 24%, 55% 11%,
-                                       62% 36%, 68% 17%, 71% 30%, 78% 9%, 84% 33%, 89% 20%,
-                                       95% 39%, 100% 22%, 100% 100%, 0 100%);
-                    pointer-events: none; }
-
 /* ── TASK-034 · the forest ──────────────────────────────────────────────────────
    The one dark surface in a light app. Colours that carry meaning are NOT set here:
    they come from NIGHT_PALETTE in CertaintyBadge.tsx, because that is the only place
@@ -586,7 +490,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .forest-empty { margin: 0; padding: 48px 24px; color: #cfdcd7; text-align: center; }
 
 .reading { max-width: 900px; margin: 0 auto; padding: 32px 20px 0; }
-.stage-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.stage-controls { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0 0; }
 
 @media (prefers-reduced-motion: reduce) {
   .fly, .ring, .memory { animation: none; opacity: 0.85; }
@@ -599,4 +503,190 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 @media (max-width: 700px) {
   .memory-name { display: none; }
   .forest-chrome { padding: 16px 16px 14px; }
+}
+
+
+/* ── TASK-035 · the book, turned by hand ────────────────────────────────────────
+   The governing rule, learned by building the opposite first: what must be READ is
+   never tilted; what is TILTED never needs to be read. Every rule below that adds
+   depth applies to a surface with no words on it.                                */
+
+.volume { margin: 0 0 8px; }
+
+.book-body {
+  position: relative;
+  perspective: 2200px;
+  padding: 8px 0 34px;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.book-body:active { cursor: grabbing; }
+.book-body:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
+
+/* The block of paper the spread rests on: a stack of edges and a shadow in the gutter.
+   This is the whole depth budget, and it carries no text. */
+.page-block { position: absolute; inset: 8px 0 34px; pointer-events: none; }
+
+/* The stack the open spread rests on. Offsets are generous on purpose — measured at 5px it was
+   invisible behind the spread's own opaque background, which is the whole depth budget wasted. */
+.block-under {
+  position: absolute;
+  inset: 10px -14px -12px;
+  border-radius: 2px;
+  background: #e4e1d7;
+  box-shadow:
+    3px 3px 0 -1px #ebe8df, 6px 6px 0 -2px #e0ddd3, 9px 9px 0 -3px #eae7de,
+    12px 12px 0 -4px #dcd9cf, 0 16px 26px rgba(29, 35, 33, 0.16);
+}
+
+/* ON TOP of the spread, not under it: a fold is a shadow falling ACROSS the paper. */
+.gutter {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 46px;
+  z-index: 2;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(29, 35, 33, 0) 0%, rgba(29, 35, 33, 0.10) 38%,
+    rgba(29, 35, 33, 0.16) 50%, rgba(29, 35, 33, 0.10) 62%, rgba(29, 35, 33, 0) 100%);
+}
+
+.book-body .spread { position: relative; z-index: 1; }
+
+/* The leaf under the reader's hand. Blank by construction. */
+.turning-leaf {
+  position: absolute;
+  left: 50%;
+  top: 8px;
+  bottom: 34px;
+  width: 50%;
+  z-index: 2;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  border-radius: 0 3px 3px 0;
+  pointer-events: none;
+  background: linear-gradient(to right, #f7f5ef 0%, #f2f1ec 38%, #eceadf 100%);
+  box-shadow: -14px 0 26px rgba(29, 35, 33, 0.2);
+}
+
+/* The refusal, felt before it is read: the book resists rather than turning. */
+.book-body.refusing .turning-leaf {
+  background: linear-gradient(to right, #f6ece9 0%, #f2e6e2 60%, #ecd9d4 100%);
+  box-shadow: -14px 0 26px rgba(140, 47, 34, 0.28);
+}
+.book-body.refusing { cursor: not-allowed; }
+
+/* The fore-edge: the stacked page edges, one per memory, coloured by certainty. It is the
+   fore-edge of a real book, not a toolbar — but it is focusable and named, because
+   FR-BOOK-08 removes what is SEEN, never what is ANNOUNCED. */
+.fore-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 6px;
+  display: flex;
+  gap: 2px;
+  justify-content: center;
+  z-index: 3;
+}
+
+.edge {
+  position: relative;
+  width: 26px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 0 0 2px 2px;
+  cursor: pointer;
+  opacity: 0.42;
+  transition: height 140ms ease, opacity 140ms ease;
+}
+.edge:hover, .edge.here { opacity: 1; height: 26px; }
+.edge.torn { box-shadow: inset 0 -3px 0 var(--lacquer); }
+.edge.locked { opacity: 0.14; cursor: not-allowed; }
+.edge:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; opacity: 1; }
+
+.edge-year {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 5px);
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+.edge:hover .edge-year, .edge:focus-visible .edge-year, .edge.here .edge-year { opacity: 1; }
+
+.spread-locked { opacity: 0.5; }
+.spread-locked h3 { font-size: 16px; margin: 2px 0 4px; }
+
+/* ── The closed volume ──────────────────────────────────────────────────────── */
+
+.cover-stage { display: flex; justify-content: center; padding: 18px 0 10px; perspective: 1400px; }
+
+.cover {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transform: rotateY(-13deg) rotateX(3deg);
+  transition: transform 260ms cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.cover:hover, .cover:focus-visible { transform: rotateY(-4deg) rotateX(1deg) scale(1.03); }
+.cover:focus-visible { outline: 2px solid var(--ink); outline-offset: 8px; }
+
+.cover-board {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  width: 232px;
+  height: 320px;
+  padding: 30px 26px 26px 40px;
+  border-radius: 2px 5px 5px 2px;
+  background: linear-gradient(125deg, #4a2f26 0%, #6b4436 42%, #3d251d 100%);
+  box-shadow: 12px 14px 30px rgba(29, 35, 33, 0.34), inset 0 0 0 1px rgba(232, 212, 106, 0.16);
+  text-align: left;
+}
+
+.cover-spine {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 16px;
+  border-radius: 2px 0 0 2px;
+  background: linear-gradient(to right, #2c1a14 0%, #45291f 62%, rgba(0, 0, 0, 0.18) 100%);
+}
+.cover-rule {
+  position: absolute;
+  left: 28px; right: 18px; top: 20px;
+  height: 1px;
+  background: rgba(232, 212, 106, 0.42);
+}
+.cover-title { font-family: Newsreader, Georgia, serif; font-size: 26px; color: #f0e5c8; }
+.cover-sub { font-size: 12px; letter-spacing: 0.08em; color: rgba(240, 229, 200, 0.66); }
+.cover-year {
+  margin-top: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: #e8d46a;
+}
+.cover-torn .cover-board { box-shadow: 12px 14px 30px rgba(29, 35, 33, 0.34), inset 0 0 0 1px var(--lacquer); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cover, .edge, .edge-year { transition: none; }
+}
+
+@media (max-width: 700px) {
+  .cover-board { width: 190px; height: 264px; padding: 24px 20px 20px 32px; }
+  .cover-title { font-size: 22px; }
+  .edge { width: 18px; }
 }
