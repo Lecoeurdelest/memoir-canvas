@@ -7,8 +7,18 @@ reconstruct family history together from oral accounts, old photographs and docu
 agent must cite its sources, must show where it is unsure, and **may never resolve a
 contradiction on its own**.
 
-The 3D book on screen *is* the memory graph rendered. When two sources disagree, the page
-**tears along a red line and will not close** — until a person decides.
+The screen *is* the memory graph rendered. The archive opens as a **forest at night, one firefly
+per memory**, where brightness and hue are certainty — so how sure this family is of its own past
+reads before a word does. A light opens into a bound volume you turn **by hand**; there is not a
+single navigation button anywhere.
+
+When two sources disagree, that page **will not turn**. It lifts under your hand and springs back,
+torn down the gutter, and the forest behind it goes dark — until a person puts their name to a
+year.
+
+All of it is CSS perspective and `box-shadow`. **No WebGL, no `three`, no canvas** — measured at
++212 kB gzipped for a scene whose Vietnamese text would then have to be solved separately, against
+a 47 kB entry chunk.
 
 ---
 
@@ -56,6 +66,15 @@ One thing does leave, by design: **whatever you hand to the agent.** WebMCP tool
 results travel to the model driving the session, which is a hosted service. That is the trade the
 project is making, and it is stated rather than glossed.
 
+Photographs do not leave, and do not even enter. Drop one on a memory and its date is read out of
+the EXIF header in the tab; the archive keeps the date, the filename and whether the photograph
+**agrees** with the story. A photograph dated 1974 dropped on a memory that says 1972 is recorded
+as contradicting it — which is the archive working, not breaking. The pixels are never stored.
+
+There is no Google Photos integration, and the reason is specific rather than lazy: Google
+withdrew the broad Photos Library scopes after 2025-03-31, and it blocks its OAuth consent screen
+inside embedded webviews — which is exactly the browser this has to run in.
+
 | Command | What it does |
 |---|---|
 | `npm run dev` | dev server |
@@ -64,6 +83,7 @@ project is making, and it is stated rather than glossed.
 | `npm test` | vitest |
 | `npm run db:verify` | **prove the three constraints still bite** |
 | `npm run arch:check` | check R1–R4 with grep (R5 is enforced by review — see `NFR-MAINT-01`) |
+| `npm run deploy` | build and push to Cloudflare Pages (browser login; **no token in this repo**) |
 
 ---
 
