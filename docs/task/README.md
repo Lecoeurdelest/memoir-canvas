@@ -1,6 +1,6 @@
 # Tasks
 
-42 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
+45 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
 inserted in the middle.
 
 Four tasks are **superseded**: the direction changed after the DAY 4 GATE and the book became a
@@ -54,6 +54,9 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-040`](TASK-040-the-forest-you-can-actually-use.md) | The forest you can actually use | A | 6 | `TASK-034`, `TASK-037` | ☑ |
 | [`TASK-041`](TASK-041-the-book-comes-back-into-the-forest.md) | The book comes back into the forest | A | 6 | `TASK-035`, `TASK-037` | ☑ |
 | [`TASK-042`](TASK-042-somewhere-to-tell-it.md) | Somewhere to tell it | A | 6 | `TASK-038` | ☑ |
+| [`TASK-043`](TASK-043-the-ladder-becomes-the-light.md) | The ladder becomes the light | A | 6 | `TASK-034`, `TASK-040` | ☐ |
+| [`TASK-044`](TASK-044-nothing-that-looks-like-a-control.md) | Nothing that looks like a control | A | 6 | `TASK-041`, `TASK-043` | ☐ |
+| [`TASK-045`](TASK-045-the-agent-shown-by-acting.md) | The agent, shown by acting | A | 6 | `TASK-043` | ☐ |
 
 ## Milestones
 
