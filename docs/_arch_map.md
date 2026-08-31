@@ -79,7 +79,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/view/RefusedPage.tsx` | the page that will not turn — **the project's argument, rendered** | `TASK-036` |
 | `src/view/webgl.ts` | memoised WebGL preflight and the `?flat=1` escape hatch | `TASK-030` |
 | `src/view/Spread.tsx` | one station's content, as ordinary DOM | `TASK-016` (superseded), `TASK-030` |
-| `src/view/Tear.tsx` | the conflict tear and its healing | `TASK-018`, `TASK-019` |
+| `src/view/Tear.tsx` | the healing, and the name of whoever signed it | `TASK-019`, `TASK-036` |
 | `src/view/CssBook.tsx` | the flat list — the escape hatch, and it honours the wedge | `TASK-026`, `TASK-035` |
 | `src/view/Book.tsx` | **dead stub** — kept so the supersession stays legible | `TASK-015` (superseded) |
 | `src/view/PageTurn.tsx` | **dead stub** | `TASK-017` (superseded) |

@@ -14,6 +14,7 @@
  * R5: reads the projection. All navigation truth lives in useSpreadNavigation.
  */
 
+import { RefusedPage } from './RefusedPage';
 import { Spread } from './Spread';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
@@ -46,7 +47,11 @@ export function CssBook({ nav }: { nav: SpreadNavigation }): JSX.Element {
             </article>
           );
         }
-        return <Spread key={spread.key} spread={spread} />;
+        return spread.conflict ? (
+          <RefusedPage key={spread.key} spread={spread} conflict={spread.conflict} />
+        ) : (
+          <Spread key={spread.key} spread={spread} />
+        );
       })}
     </section>
   );

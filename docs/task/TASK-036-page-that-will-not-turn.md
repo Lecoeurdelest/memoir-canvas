@@ -4,7 +4,7 @@ title: The page that will not turn
 branch: A
 day: 6
 depends_on: [TASK-035]
-status: todo
+status: done
 ---
 
 # TASK-036 — The page that will not turn
@@ -35,20 +35,22 @@ cut, this is not.
 
 ## Acceptance criteria
 
-- [ ] The refusal appears if and only if a conflict is open
-- [ ] Dragging forward lifts the page and returns it; the reader cannot pass
-- [ ] Neither competing claim is visually favoured
-- [ ] Dropping a name on a year calls `commands.resolveClaim` as `'human'`
-- [ ] An agent reaching the same function is still refused by Postgres, verbatim
-- [ ] Keyboard reaches the same outcome without a pointer
-- [ ] `tests/core-loop.spec.ts` — the DAY 4 GATE — passes untouched
+- [x] The refusal appears if and only if a conflict is open
+- [x] Dragging forward lifts the page and returns it; the reader cannot pass
+- [x] Neither competing claim is visually favoured
+- [x] Dropping a name on a year calls `commands.resolveClaim` as `'human'`
+- [x] An agent reaching the same function is still refused by Postgres, verbatim
+- [x] Keyboard reaches the same outcome without a pointer
+- [x] `tests/core-loop.spec.ts` — the DAY 4 GATE — passes untouched
 
 ## Files touched
 
 - `src/view/RefusedPage.tsx` (new)
 - `src/view/Tear.tsx`
 - `src/app.css`
-- `tests/core-loop.spec.ts` (must not need changing)
+- `tests/refusal.spec.ts` (new — `core-loop.spec.ts` did not need changing)
+- `src/view/Volume.tsx`, `src/view/CssBook.tsx`
+- `src/i18n/locales/vi.json`, `src/i18n/locales/en.json`
 
 ## Notes
 

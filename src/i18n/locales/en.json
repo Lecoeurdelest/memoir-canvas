@@ -38,6 +38,12 @@
     "working": "saving…",
     "noYear": "no year"
   },
+  "refused": {
+    "heading": "This page will not turn",
+    "cannotTurn": "The book stops here until a person settles it.",
+    "putNameOn": "Put {{name}}'s name on {{year}}",
+    "pickFirst": "Choose a person first"
+  },
   "evidence": {
     "noYear": "No year",
     "circa": "around {{year}}",

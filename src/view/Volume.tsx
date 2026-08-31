@@ -18,6 +18,7 @@
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PALETTE } from '../panels/CertaintyBadge';
+import { RefusedPage } from './RefusedPage';
 import { Spread } from './Spread';
 import { certaintyOf } from './forestLayout';
 import { angleOf, usePageDrag } from './usePageDrag';
@@ -63,7 +64,11 @@ export function Volume({ nav }: { nav: SpreadNavigation }): JSX.Element {
           <span className="gutter" />
         </div>
 
-        <Spread spread={spread} />
+        {spread.conflict ? (
+          <RefusedPage spread={spread} conflict={spread.conflict} />
+        ) : (
+          <Spread spread={spread} />
+        )}
 
         {/* The leaf under the reader's hand. Blank paper by construction — it is the one surface
             that tilts, so by the rule above it must never need reading. */}

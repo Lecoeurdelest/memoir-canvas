@@ -38,6 +38,12 @@
     "working": "đang ghi…",
     "noYear": "không rõ năm"
   },
+  "refused": {
+    "heading": "Trang này không lật được",
+    "cannotTurn": "Sách dừng ở đây cho tới khi có người quyết.",
+    "putNameOn": "Đặt tên {{name}} vào năm {{year}}",
+    "pickFirst": "Chọn tên một người trước"
+  },
   "evidence": {
     "noYear": "Không rõ năm",
     "circa": "khoảng {{year}}",
