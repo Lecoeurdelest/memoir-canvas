@@ -10,6 +10,7 @@
  */
 
 import { CertaintyBadge } from './CertaintyBadge';
+import { PhotoDrop } from './PhotoDrop';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import type { Claim, Evidence, Source, Stance } from '../domain/types';
@@ -94,6 +95,9 @@ export function EvidencePanel({ claim }: { claim: Claim }): JSX.Element {
           ))}
         </ul>
       )}
+
+      {/* TASK-032 — a photograph becomes one more row of this list, dated by its own metadata. */}
+      <PhotoDrop claim={claim} />
     </section>
   );
 }

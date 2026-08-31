@@ -88,6 +88,14 @@
       "external_record": "Hồ sơ bên ngoài"
     }
   },
+  "photo": {
+    "add": "Thêm ảnh",
+    "reading": "đang đọc ảnh…",
+    "fileSays": "Ảnh ghi năm {{year}}",
+    "noDate": "Ảnh không ghi năm",
+    "disagrees": "lệch với năm trong lời kể",
+    "stays": "Ảnh không rời khỏi máy bạn. Kho chỉ giữ ngày tháng và tên tệp."
+  },
   "certainty": {
     "uncertain": "Chưa rõ",
     "oral": "Lời kể",

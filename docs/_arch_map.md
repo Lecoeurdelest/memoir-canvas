@@ -88,6 +88,8 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/panels/EvidencePanel.tsx` | sources, excerpts, stance | `TASK-022` |
 | `src/panels/StoryCard.tsx` | the bilingual story card | `TASK-023` |
 | `src/panels/AuditTrail.tsx` | the readable audit log | `TASK-024` |
+| `src/lib/photoDate.ts` | EXIF and Takeout date readers — pure, no dependency | `TASK-032` |
+| `src/panels/PhotoDrop.tsx` | drop a photograph on a memory; it dates itself | `TASK-032` |
 | `src/panels/Backstage.tsx` | one drawer for the machinery — boot facts, tools, audit | `TASK-031` |
 | `src/panels/ManualToolPanel.tsx` | invoke tools by hand; the Postgres role is named on the toggle | `TASK-006`, `TASK-031` |
 | `src/seed/family.sql` | the fictional archive staging 1972/1974 | `TASK-007` |

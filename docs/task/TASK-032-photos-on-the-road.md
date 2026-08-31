@@ -1,10 +1,10 @@
 ---
 id: TASK-032
-title: Photos on the road, with nothing to configure
+title: Photographs, with nothing to configure
 branch: C
 day: 5
 depends_on: [TASK-030]
-status: todo
+status: done
 ---
 
 # TASK-032 — Photos on the road, with nothing to configure
@@ -56,9 +56,23 @@ Dates come from the file itself, so nothing is typed:
 - A Google Takeout export ships `*.supplemental-metadata.json` beside each file carrying `photoTakenTime`. **Better** than EXIF for this project: it survives editors stripping EXIF, it is `JSON.parse` rather than a byte walk, and it is Google's own attested capture time — which makes it a stronger `source` than a recollection.
 - A `.ics` file dropped in gives dated events with a few lines of parsing.
 
+## Amended 2026-08-31 — the road is gone, and a photograph is evidence
+
+Two changes, both recorded in `IMPL-TASK-032`:
+
+The road was superseded by `TASK-035`, so the drop target is on the memory itself — beside the
+evidence a photograph becomes.
+
+And **a photograph does not become a station of its own.** That would mean inventing a `claim`,
+which needs a subject and a predicate no JPEG contains. Manufacturing one is the archive turning a
+file into an assertion about someone's life — the exact failure this project exists to prevent,
+committed by the feature meant to enrich it. A photograph is evidence, which is what `FR-EVID`
+already says it is, and its date is weighed against the claim it lands on: matching year
+`supports`, differing year **`contradicts`**.
+
 ## In scope
 
-- a drop target that is the road's unpaved end, and the same target as a tap on a phone
+- a drop target on the memory, and the same target as a tap on a phone
 - sniffing each file by its **first bytes**, never its extension — Takeout filenames mislead
 - EXIF `DateTimeOriginal` and Takeout sidecar `photoTakenTime`
 - placing each photo at its year, as a `source` of kind `photo`, through `commands.ts` (`R3`)

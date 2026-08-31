@@ -88,6 +88,14 @@
       "external_record": "External record"
     }
   },
+  "photo": {
+    "add": "Add a photograph",
+    "reading": "reading the photograph…",
+    "fileSays": "The file says {{year}}",
+    "noDate": "The file carries no date",
+    "disagrees": "disagrees with the year told",
+    "stays": "The photograph never leaves your machine. The archive keeps only its date and its filename."
+  },
   "certainty": {
     "uncertain": "Uncertain",
     "oral": "Oral recollection",
