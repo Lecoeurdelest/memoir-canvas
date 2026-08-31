@@ -4,7 +4,7 @@ title: The front page — ask the book, and it marks itself
 branch: A
 day: 6
 depends_on: [TASK-035]
-status: todo
+status: done
 ---
 
 # TASK-039 — The front page: ask the book, and it marks itself
@@ -52,13 +52,13 @@ answer built on one uncertain page is the same lie the rest of this project refu
 
 ## Acceptance criteria
 
-- [ ] Asking a question marks at most three pages, each with its year and certainty
-- [ ] The stated certainty is the **floor** of the marked pages, not the best of them
-- [ ] Pulling a ribbon opens that page, and the wedge still refuses a locked one
-- [ ] A question that matches nothing says so, and marks nothing
-- [ ] Matching works in both languages and against Vietnamese diacritics
-- [ ] Keyboard reaches every ribbon; each is named
-- [ ] Nothing is written to the archive by asking
+- [x] Asking a question marks at most three pages, each with its year and certainty
+- [x] The stated certainty is the **floor** of the marked pages, not the best of them
+- [x] Pulling a ribbon opens that page, and the wedge still refuses a locked one
+- [x] A question that matches nothing says so, and marks nothing
+- [x] Matching works in both languages and against Vietnamese diacritics
+- [x] Keyboard reaches every ribbon; each is named
+- [x] Nothing is written to the archive by asking
 
 ## Files touched
 

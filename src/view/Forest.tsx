@@ -69,6 +69,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const people = useStore((s) => s.model?.people) ?? [];
   const places = useStore((s) => s.model?.places) ?? [];
   const questions = useStore((s) => s.model?.questions) ?? [];
+  const setOpenQuestion = useStore((s) => s.setOpenQuestion);
 
   const { spreads, index, openAt } = nav;
   const width = useStageWidth();
@@ -189,22 +190,32 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
             >
               {gaps
                 .filter((g) => g.plane === plane)
-                .map((g) => (
-                  <span
-                    key={g.id}
-                    className="ring"
-                    aria-hidden="true"
-                    style={{
-                      left: `${g.x}%`,
-                      top: `${g.y}%`,
-                      width: `${g.size}px`,
-                      height: `${g.size}px`,
-                      borderColor: `rgba(${rgb(NIGHT_UNLIT)}, 0.55)`,
-                      animationDuration: `${g.duration.toFixed(1)}s`,
-                      animationDelay: `${g.delay.toFixed(1)}s`,
-                    }}
-                  />
-                ))}
+                .map((g) => {
+                  const question = questions.find((q) => q.id === g.id);
+                  const asked =
+                    lang === 'vi'
+                      ? (question?.question_vi ?? '')
+                      : (question?.question_en ?? question?.question_vi ?? '');
+                  return (
+                    <button
+                      key={g.id}
+                      type="button"
+                      className="ring"
+                      lang={lang}
+                      aria-label={`${t('forest.unanswered')} — ${asked}`}
+                      style={{
+                        left: `${g.x}%`,
+                        top: `${g.y}%`,
+                        width: `${g.size}px`,
+                        height: `${g.size}px`,
+                        borderColor: `rgba(${rgb(NIGHT_UNLIT)}, 0.55)`,
+                        animationDuration: `${g.duration.toFixed(1)}s`,
+                        animationDelay: `${g.delay.toFixed(1)}s`,
+                      }}
+                      onClick={() => setOpenQuestion(g.id)}
+                    />
+                  );
+                })}
 
               {lights
                 .filter((l) => l.plane === plane)

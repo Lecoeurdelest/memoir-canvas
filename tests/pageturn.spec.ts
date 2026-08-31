@@ -9,7 +9,15 @@
  * decides whether it is allowed, and `tests/navigation.spec.ts` owns the refusal.
  */
 import { describe, expect, it } from 'vitest';
-import { COMMIT_AT, angleOf, commits, directionOf, progressOf } from '../src/view/usePageDrag';
+import {
+  CLOSE_AT,
+  COMMIT_AT,
+  angleOf,
+  commits,
+  directionOf,
+  isPullDown,
+  progressOf,
+} from '../src/view/usePageDrag';
 
 describe('how far the page has been pulled', () => {
   it('is a full turn at half the width, in either direction', () => {
@@ -71,5 +79,28 @@ describe('the lifted leaf', () => {
     const half = Math.abs(angleOf(-0.5));
     const full = Math.abs(angleOf(-1));
     expect(half).toBeCloseTo(full / 2, 5);
+  });
+});
+
+describe('shutting the book instead of turning a page', () => {
+  it('shuts when the hand is pulled down past a quarter of the height', () => {
+    expect(isPullDown(0, 900 * CLOSE_AT, 900)).toBe(true);
+    expect(isPullDown(0, 900 * CLOSE_AT - 1, 900)).toBe(false);
+  });
+
+  it('never shuts on an upward drag', () => {
+    expect(isPullDown(0, -400, 900)).toBe(false);
+  });
+
+  it('turns rather than shuts when the hand went further sideways', () => {
+    // The real bug this guards: a downward drag always drifts sideways a little, and a shut book
+    // must not turn a page on its way closed. Furthest wins, not first-across-a-line.
+    expect(isPullDown(400, 300, 900)).toBe(false);
+    expect(isPullDown(-400, 300, 900)).toBe(false);
+    expect(isPullDown(100, 300, 900)).toBe(true);
+  });
+
+  it('does not shut a book that has not been laid out yet', () => {
+    expect(isPullDown(0, 400, 0)).toBe(false);
   });
 });

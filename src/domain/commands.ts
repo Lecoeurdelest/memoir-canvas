@@ -555,6 +555,89 @@ export async function proposeFollowupQuestion(
   return id;
 }
 
+export interface AnswerQuestionInput {
+  question_id: string;
+  /** What the family wrote, kept exactly as they wrote it. */
+  answer_text: string;
+  /** The person telling it. The database rejects an oral account with no contributor. */
+  told_by: string;
+}
+
+/**
+ * TASK-038 — a person answers a question the assistant asked.
+ *
+ * There is no tool for this, and there will not be one. `schema.sql` has said so since it froze:
+ *
+ *   GRANT UPDATE (status, answer_text, answered_at) ON followup_question TO app_human;
+ *
+ * `app_agent` is absent from that line, so an agent reaching this function is refused by Postgres
+ * the same way it is refused at `resolve_claim` — the assistant may ask, and only a person may
+ * answer.
+ *
+ * What the answer BECOMES is deliberately modest: an oral account, recorded verbatim against the
+ * claim the question was about. It does not become a claim of its own. Turning prose into a
+ * structured assertion means guessing a subject and a predicate the family never gave, which is
+ * the exact failure this project exists to prevent — and it would be this project committing it,
+ * in the feature built to let people speak.
+ */
+export async function answerFollowupQuestion(
+  input: AnswerQuestionInput,
+  ctx: CommandContext,
+): Promise<{ sourceId: string }> {
+  const sourceId = uuid();
+  const audit: AuditInput = {
+    actor: ctx.actor,
+    toolName: 'answer_followup_question',
+    args: input,
+    targetTable: 'followup_question',
+    targetId: input.question_id,
+    after: { sourceId },
+    registeredBecause: ctx.registeredBecause,
+  };
+
+  if (!input.answer_text.trim()) {
+    return refuse(audit, 'an answer with no words in it is not an answer');
+  }
+  if (!input.told_by) {
+    return refuse(audit, 'an oral account needs the person who told it');
+  }
+
+  const [question] = await query<{ claim_id: string | null; status: string }>(
+    'SELECT claim_id, status FROM followup_question WHERE id = $1',
+    [input.question_id],
+  );
+
+  if (!question) return refuse(audit, 'no such question');
+  if (question.status !== 'open') return refuse(audit, 'that question has already been answered');
+  if (!question.claim_id) {
+    return refuse(audit, 'this question points at a conflict rather than a claim — settle it there');
+  }
+
+  const claimId = question.claim_id;
+
+  await withAudit(audit, async (tx) => {
+    await tx.exec(
+      `INSERT INTO source (id, kind, title, verbatim, contributor_id)
+       VALUES ($1, 'oral_account', $2, $3, $4)`,
+      [sourceId, 'Lời kể', input.answer_text, input.told_by],
+    );
+    await tx.exec(
+      `INSERT INTO evidence (claim_id, source_id, stance, excerpt)
+       VALUES ($1, $2, 'mentions', $3)`,
+      [claimId, sourceId, input.answer_text.slice(0, 240)],
+    );
+    // Human-only, and enforced by the GRANT rather than by this line.
+    await tx.exec(
+      `UPDATE followup_question
+          SET status = 'answered', answer_text = $2, answered_at = now()
+        WHERE id = $1`,
+      [input.question_id, input.answer_text],
+    );
+  });
+
+  return { sourceId };
+}
+
 // ─────────────────────────────────── story cards ───────────────────────────────────
 
 export interface GenerateStoryCardInput {

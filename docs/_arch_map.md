@@ -75,7 +75,10 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/view/forestLayout.ts` | where every light goes and why — pure, so it tests without a DOM | `TASK-034` |
 | `src/view/Volume.tsx` | the spread, turned by hand. **No WebGL, no buttons** | `TASK-035` |
 | `src/view/Cover.tsx` | the closed volume, its title, the way in from the forest | `TASK-035` |
-| `src/view/usePageDrag.ts` | pointer gesture → a committed page turn | `TASK-035` |
+| `src/view/usePageDrag.ts` | pointer gesture → a page turn, or the book shut | `TASK-035`, `TASK-039` |
+| `src/view/BlankPage.tsx` | the page nobody has written yet — the assistant asks, the family writes | `TASK-038` |
+| `src/view/FrontPage.tsx` | the flyleaf — ask the book, ribbons mark the pages | `TASK-039` |
+| `src/view/bookSearch.ts` | folded matching and the certainty **floor** — pure | `TASK-039` |
 | `src/view/RefusedPage.tsx` | the page that will not turn — **the project's argument, rendered** | `TASK-036`, `TASK-031` |
 | `src/view/webgl.ts` | memoised WebGL preflight and the `?flat=1` escape hatch | `TASK-030` |
 | `src/view/Spread.tsx` | one station's content, as ordinary DOM | `TASK-016` (superseded), `TASK-030` |

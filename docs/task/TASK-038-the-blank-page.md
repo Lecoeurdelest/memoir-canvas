@@ -4,7 +4,7 @@ title: The page nobody has written yet
 branch: A
 day: 6
 depends_on: [TASK-034, TASK-035]
-status: todo
+status: done
 ---
 
 # TASK-038 — The page nobody has written yet
@@ -58,14 +58,14 @@ that costs nothing to demonstrate because the GRANT is already written.
 
 ## Acceptance criteria
 
-- [ ] A ring in the forest is focusable, named, and opens the blank page
-- [ ] The assistant's question appears in the margin, attributed to the assistant
-- [ ] Writing an answer records it against the claim the question was about, as `oral`
-- [ ] The answer is stored **verbatim** and attributed to the person who told it
-- [ ] The question becomes `answered`, and the ring goes out
-- [ ] An **agent** calling the same command is refused by Postgres, verbatim
-- [ ] Keyboard reaches the whole path
-- [ ] `npm run db:verify` still 12/12; `tests/core-loop.spec.ts` untouched
+- [x] A ring in the forest is focusable, named, and opens the blank page
+- [x] The assistant's question appears in the margin, attributed to the assistant
+- [x] Writing an answer records it against the claim the question was about, as `oral`
+- [x] The answer is stored **verbatim** and attributed to the person who told it
+- [x] The question becomes `answered`, and the ring goes out
+- [x] An **agent** calling the same command is refused by Postgres, verbatim
+- [x] Keyboard reaches the whole path
+- [x] `npm run db:verify` still 12/12; `tests/core-loop.spec.ts` untouched
 
 ## Files touched
 

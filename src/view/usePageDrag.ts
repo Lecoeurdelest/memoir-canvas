@@ -37,6 +37,21 @@ export function angleOf(progress: number): number {
   return -progress * 168;
 }
 
+/** A quarter of the book's height, pulled down, closes it. */
+export const CLOSE_AT = 0.25;
+
+/**
+ * Whether a gesture was a page turn or the book being shut.
+ *
+ * The test is which way the hand travelled FURTHEST, not which crossed a line first: a downward
+ * drag always drifts sideways a little, and without this a shut book would sometimes turn a page
+ * on its way closed.
+ */
+export function isPullDown(dx: number, dy: number, height: number): boolean {
+  if (height <= 0) return false;
+  return dy > Math.abs(dx) && dy / height >= CLOSE_AT;
+}
+
 export interface PageDrag {
   /** −1…1 while a finger is down, 0 at rest. */
   progress: number;
@@ -49,32 +64,43 @@ export interface PageDrag {
   };
 }
 
-export function usePageDrag(turn: (direction: 1 | -1) => void): PageDrag {
-  const from = useRef<{ x: number; width: number } | null>(null);
+export function usePageDrag(
+  turn: (direction: 1 | -1) => void,
+  /** Pulling the book down shuts it (FR-BOOK-08). Omit and a downward drag does nothing. */
+  pullDown?: () => void,
+): PageDrag {
+  const from = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
   const [progress, setProgress] = useState(0);
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLElement>) => {
     // A drag that starts on a control is that control's business, not the book's.
     if ((e.target as HTMLElement).closest('button, select, input, a')) return;
-    const width = e.currentTarget.getBoundingClientRect().width;
-    from.current = { x: e.clientX, width };
+    const box = e.currentTarget.getBoundingClientRect();
+    from.current = { x: e.clientX, y: e.clientY, width: box.width, height: box.height };
     e.currentTarget.setPointerCapture(e.pointerId);
   }, []);
 
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLElement>) => {
     if (!from.current) return;
-    setProgress(progressOf(e.clientX - from.current.x, from.current.width));
+    const { x, y, width, height } = from.current;
+    // A shutting gesture must not also lift a page on the way down.
+    if (isPullDown(e.clientX - x, e.clientY - y, height)) return setProgress(0);
+    setProgress(progressOf(e.clientX - x, width));
   }, []);
 
   const release = useCallback(
     (e: React.PointerEvent<HTMLElement>) => {
       if (!from.current) return;
-      const settled = progressOf(e.clientX - from.current.x, from.current.width);
+      const { x, y, width, height } = from.current;
+      const dx = e.clientX - x;
+      const settled = progressOf(dx, width);
       from.current = null;
       setProgress(0);
+
+      if (pullDown && isPullDown(dx, e.clientY - y, height)) return pullDown();
       if (commits(settled)) turn(directionOf(settled));
     },
-    [turn],
+    [turn, pullDown],
   );
 
   return {

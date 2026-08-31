@@ -984,3 +984,175 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .landed.stance-contradicts { border-left-color: var(--lacquer); }
 .landed.stance-supports { border-left-color: var(--ok); }
 .landed-clash { grid-column: 2; color: var(--lacquer); font-weight: 600; }
+
+/* ── TASK-039 · the front page ──────────────────────────────────────────────────
+   The flyleaf. Reached by turning BACK past page one, which is how a book works
+   and why it needs no button (FR-BOOK-08).                                       */
+
+.front-page { margin: 0 0 8px; }
+
+.flyleaf-spread {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+  overflow: hidden;
+}
+.flyleaf-spread .page { padding: 26px 28px 30px; }
+.flyleaf-spread .page-left { border-right: 1px solid var(--rule); }
+
+.flyleaf-ask {
+  margin: 6px 0 14px;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 26px;
+  font-weight: 400;
+}
+
+/* A line on a page, not a form control. */
+.flyleaf-line {
+  width: 100%;
+  padding: 4px 0 8px;
+  font: inherit;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 19px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  outline-offset: 6px;
+}
+.flyleaf-line:focus { border-bottom-color: var(--ink-soft); }
+.flyleaf-line::-webkit-search-cancel-button { display: none; }
+
+.folio { margin: 26px 0 0; color: var(--ink-soft); font-size: 12px; }
+
+.ribbons { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+
+/* A ribbon out of the spine: it starts off the left edge of the page and reaches in. */
+.ribbon {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  width: calc(100% + 28px);
+  margin-left: -28px;
+  padding: 9px 14px 9px 28px;
+  border: 0;
+  border-radius: 0 3px 3px 0;
+  font: inherit;
+  font-size: 13px;
+  color: #f7f4ea;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(29, 35, 33, 0.22);
+  transition: transform 160ms ease;
+}
+.ribbon:hover, .ribbon:focus-visible { transform: translateX(6px); }
+.ribbon:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.ribbon.locked { opacity: 0.4; cursor: not-allowed; }
+.ribbon.locked:hover { transform: none; }
+
+.ribbon-year { font-variant-numeric: tabular-nums; font-weight: 600; }
+.ribbon-label { opacity: 0.92; }
+.ribbon-page { opacity: 0.75; font-variant-numeric: tabular-nums; }
+
+.floor { display: flex; align-items: center; gap: 10px; margin: 18px 0 0; font-size: 13px; }
+.floor span { color: var(--ink-soft); max-width: 34ch; }
+
+@media (prefers-reduced-motion: reduce) { .ribbon { transition: none; } }
+
+@media (max-width: 700px) {
+  .flyleaf-spread { grid-template-columns: 1fr; }
+  .flyleaf-spread .page-left { border-right: 0; border-bottom: 1px solid var(--rule); }
+  .flyleaf-spread .page { padding: 18px 16px 20px; }
+  .ribbon { width: calc(100% + 16px); margin-left: -16px; padding-left: 16px; }
+}
+
+/* ── TASK-038 · the page nobody has written yet ─────────────────────────────────
+   A ruled recto with room to write, and the assistant's question in the margin
+   opposite it — where a real family notebook would carry a pencilled note.       */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.blank-page { margin: 0 0 8px; }
+.blank-page .spread { position: relative; z-index: 1; }
+
+/* Ruled, because a blank page in a notebook has lines on it. */
+.page.ruled {
+  background-image: repeating-linear-gradient(
+    to bottom, transparent 0 27px, rgba(29, 35, 33, 0.09) 27px 28px);
+  background-position: 0 76px;
+}
+.page.ruled h3 { font-weight: 400; color: var(--ink-soft); font-style: italic; }
+
+.write-on { display: block; margin: 14px 0 0; }
+.write-on textarea {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  resize: vertical;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--ink);
+  outline-offset: 6px;
+}
+.write-on textarea::placeholder { color: var(--ink-soft); opacity: 0.6; font-style: italic; }
+
+/* Faint ink, the way a note pencilled in a margin looks. It is the assistant's voice, and it is
+   visibly not the family's hand. */
+.margin-note {
+  margin: 10px 0 22px;
+  padding-left: 14px;
+  border-left: 2px solid rgba(106, 84, 16, 0.35);
+  font-family: Newsreader, Georgia, serif;
+  font-size: 17px;
+  font-style: italic;
+  color: #6a5410;
+  max-width: 40ch;
+}
+
+.signing { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
+.signing label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-soft); }
+.signing select { font: inherit; font-size: 14px; padding: 5px 8px; }
+
+.write-it {
+  font: inherit;
+  font-size: 14px;
+  padding: 7px 16px;
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  background: var(--paper);
+  color: var(--ink-soft);
+  cursor: not-allowed;
+}
+.write-it:not(:disabled) {
+  border-color: var(--ok);
+  background: var(--ok);
+  color: #f2f1ec;
+  cursor: pointer;
+}
+.whose-words { margin: 18px 0 0; max-width: 46ch; }
+
+/* A ring is a target now, not decoration. */
+.ring { padding: 0; cursor: pointer; }
+.ring:hover, .ring:focus-visible { opacity: 1; animation: none; transform: scale(1.5); }
+.ring:focus-visible { outline: 2px solid #fffce8; outline-offset: 4px; }
+
+@media (max-width: 700px) {
+  .blank-page .spread { grid-template-columns: 1fr; }
+}

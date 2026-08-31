@@ -19,6 +19,30 @@
     "bookView": "Book view",
     "listView": "List view"
   },
+  "front": {
+    "name": "The front page",
+    "askTheBook": "Ask the book",
+    "count": "The archive holds {{volumes}} pages",
+    "nothingAskedYet": "Write a question on the page beside this one.",
+    "nothingFound": "No page in the book speaks to this.",
+    "marked": "{{count}} pages marked",
+    "page": "p. {{page}}",
+    "noSurerThan": "The answer is no surer than the weakest page among these.",
+    "open": "Open the front page"
+  },
+  "blank": {
+    "name": "The blank page",
+    "stillBlank": "This page is still blank.",
+    "someYear": "Year unknown",
+    "margin": "The assistant wrote in the margin",
+    "writeHere": "Tell it here…",
+    "whoTells": "Who is telling this?",
+    "writeIt": "Write it into the book",
+    "whoseWords": "The assistant asks; the words are the family’s. The archive keeps them verbatim, in that person’s name.",
+    "page": "a blank page",
+    "gaps_one": "{{count}} place nobody has told",
+    "gaps_other": "{{count}} places nobody has told"
+  },
   "spread": {
     "recollection": "Recollection",
     "evidence": "Evidence",

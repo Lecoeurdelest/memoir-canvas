@@ -15,7 +15,7 @@
  * R5: reads the projection. Every rule about where a reader may go lives in useSpreadNavigation.
  */
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PALETTE } from '../panels/CertaintyBadge';
 import { RefusedPage } from './RefusedPage';
@@ -24,11 +24,30 @@ import { certaintyOf } from './forestLayout';
 import { angleOf, usePageDrag } from './usePageDrag';
 import type { SpreadNavigation } from './useSpreadNavigation';
 
-export function Volume({ nav }: { nav: SpreadNavigation }): JSX.Element {
+export function Volume({
+  nav,
+  onBeforeFirst,
+  onClose,
+}: {
+  nav: SpreadNavigation;
+  /** Turning back past page one reaches the flyleaf — no button, the way a book works. */
+  onBeforeFirst?: () => void;
+  /** Pulled down, the book shuts and the reader is back in the forest. */
+  onClose?: () => void;
+}): JSX.Element {
   const { t } = useTranslation();
   const { spreads, index, spread, wedged, lockedFrom, go, jumpTo } = nav;
   const stage = useRef<HTMLDivElement>(null);
-  const drag = usePageDrag(go);
+
+  const turn = useCallback(
+    (direction: 1 | -1) => {
+      if (direction === -1 && index === 0 && onBeforeFirst) return onBeforeFirst();
+      go(direction);
+    },
+    [go, index, onBeforeFirst],
+  );
+
+  const drag = usePageDrag(turn, onClose);
 
   // NFR-A11Y-03 names ArrowLeft/ArrowRight, and with no buttons left they are the whole keyboard
   // route. Bound to the book rather than the window so they do not hijack a form below it.
@@ -36,12 +55,12 @@ export function Volume({ nav }: { nav: SpreadNavigation }): JSX.Element {
     const el = stage.current;
     if (!el) return;
     const onKey = (e: KeyboardEvent): void => {
-      if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); go(1); }
-      if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(-1); }
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); turn(1); }
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); turn(-1); }
     };
     el.addEventListener('keydown', onKey);
     return () => el.removeEventListener('keydown', onKey);
-  }, [go]);
+  }, [turn]);
 
   if (!spread) return <p className="hint">{t('road.empty')}</p>;
 

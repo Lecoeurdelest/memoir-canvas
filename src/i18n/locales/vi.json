@@ -19,6 +19,29 @@
     "bookView": "Xem dạng quyển sổ",
     "listView": "Xem dạng danh sách"
   },
+  "front": {
+    "name": "Trang đầu sách",
+    "askTheBook": "Hỏi cuốn sổ",
+    "count": "Kho có {{volumes}} trang",
+    "nothingAskedYet": "Viết một câu hỏi lên trang bên cạnh.",
+    "nothingFound": "Không trang nào trong sổ nói về chuyện này.",
+    "marked": "Đã đánh dấu {{count}} trang",
+    "page": "tr. {{page}}",
+    "noSurerThan": "Câu trả lời không chắc hơn trang yếu nhất trong số này.",
+    "open": "Mở trang đầu sách"
+  },
+  "blank": {
+    "name": "Trang còn trắng",
+    "stillBlank": "Trang này còn trắng.",
+    "someYear": "Chưa rõ năm",
+    "margin": "Trợ lý ghi bên lề",
+    "writeHere": "Kể vào đây…",
+    "whoTells": "Ai kể chuyện này?",
+    "writeIt": "Viết vào sổ",
+    "whoseWords": "Trợ lý đặt câu hỏi; chữ là của người kể. Kho ghi đúng nguyên văn, đứng tên người đó.",
+    "page": "trang còn trắng",
+    "gaps_other": "{{count}} chỗ chưa ai kể"
+  },
   "spread": {
     "recollection": "Lời kể",
     "evidence": "Bằng chứng",

@@ -17,22 +17,33 @@
 import { useEffect, useState } from 'react';
 import { Cover } from './Cover';
 import { CssBook } from './CssBook';
+import { BlankPage } from './BlankPage';
 import { Forest } from './Forest';
+import { FrontPage } from './FrontPage';
 import { Volume } from './Volume';
 import { useSpreadNavigation } from './useSpreadNavigation';
 import { flatRequested } from './webgl';
 import { useTranslation } from 'react-i18next';
+import { useStore } from '../store/store';
 
 export function BookStage(): JSX.Element {
   const { t } = useTranslation();
   const nav = useSpreadNavigation();
   const [flat, setFlat] = useState(flatRequested);
   const [bound, setBound] = useState(true);
+  const [atFront, setAtFront] = useState(false);
   const { open, close, spread } = nav;
+  const questions = useStore((s) => s.model?.questions) ?? [];
+  const openQuestion = useStore((s) => s.openQuestion);
+  const setOpenQuestion = useStore((s) => s.setOpenQuestion);
+  const question = questions.find((q) => q.id === openQuestion && q.status === 'open');
 
   // Every trip out of the forest starts at the closed book again.
   useEffect(() => {
-    if (open) setBound(true);
+    if (open) {
+      setBound(true);
+      setAtFront(false);
+    }
   }, [open]);
 
   // Escape closes from anywhere inside. FR-BOOK-08 wants the pointer route to be a drag; the
@@ -56,6 +67,19 @@ export function BookStage(): JSX.Element {
     }
   }
 
+  if (question) {
+    return (
+      <div className="reading">
+        <BlankPage question={question} onClose={() => setOpenQuestion(null)} />
+        <div className="stage-controls">
+          <button type="button" className="skin-toggle" onClick={() => setOpenQuestion(null)}>
+            {t('forest.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   if (!open) return <Forest nav={nav} />;
 
   return (
@@ -64,13 +88,14 @@ export function BookStage(): JSX.Element {
         <CssBook nav={nav} />
       ) : bound && spread ? (
         <Cover spread={spread} onOpen={() => setBound(false)} />
+      ) : atFront ? (
+        <FrontPage nav={nav} onLeave={() => setAtFront(false)} onClose={close} />
       ) : (
-        <Volume nav={nav} />
+        <Volume nav={nav} onBeforeFirst={() => setAtFront(true)} onClose={close} />
       )}
+      {/* The way out is a downward drag or Escape (FR-BOOK-08). What stays visible is the
+          NFR-PORT-01 escape hatch, which has to be visible to be an escape hatch. */}
       <div className="stage-controls">
-        <button type="button" className="skin-toggle" onClick={close}>
-          {t('forest.back')}
-        </button>
         <button type="button" className="skin-toggle" onClick={toggle}>
           {t(flat ? 'volume.bookView' : 'volume.listView')}
         </button>
