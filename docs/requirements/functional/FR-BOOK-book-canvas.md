@@ -145,3 +145,26 @@ The first words on the page were `WEBMCP — not offered by this browser`.
 
 `100dvh`, not `100vh`: in WKWebView — the browser `NFR-PORT-01` names — `100vh` is the height with
 the toolbar hidden, so a full-screen element hangs beneath the browser chrome.
+
+## Amended 2026-08-31 (fifth) — the two views the book was still missing
+
+The design canvas carries **six** views. Four were built (`TASK-034` … `TASK-037`); the product
+owner's note on the canvas — *"Chưa đủ màn đâu"* — is correct, and these are the two.
+
+| ID | Requirement |
+|---|---|
+| `FR-BOOK-10` | **New. A gap is a blank page.** An unanswered question is an unlit ring in the forest, and reaching it opens a ruled page with the assistant's question written in the margin. The family writes the answer onto the page; the ring then goes out. The assistant asks — **the words are the family's**, and Postgres already enforces that: `GRANT UPDATE (status, answer_text, answered_at) ON followup_question TO app_human` names no agent. |
+| `FR-BOOK-11` | **New. The book can be asked.** Its front page takes a question and slides ribbons out of the spine marking the pages that bear on the answer. Pulling a ribbon opens that page. The certainty shown is the **floor** of the marked pages — never an average, never the best match. |
+
+### Why the floor, and not an average
+
+An answer assembled from three pages is worth no more than the weakest of them. Averaging would let
+two confident pages launder one uncertain one into a confident-looking answer, which is the exact
+move the rest of this project refuses — and it would be this project committing it, in the feature
+built to make the archive useful. `floorCertainty` already exists and already backs
+`story_card.floor_certainty`; the front page uses the same function.
+
+### What this does not add
+
+No new agent tool. `descriptors.ts` stays frozen at eight. Answering is a human affordance, and the
+agent's half — `propose_followup_question` — has existed since `TASK-011`.

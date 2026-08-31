@@ -1,6 +1,6 @@
 # Tasks
 
-37 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
+39 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
 inserted in the middle.
 
 Four tasks are **superseded**: the direction changed after the DAY 4 GATE and the book became a
@@ -49,6 +49,8 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-035`](TASK-035-page-turn-book.md) | The book, turned by hand | A | 6 | `TASK-034` | ☑ |
 | [`TASK-036`](TASK-036-page-that-will-not-turn.md) | The page that will not turn | A | 6 | `TASK-035` | ☑ |
 | [`TASK-037`](TASK-037-the-forest-fills-the-screen.md) | The forest fills the screen, and explains itself | A | 6 | `TASK-034` | ☑ |
+| [`TASK-038`](TASK-038-the-blank-page.md) | The page nobody has written yet | A | 6 | `TASK-034`, `TASK-035` | ☐ |
+| [`TASK-039`](TASK-039-the-front-page.md) | The front page — ask the book, and it marks itself | A | 6 | `TASK-035` | ☐ |
 
 ## Milestones
 
