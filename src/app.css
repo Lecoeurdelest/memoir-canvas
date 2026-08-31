@@ -369,16 +369,19 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
    they come from NIGHT_PALETTE in CertaintyBadge.tsx, because that is the only place
    a test can measure their contrast (NFR-A11Y-05).                                */
 
+/* FR-BOOK-09 — the archive is the screen, not a panel on it. Full bleed: no column, no radius,
+   nothing above it. `dvh` and not `vh`, because in WKWebView — the browser NFR-PORT-01 names —
+   100vh is the height with the toolbar HIDDEN, so the bottom of the forest would sit underneath
+   the browser chrome. The vh line is the fallback for anything that does not know dvh. */
 .forest {
-  margin: 0 0 24px;
-  border-radius: 4px;
-  overflow: hidden;
   background: #071319;
+  height: 100vh;
+  height: 100dvh;
 }
 
 .forest-stage {
   position: relative;
-  height: min(74vh, 620px);
+  height: 100%;
   overflow: hidden;
   cursor: crosshair;
   background:
@@ -422,12 +425,12 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   bottom: -2%;
   transform-origin: 50% 100%;
   border-radius: 5px 5px 0 0;
-  background: linear-gradient(to top, #010609 0%, #04121a 52%, rgba(16, 44, 53, 0.16) 100%);
+  background: linear-gradient(to top, #01080c 0%, #06171f 50%, rgba(20, 52, 62, 0.18) 100%);
 }
 
 /* Distance, done the cheap way: the far trees are faint and slightly out of focus. */
-.plane-0 .forest-trees { opacity: 0.45; filter: blur(1.6px); }
-.plane-1 .forest-trees { opacity: 0.72; filter: blur(0.7px); }
+.plane-0 .forest-trees { opacity: 0.6; filter: blur(1.6px); }
+.plane-1 .forest-trees { opacity: 0.85; filter: blur(0.7px); }
 .plane-2 .forest-trees { opacity: 1; }
 
 /* The floor. Without it the trunks hang in the air. */
@@ -508,12 +511,25 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   filter: grayscale(1);
 }
 
+/* The instruction line is gone (FR-BOOK-08), so hover does the explaining. The animation is
+   dropped rather than overridden — a running keyframe owns `transform`, and a hover rule that
+   fights it wins only between frames. */
+.memory:hover {
+  animation: none;
+  opacity: 1;
+  transform: scale(1.5);
+  z-index: 3;
+}
+
 .memory:focus-visible {
   outline: 2px solid #fffce8;
   outline-offset: 4px;
   animation: none;
   opacity: 1;
+  transform: scale(1.5);
 }
+
+.memory.out-of-reach:hover { transform: none; opacity: 0.22; }
 
 /* No text on a light at rest — the forest is a picture until you point at it. */
 .memory-name {
@@ -538,7 +554,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   position: absolute;
   inset: 0;
   z-index: 2;
-  padding: 20px 24px 18px;
+  padding: clamp(20px, 3.4vw, 44px) clamp(20px, 3.6vw, 52px);
   display: flex;
   flex-direction: column;
   pointer-events: none;
@@ -546,12 +562,12 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 .forest-title {
   margin: 0;
-  font-size: 22px;
+  font-size: clamp(22px, 2.6vw, 34px);
   font-weight: 400;
   color: #fffce8;
   font-family: Newsreader, Georgia, serif;
 }
-.forest-count { margin: 4px 0 0; font-size: 12px; color: #7e9a9a; font-variant-numeric: tabular-nums; }
+.forest-count { margin: 6px 0 0; font-size: 13px; color: #7e9a9a; font-variant-numeric: tabular-nums; }
 
 .forest-legend {
   list-style: none;
@@ -567,16 +583,9 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .forest-legend .dot.hollow { background: transparent; border: 1px solid currentColor; }
 .forest-legend .glyph { font-size: 12px; }
 
-.forest-invite {
-  margin: auto 0 0;
-  max-width: 46ch;
-  font-family: Newsreader, Georgia, serif;
-  font-size: 16px;
-  color: #cfdcd7;
-}
-
 .forest-empty { margin: 0; padding: 48px 24px; color: #cfdcd7; text-align: center; }
 
+.reading { max-width: 900px; margin: 0 auto; padding: 32px 20px 0; }
 .stage-controls { display: flex; gap: 8px; flex-wrap: wrap; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -588,7 +597,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 /* A phone gets a shorter stage and no hover label — there is no pointer to hover with. */
 @media (max-width: 700px) {
-  .forest-stage { height: min(62vh, 420px); }
-  .forest-invite { font-size: 14px; }
   .memory-name { display: none; }
+  .forest-chrome { padding: 16px 16px 14px; }
 }

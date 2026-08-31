@@ -30,7 +30,13 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
   const cards = model?.cards ?? [];
 
   return (
-    <div className="layout">
+    <>
+      {/* FR-BOOK-09 — the archive IS the screen. Deliberately outside `.layout`, whose 900px
+          column is what kept the forest to a third of the first viewport. Everything else keeps
+          the column and now lives below the fold; TASK-031 decides its real home. */}
+      <BookStage />
+
+      <div className="layout">
       <header>
         <div className="title-row">
           <h1>Memoir Canvas</h1>
@@ -79,8 +85,6 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
         </p>
       )}
 
-      <BookStage />
-
       {cards.length > 0 && (
         <section aria-labelledby="cards-heading">
           <h2 id="cards-heading">Story cards</h2>
@@ -95,6 +99,7 @@ export function Archive({ report }: { report: BootReport }): JSX.Element {
       </Suspense>
 
       <AuditTrail />
-    </div>
+      </div>
+    </>
   );
 }

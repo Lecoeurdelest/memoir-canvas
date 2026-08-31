@@ -8,6 +8,7 @@
  */
 import { beforeEach, describe, expect, it } from 'vitest';
 import * as commands from '../src/domain/commands';
+import { LANGS, resources } from '../src/i18n';
 import { buildReadModel } from '../src/store/projection';
 import { loadSeed, type SeededArchive } from '../src/seed/loadSeed';
 import {
@@ -227,5 +228,29 @@ describe('placement', () => {
       expect(hash(key)).toBeGreaterThanOrEqual(0);
       expect(hash(key)).toBeLessThanOrEqual(1);
     }
+  });
+});
+
+describe('TASK-037 — the forest explains itself, or not at all', () => {
+  it('carries no instruction copy in either language', () => {
+    // FR-BOOK-08, extended: a sentence telling a reader how to use the picture is an admission
+    // the picture failed. This pins it so the caption cannot creep back in unnoticed.
+    for (const lng of LANGS) {
+      const forest = resources[lng].translation.forest as Record<string, string>;
+      expect(forest.invite, `${lng} still has an instruction line`).toBeUndefined();
+    }
+  });
+
+  it('still names every light for someone who cannot see it', async () => {
+    // What is SHOWN is not what is ANNOUNCED. Removing the caption must never cost the labels.
+    const { spreads } = await buildReadModel();
+    for (const lng of LANGS) {
+      const certainty = resources[lng].translation.certainty as Record<string, string>;
+      for (const spread of spreads) {
+        expect(certainty[certaintyOf(spread)], `${lng} ${spread.key}`).toBeTruthy();
+      }
+    }
+    expect(resources.vi.translation.forest.locked).toBeTruthy();
+    expect(resources.en.translation.forest.locked).toBeTruthy();
   });
 });

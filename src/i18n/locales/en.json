@@ -16,7 +16,6 @@
     "name": "The forest of memories",
     "empty": "The forest is dark. Nothing has been told yet.",
     "summary": "{{memories}} memories · {{gaps}} gaps · {{from}}–{{to}}",
-    "invite": "Drag to walk the forest. Tap a light and it opens into the book.",
     "unanswered": "Nobody has told it",
     "locked": "out of reach, something ahead does not add up",
     "back": "Back to the forest"

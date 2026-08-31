@@ -269,7 +269,6 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
               </li>
             </ul>
           </div>
-          <p className="forest-invite">{t('forest.invite')}</p>
         </div>
       </div>
     </section>

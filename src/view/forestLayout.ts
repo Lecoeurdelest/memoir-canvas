@@ -97,9 +97,9 @@ const between = (key: string, lo: number, hi: number): number => lo + hash(key) 
  * animated box-shadow, which is the most fill-rate-expensive thing on a weak phone (NFR-PERF).
  */
 export function ambientCount(width: number): number {
-  if (width < 700) return 24;
-  if (width < 1100) return 60;
-  return 108;
+  if (width < 700) return 44;
+  if (width < 1100) return 92;
+  return 170;
 }
 
 /** Under a phone width the glow drops to a single shadow layer rather than two. */
@@ -265,7 +265,7 @@ export interface Tree {
  * information in its trees would be a forest a screen reader cannot walk.
  */
 export function trees(plane: Plane, width: number): Tree[] {
-  const count = width < 700 ? 8 + plane * 3 : 14 + plane * 6;
+  const count = width < 700 ? 10 + plane * 4 : 18 + plane * 8;
   return Array.from({ length: count }, (_, i) => {
     const key = `tree-${plane}-${i}`;
     return {

@@ -53,7 +53,7 @@ export function BookStage(): JSX.Element {
   if (!open) return <Forest nav={nav} />;
 
   return (
-    <>
+    <div className="reading">
       {flat ? <CssBook nav={nav} /> : <Road nav={nav} />}
       <div className="stage-controls">
         <button type="button" className="skin-toggle" onClick={close}>
@@ -63,6 +63,6 @@ export function BookStage(): JSX.Element {
           {t(flat ? 'road.roadView' : 'road.flatView')}
         </button>
       </div>
-    </>
+    </div>
   );
 }

@@ -4,7 +4,7 @@ title: The forest fills the screen, and explains itself
 branch: A
 day: 6
 depends_on: [TASK-034]
-status: todo
+status: done
 ---
 
 # TASK-037 — The forest fills the screen, and explains itself
@@ -106,16 +106,16 @@ this task's job shrinks to the stage geometry.
 
 ## Acceptance criteria
 
-- [ ] The forest fills the first viewport edge to edge — no `max-width` column, nothing above it
-- [ ] It is exactly the visible viewport tall on a phone, with the browser toolbar shown **and**
-      hidden (`dvh`, not `vh` — `vh` overflows by the toolbar height on iOS Safari)
-- [ ] No instruction sentence anywhere in the view, and the key is gone from both locale files
-- [ ] Pointer movement is answered immediately; a light reacts visibly to hover
-- [ ] The rest of the page is reachable by scrolling, and the forest's lower edge shows there is more
-- [ ] Every light keeps its accessible name, its focus order and its arrow-key travel
-- [ ] A vertical swipe on a phone scrolls the page; a horizontal drag walks the forest
-- [ ] `prefers-reduced-motion` is still honoured
-- [ ] Entry chunk does not regress; no runtime network request
+- [x] The forest fills the first viewport edge to edge — no `max-width` column, nothing above it
+- [~] It is exactly the visible viewport tall on a phone — the rule applies, but `dvh` and `vh`
+      resolve identically in headless Chrome, so the toolbar case is `TASK-027`'s to confirm
+- [x] No instruction sentence anywhere in the view, and the key is gone from both locale files
+- [x] Pointer movement is answered immediately; a light reacts visibly to hover
+- [~] The rest of the page is reachable by scrolling; the lower edge signal is weaker than asked — see IMPL Deviations
+- [x] Every light keeps its accessible name, its focus order and its arrow-key travel
+- [x] A vertical swipe on a phone scrolls the page; a horizontal drag walks the forest
+- [x] `prefers-reduced-motion` is still honoured
+- [x] Entry chunk does not regress; no runtime network request
 
 ## Files touched
 
@@ -123,7 +123,7 @@ this task's job shrinks to the stage geometry.
 - `src/view/Forest.tsx`
 - `src/app.css`
 - `src/i18n/locales/vi.json`, `src/i18n/locales/en.json`
-- `tests/i18n.spec.ts` — only if a key-count assertion needs it
+- `tests/forest.spec.ts` — two tests pinning the rule (i18n.spec.ts needed no change)
 
 ## Notes
 
