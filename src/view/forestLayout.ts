@@ -224,6 +224,10 @@ export function placeLights(spreads: readonly Spread[], at: number): ForestLight
 
 export interface ForestGap {
   id: string;
+  /** `question` — the agent asked something. `silence` — the years themselves are empty. */
+  kind: 'question' | 'silence';
+  /** Set for a silence: the year a story written here belongs to. */
+  year: number | null;
   plane: Plane;
   x: number;
   y: number;
@@ -262,6 +266,8 @@ export function placeGaps(
       };
       return {
         id: q.id,
+        kind: 'question' as const,
+        year: null,
         plane: beside?.plane ?? free.plane,
         x: beside ? beside.x + between(`${q.id}:dx`, -5, 5) : free.x,
         y: beside ? beside.y + between(`${q.id}:dy`, -7, 7) : free.y,
@@ -270,6 +276,72 @@ export function placeGaps(
         delay: between(`${q.id}:delay`, 0, 6),
       };
     });
+}
+
+/**
+ * A run of years the archive holds nothing for.
+ *
+ * Not decoration: a gap in a family's memory is a fact about that family, and it is computed from
+ * what the archive does and does not contain. The design says as much in its own copy — the blank
+ * page is headed *"Khoảng 1985"* and the margin note reads *"Giữa 1983 và 1988 nhà mình không còn
+ * mẩu nào"*.
+ */
+export interface Silence {
+  id: string;
+  from: number;
+  to: number;
+  /** The year the ring stands at, and the year a story written here belongs to. */
+  at: number;
+}
+
+/** Shorter than this is not a silence, it is just how years fall. */
+export const SILENT_YEARS = 6;
+
+export function silences(spreads: readonly Spread[]): Silence[] {
+  const years = [
+    ...new Set(
+      spreads
+        .flatMap((s) => s.claims.map((c) => c.year_value))
+        .filter((y): y is number => y !== null),
+    ),
+  ].sort((a, b) => a - b);
+
+  const found: Silence[] = [];
+  for (let i = 0; i < years.length - 1; i += 1) {
+    const from = years[i];
+    const to = years[i + 1];
+    if (to - from < SILENT_YEARS) continue;
+    const at = Math.round((from + to) / 2);
+    found.push({ id: `silence-${from}-${to}`, from, to, at });
+  }
+  return found;
+}
+
+/**
+ * A ring for every silent run of years, placed along the same left-to-right timeline the memories
+ * use — so an empty stretch of a life sits where that stretch belongs.
+ */
+export function placeSilences(
+  spreads: readonly Spread[],
+  years: { from: number; to: number } | null,
+): ForestGap[] {
+  if (!years || years.to === years.from) return [];
+  const usable = 100 - MARGIN * 2;
+
+  return silences(spreads).map((silence) => {
+    const across = (silence.at - years.from) / (years.to - years.from);
+    return {
+      id: silence.id,
+      kind: 'silence' as const,
+      year: silence.at,
+      plane: Math.floor(hash(`${silence.id}:plane`) * PLANE_COUNT) as Plane,
+      x: MARGIN + across * usable + between(`${silence.id}:jitter`, -2, 2),
+      y: between(`${silence.id}:y`, 28, 80),
+      size: between(`${silence.id}:size`, 10, 15),
+      duration: between(`${silence.id}:dur`, 5.8, 9.5),
+      delay: between(`${silence.id}:delay`, 0, 6),
+    };
+  });
 }
 
 /** The years the forest covers, for the one line of text that summarises the whole picture. */

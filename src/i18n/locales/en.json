@@ -43,7 +43,10 @@
     "whoseWords": "The assistant asks; the words are the family’s. The archive keeps them verbatim, in that person’s name.",
     "page": "a blank page",
     "gaps_one": "{{count}} place nobody has told",
-    "gaps_other": "{{count}} places nobody has told"
+    "gaps_other": "{{count}} places nobody has told",
+    "emptyYear": "Around {{year}}",
+    "nobodyTold": "Between {{from}} and {{to}} the family has nothing.",
+    "tellIt": "Tell it into the book"
   },
   "spread": {
     "recollection": "Recollection",
@@ -77,7 +80,8 @@
   "predicate": {
     "moved_to": "moved to",
     "born_in": "was born in",
-    "opened_business": "opened a shop in"
+    "opened_business": "opened a shop in",
+    "remembered": "told a story"
   },
   "backstage": {
     "open": "Backstage",

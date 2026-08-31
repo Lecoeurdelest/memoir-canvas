@@ -38,6 +38,8 @@ export function BookStage(): JSX.Element {
   const openQuestion = useStore((s) => s.openQuestion);
   const setOpenQuestion = useStore((s) => s.setOpenQuestion);
   const question = questions.find((q) => q.id === openQuestion && q.status === 'open');
+  const openYear = useStore((s) => s.openYear);
+  const setOpenYear = useStore((s) => s.setOpenYear);
 
   // T4 — the same line the forest carries, so a reader watches the number CHANGE as they move.
   // That change IS the claim: the registry is a pure function of what is open (R4), and a count
@@ -74,12 +76,16 @@ export function BookStage(): JSX.Element {
     }
   }
 
-  if (question) {
+  if (question || openYear !== null) {
+    const shut = (): void => {
+      setOpenQuestion(null);
+      setOpenYear(null);
+    };
     return (
-      <div className="reading">
-        <BlankPage question={question} onClose={() => setOpenQuestion(null)} />
+      <div className="reading reading-book">
+        <BlankPage question={question} year={openYear ?? undefined} onClose={shut} />
         <div className="stage-controls">
-          <button type="button" className="skin-toggle" onClick={() => setOpenQuestion(null)}>
+          <button type="button" className="skin-toggle" onClick={shut}>
             {t('forest.back')}
           </button>
         </div>
@@ -90,7 +96,7 @@ export function BookStage(): JSX.Element {
   if (!open) return <Forest nav={nav} />;
 
   return (
-    <div className="reading">
+    <div className={`reading ${flat ? 'reading-flat' : 'reading-book'}`}>
       {flat ? (
         <CssBook nav={nav} />
       ) : bound && spread ? (

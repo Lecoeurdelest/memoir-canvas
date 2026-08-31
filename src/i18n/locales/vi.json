@@ -41,7 +41,10 @@
     "writeIt": "Viết vào sổ",
     "whoseWords": "Trợ lý đặt câu hỏi; chữ là của người kể. Kho ghi đúng nguyên văn, đứng tên người đó.",
     "page": "trang còn trắng",
-    "gaps_other": "{{count}} chỗ chưa ai kể"
+    "gaps_other": "{{count}} chỗ chưa ai kể",
+    "emptyYear": "Khoảng {{year}}",
+    "nobodyTold": "Giữa {{from}} và {{to}} nhà mình chưa có mẩu nào.",
+    "tellIt": "Kể vào sổ"
   },
   "spread": {
     "recollection": "Lời kể",
@@ -75,7 +78,8 @@
   "predicate": {
     "moved_to": "chuyển tới",
     "born_in": "sinh ra ở",
-    "opened_business": "mở tiệm ở"
+    "opened_business": "mở tiệm ở",
+    "remembered": "kể một chuyện"
   },
   "backstage": {
     "open": "Hậu trường",

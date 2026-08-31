@@ -32,6 +32,7 @@ import {
   parallaxShift,
   placeGaps,
   placeLights,
+  placeSilences,
   span,
   travelShift,
   trees,
@@ -73,6 +74,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const places = useStore((s) => s.model?.places) ?? [];
   const questions = useStore((s) => s.model?.questions) ?? [];
   const setOpenQuestion = useStore((s) => s.setOpenQuestion);
+  const setOpenYear = useStore((s) => s.setOpenYear);
 
   const { spreads, index, openAt } = nav;
   const width = useStageWidth();
@@ -95,9 +97,14 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
 
   const lights = useMemo(() => placeLights(spreads, index), [spreads, index]);
   const ambient = useMemo(() => ambientLights(width), [width]);
-  const gaps = useMemo(() => placeGaps(questions, lights, spreads), [questions, lights, spreads]);
-  const woods = useMemo(() => PLANE_INDEXES.map((p) => trees(p, width)), [width]);
   const years = span(spreads);
+  // Two kinds of emptiness, drawn the same way: something the agent asked, and a stretch of years
+  // the family has simply never filled. The second is what makes a first-run archive answerable.
+  const gaps = useMemo(
+    () => [...placeGaps(questions, lights, spreads), ...placeSilences(spreads, span(spreads))],
+    [questions, lights, spreads],
+  );
+  const woods = useMemo(() => PLANE_INDEXES.map((p) => trees(p, width)), [width]);
 
   // A whole sentence, because "moved to · 1972" names no destination and reads as a fragment.
   const nameOf = (spreadIndex: number): string => {
@@ -247,9 +254,11 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
                 .map((g) => {
                   const question = questions.find((q) => q.id === g.id);
                   const asked =
-                    lang === 'vi'
-                      ? (question?.question_vi ?? '')
-                      : (question?.question_en ?? question?.question_vi ?? '');
+                    g.kind === 'silence'
+                      ? t('blank.emptyYear', { year: g.year })
+                      : lang === 'vi'
+                        ? (question?.question_vi ?? '')
+                        : (question?.question_en ?? question?.question_vi ?? '');
                   return (
                     <button
                       key={g.id}
@@ -266,7 +275,9 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
                         animationDuration: `${g.duration.toFixed(1)}s`,
                         animationDelay: `${g.delay.toFixed(1)}s`,
                       }}
-                      onClick={() => setOpenQuestion(g.id)}
+                      onClick={() =>
+                        g.kind === 'silence' ? setOpenYear(g.year) : setOpenQuestion(g.id)
+                      }
                     />
                   );
                 })}

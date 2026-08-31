@@ -7,6 +7,8 @@
   --rule: #d7d6cf;
   --lacquer: #8c2f22;
   --ok: #2f6b4f;
+  --leaf-ink: #3a2f1f;
+  --leaf-label: #726040;
   --warn-bg: #f5ecda;
   --warn-ink: #7a5a12;
   color-scheme: light;
@@ -540,6 +542,9 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .forest-empty { margin: 0; padding: 48px 24px; color: #cfdcd7; text-align: center; }
 
 .reading { max-width: 900px; margin: 0 auto; padding: 32px 20px 0; }
+/* The escape hatch keeps the plain light column, deliberately: it is what NFR-PORT-01 guarantees
+   is always there, and it has to stay the plainest thing in the app. */
+.reading-flat { max-width: 900px; margin: 0 auto; padding: 32px 20px 0; }
 .stage-controls { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0 0; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1218,3 +1223,218 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   font-variant-numeric: tabular-nums;
 }
 .stage-controls { align-items: center; }
+
+
+/* ── TASK-041 · the book comes back into the forest ─────────────────────────────
+   The forest went full-bleed and dark, and the book was still landing on a white
+   900px column — the reader fell out of the wood the moment they opened anything.
+   Every number below is measured from the design's Open.dc.html, not eyeballed.  */
+
+.reading-book {
+  position: relative;
+  max-width: none;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(40% 38% at 32% 16%, #1c4653 0%, #102b34 34%, #0a1c23 60%, #071319 80%),
+    radial-gradient(34% 34% at 74% 12%, #17414c 0%, #0d242c 36%, #071319 68%),
+    radial-gradient(90% 60% at 50% 78%, #0c2029 0%, #081820 48%, #071319 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+/* The whole volume: the design's block, its perspective and its lean. 9° and −2° is a lean, not
+   a pitch — past 30° the diacritics turned to mush, which is why these numbers exist. */
+.reading-book .book-body,
+.reading-book .cover-stage {
+  width: min(1210px, 92vw);
+  height: min(700px, 70dvh);
+  perspective: 2100px;
+  perspective-origin: 50% 44%;
+  padding: 0;
+}
+
+.reading-book .volume,
+.reading-book .front-page,
+.reading-book .blank-page,
+.reading-book .book { margin: 0; }
+
+.reading-book .book-body {
+  transform-style: preserve-3d;
+  transform: rotateX(9deg) rotateY(-2deg);
+}
+
+/* The board the pages are bound into, and the weight under it. */
+.reading-book .book-body::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  right: -20px;
+  top: -12px;
+  bottom: -20px;
+  border-radius: 5px;
+  background: linear-gradient(155deg, #241f16, #100e0a);
+  box-shadow: 0 46px 100px rgba(0, 0, 0, 0.88);
+}
+
+/* The page block, on both sides: the volume has weight either way you open it. */
+.reading-book .block-under {
+  inset: 6px -13px 6px -11px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(to bottom, #f2e9d1 0 1px, #c7b894 1px 2.7px);
+  box-shadow: none;
+}
+
+.reading-book .spread,
+.reading-book .flyleaf-spread,
+.reading-book .refused {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  border: 0;
+  border-radius: 3px;
+  overflow: hidden;
+  color: var(--leaf-ink);
+  background:
+    radial-gradient(30% 26% at 22% 20%, rgba(150, 118, 64, 0.1), rgba(150, 118, 64, 0) 72%),
+    linear-gradient(90deg, #d3c49e 0%, #eee5cc 10%, #f4ecd6 58%, #e2d7b8 88%, #b9a97f 100%);
+}
+
+.reading-book .spread, .reading-book .flyleaf-spread { display: grid; grid-template-columns: 1fr 1fr; }
+/* The two pages scroll; the apparatus for settling it does not. On the one page in the whole
+   app that has to be acted on, "scroll down to find the control" is not good enough. */
+.reading-book .refused {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 26px 40px 22px;
+}
+.reading-book .refused .facing { flex: 1 1 auto; min-height: 0; overflow: auto; }
+/* One scroller, not three: the pair of pages scrolls together, each page does not scroll itself. */
+.reading-book .facing-page { overflow: visible; }
+
+/* A scrollbar on paper reads as a browser part stuck to a page. Thin and warm, not hidden —
+   hiding it would take away the only sign there is more below. */
+.reading-book .facing,
+.reading-book .page { scrollbar-width: thin; scrollbar-color: rgba(114, 96, 64, 0.45) transparent; }
+.reading-book .facing::-webkit-scrollbar,
+.reading-book .page::-webkit-scrollbar { width: 6px; }
+.reading-book .facing::-webkit-scrollbar-thumb,
+.reading-book .page::-webkit-scrollbar-thumb {
+  background: rgba(114, 96, 64, 0.45);
+  border-radius: 3px;
+}
+.reading-book .facing::-webkit-scrollbar-track,
+.reading-book .page::-webkit-scrollbar-track { background: transparent; }
+.reading-book .refused .witnesses,
+.reading-book .refused .ask-assistant,
+.reading-book .refused .refused-foot { flex: 0 0 auto; }
+.reading-book .refused .refused-why { margin-bottom: 14px; }
+.reading-book .refused .ask-assistant { margin-top: 14px; }
+.reading-book .refused .refused-foot { margin-top: 10px; }
+.reading-book .facing-page { padding: 10px 8px 14px; }
+
+.reading-book .page,
+.reading-book .facing-page,
+.reading-book .flyleaf-spread .page {
+  padding: 44px 52px 38px 56px;
+  overflow: auto;
+  border: 0;
+}
+.reading-book .page-left { border-right: 0; }
+
+/* Ink and labels on cream, not on the app's cool white. Both measured — see
+   tests/certainty.spec.ts, which caught the design's own label at 3.76:1. */
+.reading-book .page-label,
+.reading-book .folio,
+.reading-book .hint,
+.reading-book .ev-for + .badge,
+.reading-book .contributor { color: var(--leaf-label); }
+.reading h3, .reading h4, .reading-book .facing-year, .reading-book .flyleaf-ask { color: var(--leaf-ink); }
+.reading-book .verbatim, .reading-book .object, .reading-book .margin-note { color: #4a3d29; }
+.reading-book .flyleaf-line { color: var(--leaf-ink); border-bottom-color: rgba(114, 96, 64, 0.4); }
+.reading-book .write-on textarea { color: var(--leaf-ink); }
+.reading-book .evidence { border-left-color: rgba(114, 96, 64, 0.35); }
+
+/* The fore-edge becomes what the design draws: four colour tabs off the right edge of the block. */
+.reading-book .fore-edge {
+  left: auto;
+  right: -15px;
+  top: 6px;
+  bottom: 6px;
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 0;
+  z-index: 3;
+}
+.reading-book .edge {
+  width: 20px;
+  height: 26px;
+  border-radius: 0 3px 3px 0;
+  opacity: 0.85;
+}
+.reading-book .edge:hover, .reading-book .edge.here { opacity: 1; height: 32px; }
+.reading-book .edge.torn { box-shadow: 0 0 14px rgba(255, 154, 118, 0.5); }
+.reading-book .edge-year {
+  left: auto;
+  right: calc(100% + 8px);
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #f0e5c8;
+}
+
+/* The gutter, the tear and the turning leaf all keep working — they just sit on warmer paper. */
+.reading-book .gutter { width: 46px; }
+.reading-book .turning-leaf {
+  background: linear-gradient(to right, #f7f0dc 0%, #f4ecd6 38%, #e2d7b8 100%);
+}
+
+.reading-book .stage-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  justify-content: center;
+  margin: 0;
+  z-index: 4;
+}
+.reading-book .reading-agent { flex: 0 0 auto; color: #9fb4ae; }
+.reading-book .skin-toggle { color: #9fb4ae; border-color: rgba(159, 180, 174, 0.4); background: transparent; }
+.reading-book .skin-toggle:hover { color: #e8d46a; border-color: #e8d46a; }
+.reading-book .wedged {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 52px;
+  margin: 0;
+  z-index: 4;
+  color: #ff9a76;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .reading-book .book-body { transform: none; }
+  .reading-book .book-body::before { display: none; }
+  .reading-book .spread, .reading-book .flyleaf-spread { grid-template-columns: 1fr; }
+  .reading-book .page { padding: 20px 18px; }
+  .reading-book .fore-edge {
+    right: auto;
+    left: 0;
+    top: auto;
+    bottom: -22px;
+    flex-direction: row;
+    width: auto;
+    justify-content: center;
+  }
+  .reading-book .edge { border-radius: 0 0 3px 3px; }
+  .reading-book .edge-year { right: auto; left: 50%; top: auto; bottom: calc(100% + 5px); transform: translateX(-50%); }
+}

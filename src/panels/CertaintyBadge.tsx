@@ -79,6 +79,24 @@ export const NIGHT_PALETTE: Record<Certainty, string> = {
 /** An unlit ring: a question nobody has answered. Deliberately colourless — it is an absence. */
 export const NIGHT_UNLIT = '#cfdcd7';
 
+/**
+ * TASK-041 — the paper the book is actually printed on, once it moved back into the forest.
+ *
+ * The app's light page is `PAPER` (#f2f1ec, a cool white). A book lying in a wood at night is not
+ * that: the design gives it a warm, aged sheet lit from one side. Its ink is warmer and darker to
+ * match, and — like every other palette here — the ratio between them is asserted rather than
+ * assumed, because a badge that passed on cool white can fail on cream.
+ */
+export const LEAF = '#f4ecd6';
+export const LEAF_INK = '#3a2f1f';
+/**
+ * The design canvas uses #8a7550 here. Measured on its own paper that is **3.76:1** — below the
+ * 4.5 WCAG asks of small text, and these labels are 10px. Darkened along the same hue to 5.15,
+ * which is the smallest change that clears the bar. Following a design into a contrast failure
+ * would be following it badly.
+ */
+export const LEAF_LABEL = '#726040';
+
 export function CertaintyBadge({
   certainty,
   lang = 'vi',

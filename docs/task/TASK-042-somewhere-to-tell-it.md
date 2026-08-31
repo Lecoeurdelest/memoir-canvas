@@ -4,7 +4,7 @@ title: Somewhere to tell it
 branch: A
 day: 6
 depends_on: [TASK-038]
-status: todo
+status: done
 ---
 
 # TASK-042 — Somewhere to tell it
@@ -58,14 +58,14 @@ archive gains a memory it can show and cite, and asserts nothing it was not told
 
 ## Acceptance criteria
 
-- [ ] A first-run archive shows empty spots without the agent having asked anything
-- [ ] Each ring sits at a year the archive genuinely has nothing for
-- [ ] Reaching one opens the blank page headed with that year
-- [ ] Writing records a claim of `oral` certainty and the story verbatim in the teller's name
-- [ ] The claim asserts only that someone remembered something around that year
-- [ ] The new memory appears in the forest as a light
-- [ ] An agent calling `tellMemory` is refused, or holds no tool that reaches it
-- [ ] `npm run db:verify` still 12/12
+- [x] A first-run archive shows empty spots without the agent having asked anything
+- [x] Each ring sits at a year the archive genuinely has nothing for
+- [x] Reaching one opens the blank page headed with that year
+- [x] Writing records a claim of `oral` certainty and the story verbatim in the teller's name
+- [x] The claim asserts only that someone remembered something around that year
+- [x] The new memory appears in the forest as a light
+- [x] An agent calling `tellMemory` is refused, or holds no tool that reaches it
+- [x] `npm run db:verify` still 12/12
 
 ## Files touched
 

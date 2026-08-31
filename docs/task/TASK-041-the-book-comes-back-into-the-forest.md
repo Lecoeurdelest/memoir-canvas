@@ -4,7 +4,7 @@ title: The book comes back into the forest
 branch: A
 day: 6
 depends_on: [TASK-035, TASK-037]
-status: todo
+status: done
 ---
 
 # TASK-041 — The book comes back into the forest
@@ -64,13 +64,13 @@ that reason, and the body text stays near-frontal at them. Anything steeper goes
 
 ## Acceptance criteria
 
-- [ ] Opening a memory does not leave the forest — the ground and embers stay behind the book
-- [ ] The book carries the tilt, the board, the striped page block and the spine tabs
-- [ ] Every word inside the book is legible; nothing is rotated past the design's 9° / −2°
-- [ ] Contrast of ink on paper meets WCAG AA, asserted like every other palette in this repo
-- [ ] The book fits a 1440 stage and degrades to one column on a phone
-- [ ] `?flat=1` is unchanged
-- [ ] `prefers-reduced-motion` stops the embers
+- [x] Opening a memory does not leave the forest — the ground and embers stay behind the book
+- [x] The book carries the tilt, the board, the striped page block and the spine tabs
+- [x] Every word inside the book is legible; nothing is rotated past the design's 9° / −2°
+- [x] Contrast of ink on paper meets WCAG AA, asserted like every other palette in this repo
+- [x] The book fits a 1440 stage and degrades to one column on a phone
+- [x] `?flat=1` is unchanged
+- [x] `prefers-reduced-motion` stops the embers
 
 ## Files touched
 

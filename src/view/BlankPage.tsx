@@ -24,9 +24,13 @@ import type { FollowupQuestion } from '../domain/types';
 
 export function BlankPage({
   question,
+  year,
   onClose,
 }: {
-  question: FollowupQuestion;
+  /** A question the agent asked. Absent when the reader opened a silent year instead. */
+  question?: FollowupQuestion;
+  /** A stretch of years the archive holds nothing for. */
+  year?: number;
   onClose: () => void;
 }): JSX.Element {
   const { t } = useTranslation();
@@ -44,18 +48,29 @@ export function BlankPage({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const about = claims.find((c) => c.id === question.claim_id);
-  const asked = lang === 'vi' ? question.question_vi : (question.question_en ?? question.question_vi);
+  const about = claims.find((c) => c.id === question?.claim_id);
+  const asked = question
+    ? lang === 'vi'
+      ? question.question_vi
+      : (question.question_en ?? question.question_vi)
+    : null;
   const ready = text.trim().length > 0 && teller !== '' && !busy;
 
   async function write(): Promise<void> {
     setBusy(true);
     setError(null);
     try {
-      await commands.answerFollowupQuestion(
-        { question_id: question.id, answer_text: text.trim(), told_by: teller },
-        { actor: 'human', registeredBecause: 'a person wrote on the blank page' },
-      );
+      if (question) {
+        await commands.answerFollowupQuestion(
+          { question_id: question.id, answer_text: text.trim(), told_by: teller },
+          { actor: 'human', registeredBecause: 'a person wrote on the blank page' },
+        );
+      } else if (year !== undefined) {
+        await commands.tellMemory(
+          { told_by: teller, year_value: year, story: text.trim() },
+          { actor: 'human', registeredBecause: 'a person filled a year nobody had told' },
+        );
+      }
       await refresh();
       onClose();
     } catch (err) {
@@ -77,7 +92,11 @@ export function BlankPage({
           {/* The recto: ruled, empty, and honest about being empty. */}
           <div className="page page-left ruled">
             <p className="page-label">
-              {about?.year_value ? t('evidence.circa', { year: about.year_value }) : t('blank.someYear')}
+              {year !== undefined
+                ? t('blank.emptyYear', { year })
+                : about?.year_value
+                  ? t('evidence.circa', { year: about.year_value })
+                  : t('blank.someYear')}
             </p>
             <h3>{t('blank.stillBlank')}</h3>
 
@@ -97,10 +116,20 @@ export function BlankPage({
 
           {/* The verso: the assistant's note, in the margin, in the assistant's own voice. */}
           <div className="page page-right">
-            <p className="page-label">{t('blank.margin')}</p>
-            <p className="margin-note" lang={lang}>
-              {asked}
-            </p>
+            {asked ? (
+              <>
+                <p className="page-label">{t('blank.margin')}</p>
+                <p className="margin-note" lang={lang}>
+                  {asked}
+                </p>
+              </>
+            ) : (
+              // Nobody asked. The page states the silence it stands in, which is the whole
+              // invitation — a fact about the family rather than a prompt.
+              <p className="margin-note" lang={lang}>
+                {t('blank.nobodyTold', { from: (year ?? 0) - 2, to: (year ?? 0) + 2 })}
+              </p>
+            )}
 
             <div className="signing">
               <label>
@@ -116,7 +145,7 @@ export function BlankPage({
               </label>
 
               <button type="button" className="write-it" disabled={!ready} onClick={() => void write()}>
-                {busy ? t('tear.working') : t('blank.writeIt')}
+                {busy ? t('tear.working') : t(question ? 'blank.writeIt' : 'blank.tellIt')}
               </button>
             </div>
 

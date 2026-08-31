@@ -10,6 +10,9 @@ import { describe, expect, it } from 'vitest';
 import { CERTAINTY_ORDER } from '../src/domain/types';
 import {
   LABELS,
+  LEAF,
+  LEAF_INK,
+  LEAF_LABEL,
   NIGHT,
   NIGHT_PALETTE,
   NIGHT_UNLIT,
@@ -96,5 +99,24 @@ describe('TASK-034 — the same ladder after dark', () => {
 
   it('covers the same five rungs as the light palette, and no more', () => {
     expect(Object.keys(NIGHT_PALETTE).sort()).toEqual(Object.keys(PALETTE).sort());
+  });
+});
+
+describe('TASK-041 — the paper the book is printed on', () => {
+  it('carries its own ink at WCAG AA, because cream is not the app’s white', () => {
+    expect(contrast(LEAF_INK, LEAF), 'body ink on the leaf').toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('keeps even the quiet label legible', () => {
+    // The page labels are small and grey-gold. They are the first thing to fail on warm paper,
+    // so they get the 4.5 bar rather than the 3.0 one large text would allow.
+    expect(contrast(LEAF_LABEL, LEAF), 'page label on the leaf').toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('still meets AA for every certainty badge printed on it', () => {
+    for (const certainty of CERTAINTY_ORDER) {
+      const { ink } = PALETTE[certainty];
+      expect(contrast(ink, LEAF), `${certainty} on the leaf`).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

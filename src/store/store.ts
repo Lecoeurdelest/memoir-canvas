@@ -37,13 +37,18 @@ interface Store {
    * opening a drawer must not change which tools an agent holds.
    */
   backstage: boolean;
-  /** The unanswered question whose blank page is open, if any. UI state, like `backstage`. */
+  /**
+   * The blank page that is open, if any — either a question the agent asked, or a silent year
+   * the family may fill. UI state, like `backstage`.
+   */
   openQuestion: string | null;
+  openYear: number | null;
   refresh: () => Promise<void>;
   setUi: (ui: UiState) => void;
   setLang: (lang: Lang) => void;
   setBackstage: (open: boolean) => void;
   setOpenQuestion: (id: string | null) => void;
+  setOpenYear: (year: number | null) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -52,11 +57,13 @@ export const useStore = create<Store>((set) => ({
   lang: currentLang(),
   backstage: false,
   openQuestion: null,
+  openYear: null,
   refresh: async () => set({ model: await buildReadModel() }),
   setUi: (ui) => set({ ui }),
   setLang: (lang) => void i18n.changeLanguage(lang),
   setBackstage: (backstage) => set({ backstage }),
-  setOpenQuestion: (openQuestion) => set({ openQuestion }),
+  setOpenQuestion: (openQuestion) => set({ openQuestion, openYear: null }),
+  setOpenYear: (openYear) => set({ openYear, openQuestion: null }),
 }));
 
 i18n.on('languageChanged', () => useStore.setState({ lang: currentLang() }));

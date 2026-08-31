@@ -638,6 +638,71 @@ export async function answerFollowupQuestion(
   return { sourceId };
 }
 
+export interface TellMemoryInput {
+  /** The person telling it, who is also what the claim is about. See the note below. */
+  told_by: string;
+  /** Roughly when. A silence in the archive is a span; the ring stands at its middle. */
+  year_value: number;
+  /** What they said, kept exactly as they said it. */
+  story: string;
+}
+
+/**
+ * TASK-042 — a person writes a memory into a year the archive had nothing for.
+ *
+ * What this records is deliberately narrow. Prose cannot become a structured assertion: deriving
+ * a subject and a predicate from a paragraph is the failure this project exists to prevent, and
+ * it would be this project committing it in the feature built to let a family speak.
+ *
+ * What IS knowable is that a named person told a story belonging to about this year. So the claim
+ * says that and nothing more — `remembered`, the year, `circa`, `oral` — and the story itself
+ * lives verbatim in an oral account in that person's name. The archive gains something it can
+ * show and cite, and asserts nothing it was not told.
+ *
+ * Both rows go in one transaction. Written as two calls, a failure between them leaves a memory
+ * in the forest that nobody said.
+ */
+export async function tellMemory(
+  input: TellMemoryInput,
+  ctx: CommandContext,
+): Promise<{ claimId: string; sourceId: string }> {
+  const claimId = uuid();
+  const sourceId = uuid();
+  const audit: AuditInput = {
+    actor: ctx.actor,
+    toolName: 'tell_memory',
+    args: input,
+    targetTable: 'claim',
+    targetId: claimId,
+    after: { claimId, sourceId },
+    registeredBecause: ctx.registeredBecause,
+  };
+
+  if (!input.story.trim()) return refuse(audit, 'a memory with no words in it is not a memory');
+  if (!input.told_by) return refuse(audit, 'an oral account needs the person who told it');
+  if (!Number.isInteger(input.year_value)) return refuse(audit, 'a memory needs a year to sit in');
+
+  await withAudit(audit, async (tx) => {
+    await tx.exec(
+      `INSERT INTO claim (id, subject_kind, subject_id, predicate, year_value, year_precision, certainty)
+       VALUES ($1, 'person', $2, 'remembered', $3, 'circa', 'oral')`,
+      [claimId, input.told_by, input.year_value],
+    );
+    await tx.exec(
+      `INSERT INTO source (id, kind, title, verbatim, contributor_id)
+       VALUES ($1, 'oral_account', $2, $3, $4)`,
+      [sourceId, 'Lời kể', input.story, input.told_by],
+    );
+    await tx.exec(
+      `INSERT INTO evidence (claim_id, source_id, stance, excerpt)
+       VALUES ($1, $2, 'supports', $3)`,
+      [claimId, sourceId, input.story.slice(0, 240)],
+    );
+  });
+
+  return { claimId, sourceId };
+}
+
 // ─────────────────────────────────── story cards ───────────────────────────────────
 
 export interface GenerateStoryCardInput {
