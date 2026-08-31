@@ -1,6 +1,6 @@
 # Tasks
 
-36 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
+37 tasks, six days, three branches. Numbering leaves room — new tasks go on the end, never
 inserted in the middle.
 
 Four tasks are **superseded**: the direction changed after the DAY 4 GATE and the book became a
@@ -45,9 +45,10 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-031`](TASK-031-backstage.md) | Backstage — one door to the machinery | C | 5 | `TASK-024`, `TASK-030`, `TASK-033` | ☐ |
 | [`TASK-032`](TASK-032-photos-on-the-road.md) | Photos on the road, with nothing to configure | C | 5 | `TASK-030` | ☐ |
 | [`TASK-033`](TASK-033-i18n-catalogue.md) | Real i18n | C | 5 | `TASK-030` | ☑ |
-| [`TASK-034`](TASK-034-firefly-forest.md) | The firefly forest | A | 6 | `TASK-010`, `TASK-033` | ☐ |
+| [`TASK-034`](TASK-034-firefly-forest.md) | The firefly forest | A | 6 | `TASK-010`, `TASK-033` | ☑ |
 | [`TASK-035`](TASK-035-page-turn-book.md) | The book, turned by hand | A | 6 | `TASK-034` | ☐ |
 | [`TASK-036`](TASK-036-page-that-will-not-turn.md) | The page that will not turn | A | 6 | `TASK-035` | ☐ |
+| [`TASK-037`](TASK-037-the-forest-fills-the-screen.md) | The forest fills the screen, and explains itself | A | 6 | `TASK-034` | ☐ |
 
 ## Milestones
 

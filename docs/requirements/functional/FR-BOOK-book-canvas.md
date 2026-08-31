@@ -115,3 +115,33 @@ The dark palette this direction needs was checked rather than assumed: firefly a
 score **6.25–13.32** against the forest ground, and book-spine text **6.70–7.50** against its
 fill — every value clears WCAG AA. `PALETTE` in `CertaintyBadge.tsx` is light-only today, so
 adopting this costs a dark set and an extension to `tests/certainty.spec.ts`.
+
+## Amended 2026-08-31 (fourth) — the forest takes the screen, and says nothing
+
+Product owner: *"garden là chiếm toàn màn hình và không có chữ hướng dẫn"*. Built as `TASK-037`.
+
+| ID | Now reads |
+|---|---|
+| `FR-BOOK-08` | Extended. No visible navigation controls **and no instruction copy**. The archive teaches itself through what it does when touched: the scene answers the pointer, a light reacts to hover, an edge fades to show there is more. A sentence explaining the gesture is an admission the gesture failed. |
+| `FR-BOOK-09` | **New. The archive is the screen, not a panel on it.** The entry view fills the first viewport edge to edge. Nothing is placed above it — no heading, no diagnostics, no tagline. |
+
+### What this does not mean
+
+`FR-BOOK-08` governs what is *shown*, never what is *announced*. Every light keeps its accessible
+name, its place in focus order and its ArrowLeft/ArrowRight travel; `NFR-A11Y-01` and
+`NFR-A11Y-03` are untouched by both halves of this amendment. Removing a caption aimed at someone
+who can see the picture is not the same as removing the picture's description for someone who
+cannot, and the two must never be traded against each other.
+
+The certainty legend also stays. It is a key rather than an instruction, and `NFR-A11Y-02` forbids
+carrying meaning by colour alone — a rule `tests/certainty.spec.ts` already enforces. It can only
+go once something non-textual carries the same information.
+
+### The measurement that made this necessary
+
+At 1440×900 the forest held roughly **a third** of the first screen: `.layout` caps it at 900 px
+wide, `.forest-stage` at `min(74vh, 620px)`, and a heading plus four boot statistics sit above it.
+The first words on the page were `WEBMCP — not offered by this browser`.
+
+`100dvh`, not `100vh`: in WKWebView — the browser `NFR-PORT-01` names — `100vh` is the height with
+the toolbar hidden, so a full-screen element hangs beneath the browser chrome.
