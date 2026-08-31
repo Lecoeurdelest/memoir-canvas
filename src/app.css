@@ -693,6 +693,10 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   .cover-board { width: 190px; height: 264px; padding: 24px 20px 20px 32px; }
   .cover-title { font-size: 22px; }
   .edge { width: 18px; }
+  /* One page at a time on a phone, so there is no fold — the shadow was reading as a smudge
+     down the middle of a single column. */
+  .gutter { display: none; }
+  .block-under { inset: 8px -7px -8px; }
 }
 
 
