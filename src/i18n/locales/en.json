@@ -10,7 +10,9 @@
     "summary": "{{memories}} memories · {{gaps}} gaps · {{from}}–{{to}}",
     "unanswered": "Nobody has told it",
     "locked": "out of reach, something ahead does not add up",
-    "back": "Back to the forest"
+    "back": "Back to the forest",
+    "agentHolds_one": "The assistant is holding {{count}} tool — it changes with what you open",
+    "agentHolds_other": "The assistant is holding {{count}} tools — they change with what you open"
   },
   "volume": {
     "name": "The book",

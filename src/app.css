@@ -286,6 +286,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .forest-stage {
   position: relative;
   height: 100%;
+  cursor: grab;
   overflow: hidden;
   cursor: crosshair;
   background:
@@ -296,6 +297,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
     radial-gradient(90% 60% at 50% 78%, #0c2029 0%, #081820 48%, #071319 100%);
   touch-action: pan-y;
 }
+.forest-stage:active { cursor: grabbing; }
 
 /* Oversized on purpose: the planes slide by up to 750px, and a plane the size of the
    stage would drag its own edge into view. */
@@ -314,13 +316,22 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .forest-trees, .forest-ambient { position: absolute; inset: 0; }
 
 /* Sized to the stage, unlike the scenery planes: a per-cent here is a per-cent of what the
-   reader can actually see, which is the only way a light stays clickable. */
+   reader can actually see, which is the only way a light stays clickable.
+
+   `pointer-events: none` is load-bearing and was missing. Each of these is a transparent sheet
+   the full size of the forest, so the last one in DOM order lay over everything and swallowed
+   every click meant for the two beneath it — no light could be clicked at all. The lights
+   themselves take their events back below. */
 .forest-lights {
   position: absolute;
   inset: 0;
+  pointer-events: none;
   transition: transform 520ms cubic-bezier(0.18, 0.72, 0.28, 1);
   will-change: transform;
 }
+
+/* While the hand is down the forest must track it, not glide after it. */
+.forest-lights.walking, .forest-plane.walking { transition: none; }
 
 /* A silhouette, so DARKER than the ground it stands on. Built the other way first and the
    forest came out looking like a barcode of pale vertical bars. */
@@ -349,6 +360,20 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 .fly, .memory, .ring { position: absolute; border-radius: 50%; }
 
+/* A 12px dot is not a target. The glow stays small; the reachable area does not — WCAG puts the
+   floor at 24px and comfort at 44. The ::before is invisible and carries the hit. */
+.memory, .ring { pointer-events: auto; }
+.memory::before, .ring::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+}
+
 .fly {
   opacity: 0.28;
   animation-name: blink;
@@ -356,6 +381,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   animation-iteration-count: infinite;
 }
 
+/* Ambient fireflies may scale — nothing clicks them. */
 @keyframes blink {
   0%, 100% { opacity: 0.16; transform: scale(0.7); }
   38%      { opacity: 1;    transform: scale(1.14); }
@@ -371,9 +397,10 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   animation-iteration-count: infinite;
 }
 
+/* A ring is clickable too, so it holds still for the same reason. */
 @keyframes waiting {
-  0%, 100% { opacity: 0.22; transform: scale(0.9); }
-  50%      { opacity: 0.62; transform: scale(1.08); }
+  0%, 100% { opacity: 0.28; }
+  50%      { opacity: 0.7; }
 }
 
 .memory {
@@ -385,30 +412,35 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   animation-iteration-count: infinite;
 }
 
-/* Ambient fireflies blink out to almost nothing; a memory only breathes. It is a thing to
-   click, and a target that disappears for half a second is a target you cannot hit. */
+/* A memory only breathes, and it breathes WITHOUT MOVING.
+   A target that changes size is a target that slips out from under the pointer — the automated
+   check refused to click one outright ("element is not stable"), and a person aiming at a dot
+   that grows and shrinks has the same problem with less patience. So the pulse lives entirely in
+   opacity and in the glow, neither of which touches the hit box. */
 @keyframes breathe {
-  0%, 100% { opacity: 0.72; transform: scale(0.92); }
-  50%      { opacity: 1;    transform: scale(1.1); }
+  0%, 100% { opacity: 0.74; }
+  50%      { opacity: 1; }
 }
 
-/* Out of time with everything else, so the eye finds it without reading a word. */
+/* Out of time with everything else, so the eye finds it without reading a word — and still
+   without moving, because this is the ONE light a reader most needs to hit. */
 .memory.flickering { animation-name: flicker; }
 
 @keyframes flicker {
-  0%   { opacity: 1;    transform: scale(1.24); }
-  9%   { opacity: 0.42; transform: scale(0.86); }
-  17%  { opacity: 1;    transform: scale(1.12); }
-  23%  { opacity: 0.5;  transform: scale(0.92); }
-  46%  { opacity: 1;    transform: scale(1.28); }
-  55%  { opacity: 0.44; transform: scale(0.84); }
-  100% { opacity: 0.95; transform: scale(1.06); }
+  0%   { opacity: 1; }
+  9%   { opacity: 0.4; }
+  17%  { opacity: 1; }
+  23%  { opacity: 0.5; }
+  46%  { opacity: 1; }
+  55%  { opacity: 0.42; }
+  100% { opacity: 0.95; }
 }
 
 /* The wedge, drawn: what lies behind an open contradiction is still there, and still
    dark, until a person settles it. */
 .memory.out-of-reach {
   cursor: not-allowed;
+  pointer-events: auto;
   opacity: 0.22;
   animation: none;
   box-shadow: none !important;
@@ -434,6 +466,18 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 }
 
 .memory.out-of-reach:hover { transform: none; opacity: 0.22; }
+
+/* T3 — the light becomes the book rather than being replaced by it. */
+.memory.blooming {
+  animation: bloom 260ms cubic-bezier(0.3, 0, 0.2, 1) forwards;
+  z-index: 5;
+}
+
+@keyframes bloom {
+  0%   { transform: scale(1);  opacity: 1; }
+  55%  { transform: scale(9);  opacity: 0.85; }
+  100% { transform: scale(26); opacity: 0; }
+}
 
 /* No text on a light at rest — the forest is a picture until you point at it. */
 .memory-name {
@@ -471,7 +515,13 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   color: #fffce8;
   font-family: Newsreader, Georgia, serif;
 }
-.forest-count { margin: 6px 0 0; font-size: 13px; color: #7e9a9a; font-variant-numeric: tabular-nums; }
+.forest-agent {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #e8d46a;
+  font-variant-numeric: tabular-nums;
+}
+.forest-count { margin: 4px 0 0; font-size: 13px; color: #7e9a9a; font-variant-numeric: tabular-nums; }
 
 .forest-legend {
   list-style: none;
@@ -495,6 +545,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 @media (prefers-reduced-motion: reduce) {
   .fly, .ring, .memory { animation: none; opacity: 0.85; }
   .memory { opacity: 1; }
+  .memory.blooming { animation: none; }
   .memory.out-of-reach { opacity: 0.22; }
   .forest-plane, .forest-lights { transition: none; }
 }
@@ -1150,9 +1201,20 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 /* A ring is a target now, not decoration. */
 .ring { padding: 0; cursor: pointer; }
-.ring:hover, .ring:focus-visible { opacity: 1; animation: none; transform: scale(1.5); }
+.ring:hover, .ring:focus-visible { opacity: 1; animation: none; transform: scale(1.4); }
 .ring:focus-visible { outline: 2px solid #fffce8; outline-offset: 4px; }
 
 @media (max-width: 700px) {
   .blank-page .spread { grid-template-columns: 1fr; }
 }
+
+/* T4 — the agent's tool count, on the page a reader is actually on. It is the same string the
+   forest carries, so the number is seen CHANGING rather than being asserted. */
+.reading-agent {
+  margin: 0;
+  flex: 1 1 auto;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+.stage-controls { align-items: center; }

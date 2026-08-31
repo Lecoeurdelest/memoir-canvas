@@ -12,8 +12,11 @@ import { LANGS, resources } from '../src/i18n';
 import { buildReadModel } from '../src/store/projection';
 import { loadSeed, type SeededArchive } from '../src/seed/loadSeed';
 import {
+  HIT_TARGET,
   PLANES,
+  TRAVEL_LIMIT,
   ambientCount,
+  clampTravel,
   certaintyOf,
   glowLayers,
   hash,
@@ -21,6 +24,7 @@ import {
   placeGaps,
   placeLights,
   span,
+  travelShift,
   trees,
 } from '../src/view/forestLayout';
 import type { Spread } from '../src/store/projection';
@@ -252,5 +256,55 @@ describe('TASK-037 — the forest explains itself, or not at all', () => {
     }
     expect(resources.vi.translation.forest.locked).toBeTruthy();
     expect(resources.en.translation.forest.locked).toBeTruthy();
+  });
+});
+
+describe('TASK-040 — a light has to be reachable by a hand', () => {
+  it('asks for a target no smaller than the accessible floor', () => {
+    // The visible dot is 11–17px. WCAG puts the floor at 24 and comfort at 44, and the reported
+    // defect was that no light could be clicked at all — so the target is stated here, in a
+    // constant the stylesheet reads, rather than left to a rule nobody re-checks.
+    expect(HIT_TARGET).toBeGreaterThanOrEqual(44);
+  });
+
+  it('keeps every light well inside the travel the forest allows', async () => {
+    // A forest you can lose every light in is not exploration, it is an empty wood. Travel is
+    // clamped to a third of the stage, so a light at the margin stays on screen at full pan.
+    const { spreads } = await buildReadModel();
+    const MARGIN = 9;
+    for (const light of placeLights(spreads, 0)) {
+      expect(light.x, light.key).toBeGreaterThan(MARGIN - 3);
+      expect(light.x, light.key).toBeLessThan(100 - MARGIN + 3);
+    }
+    expect(TRAVEL_LIMIT).toBeLessThan(0.5);
+  });
+});
+
+describe('TASK-040 — walking the forest, not leaning at it', () => {
+  it('carries the scene further the further the hand goes', () => {
+    const near = travelShift({ x: 100, y: 0 }, 2, true);
+    const far = travelShift({ x: 400, y: 0 }, 2, true);
+    expect(Math.abs(far.x)).toBeGreaterThan(Math.abs(near.x));
+  });
+
+  it('moves the scenery further than the lights, so depth survives the walk', () => {
+    const scenery = travelShift({ x: 300, y: 0 }, 2, true);
+    const lights = travelShift({ x: 300, y: 0 }, 2, false);
+    expect(Math.abs(scenery.x)).toBeGreaterThan(Math.abs(lights.x));
+  });
+
+  it('refuses to carry the forest off its own edge', () => {
+    const stage = { width: 1440, height: 900 };
+    const far = clampTravel({ x: 99999, y: 99999 }, stage);
+    expect(far.x).toBeLessThanOrEqual(stage.width * TRAVEL_LIMIT);
+    expect(far.y).toBeLessThanOrEqual(stage.height * TRAVEL_LIMIT);
+
+    const back = clampTravel({ x: -99999, y: -99999 }, stage);
+    expect(back.x).toBeGreaterThanOrEqual(-stage.width * TRAVEL_LIMIT);
+  });
+
+  it('leaves a short drag exactly where it was put', () => {
+    const stage = { width: 1440, height: 900 };
+    expect(clampTravel({ x: 120, y: 30 }, stage)).toEqual({ x: 120, y: 30 });
   });
 });

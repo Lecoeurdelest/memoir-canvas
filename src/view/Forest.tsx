@@ -20,17 +20,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CERTAINTY_ORDER } from '../domain/types';
+import { toolsOnOffer } from '../bootstrap';
 import { GLYPH, NIGHT_PALETTE, NIGHT_UNLIT } from '../panels/CertaintyBadge';
 import { useStore } from '../store/store';
 import {
   CENTRE,
   ambientLights,
+  clampTravel,
   glowLayers,
   lightShift,
   parallaxShift,
   placeGaps,
   placeLights,
   span,
+  travelShift,
   trees,
 } from './forestLayout';
 import type { Pointer } from './forestLayout';
@@ -77,6 +80,18 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const stage = useRef<HTMLDivElement>(null);
 
   const [pointer, setPointer] = useState<Pointer>(CENTRE);
+  // T2 — travel accumulates, so the forest can be walked rather than leaned at.
+  const [travel, setTravel] = useState<Pointer>(CENTRE);
+  const [walking, setWalking] = useState(false);
+  const from = useRef<{ x: number; y: number; travel: Pointer } | null>(null);
+  // T3 — the light that was pressed blooms before the book replaces it.
+  const [blooming, setBlooming] = useState<number | null>(null);
+
+  // T4 — the project's argument, stated where a person is actually looking. The registry is a
+  // pure function of what is open (R4), so this number changes the moment a memory does — and
+  // that visible change is the whole claim, made without opening Backstage.
+  const ui = useStore((s) => s.ui);
+  const toolCount = useMemo(() => toolsOnOffer().length, [ui]);
 
   const lights = useMemo(() => placeLights(spreads, index), [spreads, index]);
   const ambient = useMemo(() => ambientLights(width), [width]);
@@ -121,22 +136,56 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         className="forest-stage"
         ref={stage}
         onKeyDown={onKeyDown}
+        onPointerDown={(e) => {
+          if ((e.target as HTMLElement).closest('button')) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          from.current = { x: e.clientX, y: e.clientY, travel };
+          setWalking(true);
+          e.currentTarget.setPointerCapture(e.pointerId);
+          void r;
+        }}
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
+          if (from.current) {
+            const start = from.current;
+            setTravel(
+              clampTravel(
+                {
+                  x: start.travel.x + (e.clientX - start.x),
+                  y: start.travel.y + (e.clientY - start.y),
+                },
+                { width: r.width, height: r.height },
+              ),
+            );
+            return;
+          }
           setPointer({
             x: (e.clientX - r.left) / r.width - 0.5,
             y: (e.clientY - r.top) / r.height - 0.5,
           });
         }}
+        onPointerUp={() => {
+          from.current = null;
+          setWalking(false);
+        }}
+        onPointerCancel={() => {
+          from.current = null;
+          setWalking(false);
+        }}
         onPointerLeave={() => setPointer(CENTRE)}
       >
         {PLANE_INDEXES.map((plane) => {
-          const shift = parallaxShift(pointer, plane);
+          const lean = parallaxShift(pointer, plane);
+          const walk = travelShift(travel, plane, true);
           return (
             <div
               key={plane}
-              className={`forest-plane plane-${plane}`}
-              style={{ transform: `translate(${shift.x.toFixed(0)}px, ${shift.y.toFixed(0)}px)` }}
+              className={`forest-plane plane-${plane}${walking ? ' walking' : ''}`}
+              style={{
+                transform: `translate(${(lean.x + walk.x).toFixed(0)}px, ${(
+                  lean.y + walk.y
+                ).toFixed(0)}px)`,
+              }}
             >
               <div className="forest-trees" aria-hidden="true">
                 {woods[plane].map((tree) => (
@@ -181,12 +230,17 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         {/* The lights ride their own layers, sized exactly to the stage, so a per-cent is a
             per-cent OF WHAT YOU CAN SEE. */}
         {PLANE_INDEXES.map((plane) => {
-          const shift = lightShift(pointer, plane);
+          const lean = lightShift(pointer, plane);
+          const walk = travelShift(travel, plane, false);
           return (
             <div
               key={`lights-${plane}`}
-              className={`forest-lights lights-${plane}`}
-              style={{ transform: `translate(${shift.x.toFixed(0)}px, ${shift.y.toFixed(0)}px)` }}
+              className={`forest-lights lights-${plane}${walking ? ' walking' : ''}`}
+              style={{
+                transform: `translate(${(lean.x + walk.x).toFixed(0)}px, ${(
+                  lean.y + walk.y
+                ).toFixed(0)}px)`,
+              }}
             >
               {gaps
                 .filter((g) => g.plane === plane)
@@ -229,7 +283,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
                       data-light={l.index}
                       className={`memory${l.certainty === 'conflicting' ? ' flickering' : ''}${
                         l.reachable ? '' : ' out-of-reach'
-                      }`}
+                      }${blooming === l.index ? ' blooming' : ''}`}
                       tabIndex={l.index === index ? 0 : -1}
                       aria-label={`${name} · ${t(`certainty.${l.certainty}`)}${
                         l.reachable ? '' : ` · ${t('forest.locked')}`
@@ -246,7 +300,15 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
                         animationDuration: `${l.duration.toFixed(2)}s`,
                         animationDelay: `${l.delay.toFixed(1)}s`,
                       }}
-                      onClick={() => openAt(l.index)}
+                      onClick={() => {
+                        if (!l.reachable) return;
+                        // T3 — the light has to BECOME the book, not be replaced by it. The
+                        // delay is the bloom; reduced motion skips straight through.
+                        const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                        if (still) return openAt(l.index);
+                        setBlooming(l.index);
+                        window.setTimeout(() => openAt(l.index), 260);
+                      }}
                     >
                       <span className="memory-name" aria-hidden="true">
                         {name}
@@ -261,6 +323,9 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         <div className="forest-chrome">
           <div className="forest-head">
             <h2 className="forest-title">{t('forest.name')}</h2>
+            <p className="forest-agent" role="status">
+              {t('forest.agentHolds', { count: toolCount })}
+            </p>
             <p className="forest-count">
               {t('forest.summary', {
                 memories: lights.length,

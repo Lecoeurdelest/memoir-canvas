@@ -14,7 +14,8 @@
  * toggle, and it is what NFR-PORT-01 guarantees is always there.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { toolsOnOffer } from '../bootstrap';
 import { Cover } from './Cover';
 import { CssBook } from './CssBook';
 import { BlankPage } from './BlankPage';
@@ -37,6 +38,12 @@ export function BookStage(): JSX.Element {
   const openQuestion = useStore((s) => s.openQuestion);
   const setOpenQuestion = useStore((s) => s.setOpenQuestion);
   const question = questions.find((q) => q.id === openQuestion && q.status === 'open');
+
+  // T4 — the same line the forest carries, so a reader watches the number CHANGE as they move.
+  // That change IS the claim: the registry is a pure function of what is open (R4), and a count
+  // that visibly grows when you open a contradiction says it better than any paragraph.
+  const ui = useStore((s) => s.ui);
+  const toolCount = useMemo(() => toolsOnOffer().length, [ui]);
 
   // Every trip out of the forest starts at the closed book again.
   useEffect(() => {
@@ -96,6 +103,9 @@ export function BookStage(): JSX.Element {
       {/* The way out is a downward drag or Escape (FR-BOOK-08). What stays visible is the
           NFR-PORT-01 escape hatch, which has to be visible to be an escape hatch. */}
       <div className="stage-controls">
+        <p className="reading-agent" role="status">
+          {t('forest.agentHolds', { count: toolCount })}
+        </p>
         <button type="button" className="skin-toggle" onClick={toggle}>
           {t(flat ? 'volume.bookView' : 'volume.listView')}
         </button>

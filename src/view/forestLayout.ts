@@ -68,6 +68,31 @@ export function lightShift(pointer: Pointer, plane: Plane): Pointer {
 }
 
 /**
+ * How far a drag may carry the forest, as a fraction of the stage.
+ *
+ * T2: pan used to be a pure function of pointer position, so the picture hit its limit the moment
+ * the pointer touched the edge of the screen. That is a lean, not a walk. Travel now accumulates
+ * — and is clamped, because a forest you can lose every light in is not exploration, it is a
+ * missing feature that looks like an empty wood.
+ */
+export const TRAVEL_LIMIT = 0.34;
+
+export function clampTravel(travel: Pointer, stage: { width: number; height: number }): Pointer {
+  const limitX = stage.width * TRAVEL_LIMIT;
+  const limitY = stage.height * TRAVEL_LIMIT * 0.45;
+  return {
+    x: Math.max(-limitX, Math.min(limitX, travel.x)),
+    y: Math.max(-limitY, Math.min(limitY, travel.y)),
+  };
+}
+
+/** Scenery is dragged further than the lights, so walking has the same depth leaning does. */
+export function travelShift(travel: Pointer, plane: Plane, scenery: boolean): Pointer {
+  const depth = scenery ? 0.7 + plane * 0.5 : 0.85 + plane * 0.12;
+  return { x: travel.x * depth, y: travel.y * depth };
+}
+
+/**
  * FNV-1a with a murmur3 finalizer. The same key always lands in the same place, so the forest is
  * a map of the archive rather than a new picture every render.
  *
@@ -131,6 +156,9 @@ export function ambientLights(width: number): Ambient[] {
     };
   });
 }
+
+/** WCAG puts the floor at 24px and comfort at 44. The glow is decoration; this is the target. */
+export const HIT_TARGET = 44;
 
 export interface ForestLight {
   key: string;
