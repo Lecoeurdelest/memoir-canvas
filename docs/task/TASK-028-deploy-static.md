@@ -45,6 +45,28 @@ Build statically and deploy to Cloudflare Pages. A public URL that opens in the 
 
 Cloudflare Pages because the challenge has a dedicated Cloudflare prize and it is genuinely static hosting.
 
+## Verified 2026-08-31 — everything that does not need an account
+
+The deploy itself needs the product owner's Cloudflare login, so it is not done. Everything that
+could fail *before* that point was checked against the real `dist/`, served by `vite preview`:
+
+| Check | Result |
+|---|---|
+| `npm run build` | clean; `dist/` holds `index.html`, `_headers`, and the assets |
+| `_headers` reaches `dist/` | yes — Cloudflare Pages applies the CSP from there |
+| The built app boots | PGlite starts, the forest paints at full viewport height, four lights |
+| Off-origin requests | **none** |
+| Console errors | one, a missing `favicon.ico`; fixed with an inline data-URI icon |
+| Entry chunk | 145 kB / **47 kB gz** |
+| Secrets in the repo or its history | none — nothing is read from `import.meta.env` |
+
+`npm run deploy` now runs the build and `wrangler pages deploy dist`. Wrangler opens a browser
+login on first use; **no token is stored in this repo**, and none should ever be.
+
+**Still to do, and only the product owner can:** run `npm run deploy`, then open the resulting URL
+on a real phone (`TASK-027`) and confirm the CSP header arrives — `curl -I <url>` should show the
+`Content-Security-Policy` line, because `_headers` is silently ignored if the file is misplaced.
+
 ## When it is done
 
 1. `npm run typecheck` · `npm test`

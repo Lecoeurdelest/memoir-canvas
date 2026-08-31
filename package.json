@@ -9,6 +9,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
+    "deploy": "npm run build && npx wrangler@latest pages deploy dist --project-name memoir-canvas",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
