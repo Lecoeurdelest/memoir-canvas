@@ -63,7 +63,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/domain/commands.ts` | **the single write door**; every command in a transaction | `TASK-008` |
 | `src/domain/audit.ts` | writes `audit_event` in that same transaction; refusals get their own | `TASK-009` |
 | `src/mcp/descriptors.ts` | 8 tools: name, description, `inputSchema` | `TASK-005` |
-| `src/mcp/modelContext.ts` | feature-detecting API shim | `TASK-006` |
+| `src/mcp/modelContext.ts` | async registration, AbortSignal withdrawal, legacy API compatibility | `TASK-006`, `TASK-043` |
 | `src/mcp/handlers.ts` | validate, then delegate — **no SQL** | `TASK-011` |
 | `src/mcp/registry.ts` | `toolsFor(uiState)`, a pure function | `TASK-012`, `TASK-013` |
 | `src/store/projection.ts` | PGlite → read model | `TASK-010`, `TASK-034` |
@@ -71,6 +71,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | `src/store/uiState.ts` | what the user is looking at — the registry depends on this | `TASK-010` |
 | `src/view/useSpreadNavigation.ts` | **the single navigation truth** — state, the wedge rule, whether a book is open at all, the R4 `setUi` contract | `TASK-030`, `TASK-034` |
 | `src/view/BookStage.tsx` | the door: forest → cover → spread | `TASK-034`, `TASK-035`, `TASK-037` |
+| `src/view/GuidedStory.tsx` | guided family interview, stage-aware prompts and reviewed printable keepsake | `TASK-044` |
 | `src/view/Forest.tsx` | the entry view — one firefly per memory, brightness is certainty | `TASK-034` |
 | `src/view/forestLayout.ts` | where every light goes and why — pure, so it tests without a DOM | `TASK-034` |
 | `src/view/Volume.tsx` | the spread, turned by hand. **No WebGL, no buttons** | `TASK-035` |
@@ -109,7 +110,7 @@ Read top to bottom for the **write path**; bottom to top for the **read path**.
 | [`API_SCHEMA.md`](API_SCHEMA.md) | 8 tools, `inputSchema`, return values, registration table | branch B, judges |
 | [`USER_GUIDE.md`](USER_GUIDE.md) | how to use the app | end users, judges |
 | [`requirements/`](requirements/README.md) | 12 FR + 9 NFR | when you need to know *why* |
-| [`task/`](task/README.md) | 29 tasks, status table, milestones, fallbacks | daily |
+| [`task/`](task/README.md) | 44 tasks, status table, milestones, fallbacks | daily |
 | [`implement/`](implement/README.md) | implementation log plus test evidence | when closing a task |
 | [`technical/`](technical/) | technical notes by topic | when going deep on one layer |
 | [`_arch_review.md`](_arch_review.md) | periodic architecture review results | end of day 2, 4, 5 |
@@ -162,7 +163,7 @@ PR**. A map pointing the wrong way is worse than no map.
 | File | What it pins down | Task |
 |---|---|---|
 | `tests/registry.spec.ts` | `toolsFor(uiState)` switches tools on and off again | `TASK-013` |
-| `tests/modelContext.spec.ts` | a withdrawn tool is actually gone from the host, on both API shapes | `TASK-006` |
+| `tests/modelContext.spec.ts` | modern/legacy withdrawal, live handlers, registration failures and cleanup | `TASK-006`, `TASK-043` |
 | `tests/conflict.spec.ts` | conflict detection and the audit trail, against a real PGlite | `TASK-009`, `TASK-014` |
 | `tests/handlers.spec.ts` | all eight handlers, and that a story card cannot overstate itself | `TASK-011`, `TASK-023` |
 | `tests/certainty.spec.ts` | the ladder's glossary wording and its WCAG AA contrast | `TASK-021` |

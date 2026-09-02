@@ -10,6 +10,26 @@ Memoir Canvas is a book. You tell family stories, an agent writes them down — 
 The app ships with a sample archive (fictional) so you can see immediately how it works. Your
 own data lives in your own browser — there is no server, and nobody else can see it.
 
+## Walk through one family story
+
+Choose **Walk through Grandma's story** in the forest. This opens the fictional sample directly
+at the two accounts of her move to Đà Nẵng, with a guide beside the evidence.
+
+1. Copy the guide's prompt into your browser assistant. It reads the accounts and flags the
+   disagreement between 1972 and the photograph marked 1974.
+2. Copy the next prompt. The assistant asks Uncle Ba a specific bilingual question linked to
+   that memory. Choose **Answer as Cậu Ba**, enter the family member's words, and save them.
+3. Ask for a story using the next prompt. The answer is an attributed oral source; it does not
+   automatically confirm a year. A person may put their name on an account in the book, or
+   leave the disagreement open.
+4. Read the bilingual draft, its certainty label and sources. Check the review box to enable
+   **Print this family keepsake**. The guide resumes from the archive's saved progress.
+
+The guide's instructions switch with **English / Tiếng Việt**. Original family words stay verbatim.
+WebMCP needs a supporting browser assistant; Backstage reports how many tools actually registered
+and offers manual tools if the browser has no WebMCP support. Copying a prompt does not send it
+to an assistant automatically.
+
 ## Telling a memory
 
 Talk to the agent the way you would talk to a person: *"Grandma moved from Hội An up to Đà Nẵng
