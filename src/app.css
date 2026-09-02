@@ -82,6 +82,38 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
+.guided-entry {
+  position: absolute; z-index: 8; left: max(24px, 5vw); bottom: max(28px, 7vh);
+  width: min(390px, calc(100vw - 48px)); padding: 17px 20px; text-align: left;
+  color: #fffbed; background: rgba(10, 27, 30, 0.88); border: 1px solid rgba(244, 207, 105, 0.65);
+  box-shadow: 0 14px 48px rgba(0, 0, 0, 0.45); cursor: pointer; backdrop-filter: blur(8px);
+}
+.guided-entry span, .guided-entry small { display: block; color: #d8c587; }
+.guided-entry span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.guided-entry strong { display: block; margin: 3px 0; font: 600 22px/1.25 Georgia, serif; }
+.guided-entry small { font-size: 12px; }
+
+.guided-story {
+  position: absolute; z-index: 12; top: 16px; left: 16px; width: min(390px, calc(100vw - 32px));
+  max-height: calc(100vh - 82px); overflow: auto; padding: 18px;
+  background: rgba(247, 242, 226, .97); color: #26271f; border: 1px solid #b69b62;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, .42);
+}
+.guided-story h2 { font: 600 22px/1.25 Georgia, serif; margin: 2px 0 6px; }
+.guided-kicker, .draft-label { margin: 0; color: #795b24; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.guided-leave { float: right; border: 0; background: none; color: #5c635f; text-decoration: underline; cursor: pointer; }
+.guided-prompt { border-top: 1px solid #d5c69f; margin-top: 12px; padding-top: 10px; }
+.guided-prompt blockquote { margin: 8px 0; padding: 9px 12px; background: #fff; border-left: 3px solid #8c2f22; font-size: 13px; }
+.guided-story button { font: inherit; padding: 7px 11px; cursor: pointer; }
+.guided-primary { background: #8c2f22; color: #fff; border: 0; }
+.guided-honest { padding: 8px 10px; background: #efe8d4; font-style: italic; }
+.guided-keepsake .card { box-shadow: none; margin: 8px 0; }
+.review-draft { display: flex; gap: 8px; margin: 12px 0; font-size: 13px; }
+
+@media (max-width: 680px) {
+  .guided-story { top: 8px; left: 8px; width: calc(100vw - 16px); max-height: calc(100vh - 66px); }
+}
+
 .actor { border: 1px solid var(--rule); border-radius: 3px; padding: 10px 14px; margin: 0 0 18px; }
 .actor legend { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); padding: 0 4px; }
 .actor label { margin-right: 18px; cursor: pointer; }
@@ -1437,4 +1469,38 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   }
   .reading-book .edge { border-radius: 0 0 3px 3px; }
   .reading-book .edge-year { right: auto; left: 50%; top: auto; bottom: calc(100% + 5px); transform: translateX(-50%); }
+}
+
+/* The guide and the evidence share the page without covering each other. */
+.reading.reading-guided {
+  display: grid; grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+  align-items: start; gap: 28px; padding: 28px 32px 80px; max-width: none;
+}
+.reading-guided .guided-story { position: relative; inset: auto; width: 100%; max-height: none; }
+.reading-guided .volume, .reading-guided .book { width: 100%; min-width: 0; }
+.reading-guided.reading-book .book-body { width: 100%; height: max(650px, 75dvh); transform: none; }
+.reading-guided .facing-page { padding: 20px 18px; }
+.reading-guided .stage-controls { grid-column: 1 / -1; }
+.reading-guided .guided-story button:disabled { cursor: default; opacity: .55; }
+.reading-guided:has(.guided-keepsake) { grid-template-columns: minmax(0, 1fr); }
+.reading-guided .guided-story:has(.guided-keepsake) { max-width: 800px; margin: 0 auto; }
+.guided-keepsake .photo-drop { display: none; }
+
+@media (max-width: 1050px) {
+  .reading.reading-guided { grid-template-columns: minmax(0, 1fr); padding: 16px 16px 90px; }
+  .reading-guided .guided-story { width: 100%; }
+  .reading-guided.reading-book .book-body { height: 780px; }
+  .reading-guided.reading-book .refused { padding: 22px 16px; }
+}
+
+@media print {
+  body:has(.guided-keepsake) #root > :not(.reading-guided),
+  .reading-guided:has(.guided-keepsake) > :not(.guided-story),
+  .guided-story:has(.guided-keepsake) > :not(.guided-keepsake),
+  .guided-keepsake button, .guided-keepsake > label, .guided-keepsake .draft-label { display: none; }
+  .reading.reading-guided:has(.guided-keepsake), .reading-guided .guided-story {
+    display: block; position: static; width: auto; min-height: 0; max-height: none;
+    overflow: visible; padding: 0; margin: 0; border: 0; box-shadow: none; background: white;
+  }
+  .guided-keepsake { color: #1d2321; background: white; }
 }
