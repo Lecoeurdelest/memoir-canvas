@@ -35,6 +35,7 @@ export function Backstage({
 }): JSX.Element {
   const { t } = useTranslation();
   const model = useStore((s) => s.model);
+  const webmcp = useStore((s) => s.webmcp);
   const dialog = useRef<HTMLDialogElement>(null);
 
   const conflicts = model?.conflicts.filter((c) => c.status === 'open') ?? [];
@@ -64,7 +65,15 @@ export function Backstage({
               an entry in tests/i18n's ALLOWED_IDENTICAL, weakening the rule that catches real
               untranslated strings — for a word that is the same in every language. */}
           <dt>WebMCP</dt>
-          <dd>{report.flavour === 'absent' ? t('backstage.absent') : report.flavour}</dd>
+          <dd>
+            {webmcp.status === 'ready'
+              ? t('backstage.readyTools', { count: webmcp.registered })
+              : webmcp.status === 'registering'
+                ? t('backstage.registering')
+                : webmcp.status === 'error'
+                  ? t('backstage.registrationFailed')
+                  : t('backstage.absent')}
+          </dd>
         </div>
         <div>
           <dt>{t('backstage.ready')}</dt>
@@ -80,6 +89,7 @@ export function Backstage({
         </div>
       </dl>
       <p className="hint no-server">{t('backstage.noServer')}</p>
+      {webmcp.message && <p className="result refused-error">{webmcp.message}</p>}
 
       {open && (
         <>

@@ -13,6 +13,7 @@ import { create } from 'zustand';
 import { buildReadModel, type ReadModel } from './projection';
 import { INITIAL_UI_STATE, type UiState } from './uiState';
 import i18n, { currentLang, type Lang } from '../i18n';
+import type { ModelContextReport } from '../mcp/modelContext';
 
 /** The family reads Vietnamese and the judges read English; both are first-class (FR-I18N). */
 export type { Lang };
@@ -43,12 +44,14 @@ interface Store {
    */
   openQuestion: string | null;
   openYear: number | null;
+  webmcp: ModelContextReport;
   refresh: () => Promise<void>;
   setUi: (ui: UiState) => void;
   setLang: (lang: Lang) => void;
   setBackstage: (open: boolean) => void;
   setOpenQuestion: (id: string | null) => void;
   setOpenYear: (year: number | null) => void;
+  setWebmcp: (webmcp: ModelContextReport) => void;
 }
 
 export const useStore = create<Store>((set) => ({
@@ -58,12 +61,14 @@ export const useStore = create<Store>((set) => ({
   backstage: false,
   openQuestion: null,
   openYear: null,
+  webmcp: { status: 'absent', registered: 0, message: null },
   refresh: async () => set({ model: await buildReadModel() }),
   setUi: (ui) => set({ ui }),
   setLang: (lang) => void i18n.changeLanguage(lang),
   setBackstage: (backstage) => set({ backstage }),
   setOpenQuestion: (openQuestion) => set({ openQuestion, openYear: null }),
   setOpenYear: (openYear) => set({ openYear, openQuestion: null }),
+  setWebmcp: (webmcp) => set({ webmcp }),
 }));
 
 i18n.on('languageChanged', () => useStore.setState({ lang: currentLang() }));

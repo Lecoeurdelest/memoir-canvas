@@ -32,7 +32,7 @@ export const DESCRIPTORS: Record<ToolName, ToolDescriptor> = {
     name: 'read_memory_graph',
     description:
       'Read the whole family memory graph: people, places, claims, evidence, open conflicts ' +
-      'and pending questions. Every claim carries a certainty label — never present a claim ' +
+      'and family questions, including attributed answers. Every claim carries a certainty label — never present a claim ' +
       'to the user as settled fact unless its certainty is "confirmed".',
     inputSchema: {
       type: 'object',
@@ -148,7 +148,8 @@ export const DESCRIPTORS: Record<ToolName, ToolDescriptor> = {
     description:
       'Turn an uncertainty into something the family can actually act on: a specific question ' +
       'for a specific relative. Use this when you have found a conflict and cannot resolve it ' +
-      'yourself — which is always. Write the question in Vietnamese; add an English version too.',
+      'yourself — which is always. Include claim_id so the family can answer on its blank page. ' +
+      'Write the question in Vietnamese; add an English version too.',
     inputSchema: {
       type: 'object',
       required: ['question_vi'],

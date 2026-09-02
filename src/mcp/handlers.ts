@@ -82,8 +82,21 @@ export function makeHandlers(ctx: CommandContext): Handlers {
         const claims = subject ? m.claims.filter((c) => c.subject_id === subject) : m.claims;
         const keep = new Set(claims.map((c) => c.id));
 
+        const conflicts = m.conflicts.filter((conflict) => !subject || conflict.subject_id === subject);
+        const conflictIds = new Set(conflicts.map((conflict) => conflict.id));
+        const questions = m.questions.filter(
+          (question) =>
+            !subject ||
+            (question.claim_id !== null && keep.has(question.claim_id)) ||
+            (question.conflict_id !== null && conflictIds.has(question.conflict_id)),
+        );
+        const evidence = m.evidence.filter((row) => keep.has(row.claim_id));
+        const sourceIds = new Set(evidence.map((row) => row.source_id));
+        const cards = m.cards.filter((card) => card.claim_ids.some((id) => keep.has(id)));
+
         return {
-          people: subject ? m.people.filter((p) => p.id === subject) : m.people,
+          // Keep the family list available: the agent needs real ids when it proposes who to ask.
+          people: m.people,
           places: m.places,
           // Every claim carries its label. Nothing here says which of two claims is right.
           claims: claims.map((c) => ({
@@ -100,8 +113,11 @@ export function makeHandlers(ctx: CommandContext): Handlers {
             asserted_by: c.asserted_by,
             confirmed_by: c.confirmed_by,
           })),
-          sources: m.sources,
-          open_conflicts: m.conflicts
+          evidence,
+          sources: m.sources.filter((source) => sourceIds.has(source.id)),
+          questions,
+          story_cards: cards,
+          open_conflicts: conflicts
             .filter((k) => k.status === 'open')
             .map((k) => ({ id: k.id, subject_id: k.subject_id, predicate: k.predicate })),
           disagreements: m.disagreements
@@ -112,6 +128,12 @@ export function makeHandlers(ctx: CommandContext): Handlers {
               claim_ids: d.claim_ids.filter((c) => !subject || keep.has(c)),
               resolution: 'requires a person — no tool available to you can settle this',
             })),
+          next_step:
+            cards.length > 0
+              ? 'ask the family to review the draft against its cited sources before keeping it'
+              : questions.some((question) => question.status === 'answered')
+              ? 'read the attributed answer and offer a cited bilingual draft; do not confirm it'
+              : 'if evidence conflicts, ask a claim-linked question for a named family member',
         };
       }),
 

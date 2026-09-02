@@ -12,16 +12,15 @@ which tool to reach for.
 ## How the agent gets in
 
 ```ts
-const mc = navigator.modelContext ?? document.modelContext;
-mc.provideContext({ tools: toolsFor(uiState) });
+const controller = new AbortController();
+await document.modelContext.registerTool(tool, { signal: controller.signal });
+// Withdraw a conditional tool when the page state changes:
+controller.abort();
 ```
 
-The API name is not settled: the W3C proposal uses `navigator.modelContext`, while the
-challenge page shows `document.modelContext` in places. `src/mcp/modelContext.ts` detects both
-at runtime rather than guessing.
-
-Tools are handed over with `provideContext()` — **whole-set replacement** — not with per-tool
-`registerTool()` calls. That is exactly what a pure `tools = f(uiState)` wants to return.
+Current hosts expose `document.modelContext`; the legacy `navigator.modelContext` getter remains
+a compatibility fallback. Each registration owns an AbortSignal. The bridge aborts conditional
+tools when `toolsFor(uiState)` removes them and resolves the current handler at invocation time.
 
 ---
 
@@ -74,10 +73,15 @@ when no disagreement exists. An agent should read `message` and change course ra
 
 ### `read_memory_graph`
 
-Read the whole graph: people, places, claims, evidence, open conflicts and pending questions.
+Read the whole family memory graph: people, places, claims, evidence, open conflicts and family
+questions, including attributed answers. Every claim carries a certainty label — never present a
+claim to the user as settled fact unless its certainty is "confirmed".
 
-Every claim carries a certainty label. **Never present a claim to the user as settled fact
-unless its certainty is `confirmed`.**
+With `subject_id`, connected evidence, questions and cards remain in the response. The people
+list remains complete so the assistant can identify which relative to ask.
+
+Returns `people`, `places`, `claims`, `evidence`, `sources`, `questions`, `story_cards`,
+`open_conflicts`, `disagreements`, and a non-adjudicating `next_step`.
 
 ```jsonc
 { "subject_id": "string?"   // optional; restrict the read to one person or place
@@ -186,11 +190,10 @@ The `resolution` line is deliberate: the return value refuses to guess as well.
 
 ### `propose_followup_question`  · *conditionally registered*
 
-Turn an uncertainty into something the family can act on: a specific question for a specific
-relative.
-
-Use it when you have found a conflict and cannot resolve it yourself — which is always. Write
-the question in Vietnamese; add an English version.
+Turn an uncertainty into something the family can actually act on: a specific question for a
+specific relative. Use this when you have found a conflict and cannot resolve it yourself — which
+is always. Include claim_id so the family can answer on its blank page. Write the question in
+Vietnamese; add an English version too.
 
 ```jsonc
 { "conflict_id":   "string?",

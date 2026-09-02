@@ -90,6 +90,38 @@ describe('TASK-011 — the eight handlers', () => {
     }
   });
 
+  it('returns an answered family question with its attributed evidence', async () => {
+    const question = await commands.proposeFollowupQuestion(
+      {
+        conflict_id: undefined,
+        claim_id: seed.claim1972,
+        question_vi: 'Bức ảnh được chụp trước hay sau khi bà chuyển nhà?',
+        question_en: 'Was the photograph taken before or after the move?',
+        ask_person_id: seed.uncleId,
+      },
+      { actor: 'agent', registeredBecause: 'the disputed memory is open' },
+    );
+    await commands.answerFollowupQuestion(
+      { question_id: question, answer_text: 'Ảnh chụp sau khi bà chuyển nhà.', told_by: seed.uncleId },
+      HUMAN,
+    );
+
+    const result = await agent.read_memory_graph({ subject_id: seed.grandmaId });
+    const data = result.data as {
+      questions: { id: string; answer_text: string; status: string }[];
+      evidence: { source_id: string; claim_id: string }[];
+      sources: { id: string; contributor_id: string; verbatim: string }[];
+    };
+    expect(data.questions).toContainEqual(
+      expect.objectContaining({ id: question, status: 'answered', answer_text: 'Ảnh chụp sau khi bà chuyển nhà.' }),
+    );
+    const account = data.sources.find((source) => source.verbatim === 'Ảnh chụp sau khi bà chuyển nhà.');
+    expect(account?.contributor_id).toBe(seed.uncleId);
+    expect(data.evidence).toContainEqual(
+      expect.objectContaining({ claim_id: seed.claim1972, source_id: account?.id }),
+    );
+  });
+
   it('flag_conflict returns the claims in dispute and no winner', async () => {
     const r = await agent.flag_conflict({
       subject_kind: 'person',

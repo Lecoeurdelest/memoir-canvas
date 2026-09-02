@@ -16,7 +16,7 @@ import { describeUiState } from './store/uiState';
 import type { ToolDescriptor, ToolName } from './mcp/descriptors';
 import type { ActorKind } from './domain/types';
 
-const bridge = new ModelContextBridge();
+const bridge = new ModelContextBridge(undefined, (report) => useStore.getState().setWebmcp(report));
 
 export interface BootReport {
   flavour: ModelContextFlavour;
@@ -38,6 +38,21 @@ function handlersForNow(actor: ActorKind) {
   return makeHandlers({ actor, registeredBecause: describeUiState(ui) });
 }
 
+/** Native calls resolve both context and handlers at invocation time, then repaint after writes. */
+function nativeHandlers(): Record<string, (args: unknown) => Promise<unknown>> {
+  return Object.fromEntries(
+    Object.keys(handlersForNow('agent')).map((name) => [
+      name,
+      async (args: unknown) => {
+        const handler = handlersForNow('agent')[name as ToolName];
+        const result = await handler(args);
+        if (name !== 'read_memory_graph') await useStore.getState().refresh();
+        return result;
+      },
+    ]),
+  );
+}
+
 function currentTools(): ToolDescriptor[] {
   const { ui, model } = useStore.getState();
   return toolsFor({
@@ -51,7 +66,7 @@ function currentTools(): ToolDescriptor[] {
 function provideNow(): void {
   bridge.provide(
     currentTools(),
-    handlersForNow('agent') as Record<string, (a: unknown) => Promise<unknown>>,
+    nativeHandlers(),
   );
 }
 
@@ -92,7 +107,14 @@ async function runBootstrap(): Promise<BootReport> {
   provideNow();
   // Re-provide whenever the projection or the UI changes: the tool set is a pure function of
   // both, so anything that moves either has to move the agent's tools with it.
-  useStore.subscribe(provideNow);
+  const unsubscribe = useStore.subscribe((state, previous) => {
+    if (state.ui !== previous.ui || state.model !== previous.model) provideNow();
+  });
+
+  import.meta.hot?.dispose(() => {
+    unsubscribe();
+    bridge.dispose();
+  });
 
   const { ephemeral, rebuilt } = commands.archiveStatus();
   return {
