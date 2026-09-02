@@ -1,11 +1,11 @@
 ---
-task: TASK-044
+task: TASK-047
 status: done
 date: 2026-09-02
 author: Codex
 ---
 
-# IMPL-TASK-044 — A family interview with a keepsake
+# IMPL-TASK-047 — A family interview with a keepsake
 
 ## What was built
 
@@ -31,7 +31,7 @@ that specific draft. Unresolved evidence can remain unresolved through the end o
 
 | Kind | Result |
 |---|---|
-| Regression tests | `evidence/TASK-044-junit.xml`: unchanged copy of the shared final 184-test JUnit run; 0 failures |
+| Regression tests | `evidence/TASK-047-junit.xml`: unchanged copy of the shared final 184-test JUnit run; 0 failures |
 | Typecheck / build | `npm run typecheck` and `npm run build` passed |
 | Architecture | `scripts/check-invariants.sh` passed using Git Bash |
 | Constraints | N/A — schema and commands unchanged |
@@ -79,4 +79,4 @@ automatic human confirmation were introduced.
 - `src/view/GuidedStory.tsx`, `src/view/BookStage.tsx`, `src/view/Forest.tsx`
 - `src/app.css`, `src/i18n/locales/en.json`, `src/i18n/locales/vi.json`
 - `docs/USER_GUIDE.md`, `docs/_arch_map.md`, `docs/task/README.md`
-- `docs/task/TASK-044-guided-family-story.md`, this log and JUnit evidence
+- `docs/task/TASK-047-guided-family-story.md`, this log and JUnit evidence

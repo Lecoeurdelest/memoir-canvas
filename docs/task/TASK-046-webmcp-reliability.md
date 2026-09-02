@@ -1,6 +1,6 @@
-# TASK-043 — WebMCP registration and the live interview loop
+# TASK-046 — WebMCP registration and the live interview loop
 
-Status: done. Branch: `codex/webmcp-reliability`. Evidence: [IMPL-TASK-043](../implement/IMPL-TASK-043.md).
+Status: done. Branch: `codex/webmcp-reliability`. Evidence: [IMPL-TASK-046](../implement/IMPL-TASK-046.md).
 
 Register the existing eight tools on current `document.modelContext` hosts using asynchronous
 `registerTool` and AbortSignal withdrawal. Retain legacy hosts without duplicate registration.
@@ -19,4 +19,4 @@ Acceptance: modern and legacy registration tests; stale invocation refusal; nati
 update the UI; claim-linked questions can be answered by humans but never agents; scoped reads keep
 evidence and answers connected; a real in-app-browser discovery and invocation run succeeds.
 
-Preserve R1–R5 and all database grants and constraints. Record evidence in IMPL-TASK-043.
+Preserve R1–R5 and all database grants and constraints. Record evidence in IMPL-TASK-046.

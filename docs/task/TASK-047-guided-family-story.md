@@ -1,7 +1,7 @@
-# TASK-044 — One family story, from recollection to a readable keepsake
+# TASK-047 — One family story, from recollection to a readable keepsake
 
-Status: done. Depends on TASK-043. Branch: `codex/webmcp-reliability`.
-Evidence: [IMPL-TASK-044](../implement/IMPL-TASK-044.md).
+Status: done. Depends on TASK-046. Branch: `codex/webmcp-reliability`.
+Evidence: [IMPL-TASK-047](../implement/IMPL-TASK-047.md).
 
 Add a prominent bilingual entry into the seeded grandmother's story. Keep the forest available.
 The guided view reads the existing projection and reuses commands for human writes. Show the
@@ -17,4 +17,4 @@ Acceptance: a user can enter in one click; a native agent can read, flag, ask an
 can answer and optionally confirm on the same page; each step updates without reload; English
 and Vietnamese work; keyboard and narrow screens are usable. No schema or new tool required.
 
-Record browser evidence and remaining limitations in IMPL-TASK-044.
+Record browser evidence and remaining limitations in IMPL-TASK-047.

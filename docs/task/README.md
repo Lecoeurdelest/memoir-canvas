@@ -54,8 +54,8 @@ How to pick one: [`.agent/workflows/pick-a-task.md`](../../.agent/workflows/pick
 | [`TASK-040`](TASK-040-the-forest-you-can-actually-use.md) | The forest you can actually use | A | 6 | `TASK-034`, `TASK-037` | ☑ |
 | [`TASK-041`](TASK-041-the-book-comes-back-into-the-forest.md) | The book comes back into the forest | A | 6 | `TASK-035`, `TASK-037` | ☑ |
 | [`TASK-042`](TASK-042-somewhere-to-tell-it.md) | Somewhere to tell it | A | 6 | `TASK-038` | ☑ |
-| [`TASK-043`](TASK-043-webmcp-reliability.md) | WebMCP registration and the live interview loop | codex/webmcp-reliability | 6 | `TASK-006`, `TASK-011` | ☑ |
-| [`TASK-044`](TASK-044-guided-family-story.md) | One family story and a readable keepsake | codex/webmcp-reliability | 6 | `TASK-043` | ☑ |
+| [`TASK-046`](TASK-046-webmcp-reliability.md) | WebMCP registration and the live interview loop | codex/webmcp-reliability | 6 | `TASK-006`, `TASK-011` | ☑ |
+| [`TASK-047`](TASK-047-guided-family-story.md) | One family story and a readable keepsake | codex/webmcp-reliability | 6 | `TASK-046` | ☑ |
 
 ## Milestones
 

@@ -1,11 +1,11 @@
 ---
-task: TASK-043
+task: TASK-046
 status: done
 date: 2026-09-02
 author: Codex
 ---
 
-# IMPL-TASK-043 — WebMCP registration and the live interview loop
+# IMPL-TASK-046 — WebMCP registration and the live interview loop
 
 ## What was built
 
@@ -33,8 +33,8 @@ input schemas, the eight-tool inventory, database schema, grants and command pat
 
 | Kind | Result |
 |---|---|
-| Full regression suite | `evidence/TASK-043-junit.xml`: 184 tests, 0 failures, 0 errors |
-| Command | `npx vitest run --maxWorkers=1 --no-file-parallelism --reporter=junit --outputFile=docs/implement/evidence/TASK-043-junit.xml` |
+| Full regression suite | `evidence/TASK-046-junit.xml`: 184 tests, 0 failures, 0 errors |
+| Command | `npx vitest run --maxWorkers=1 --no-file-parallelism --reporter=junit --outputFile=docs/implement/evidence/TASK-046-junit.xml` |
 | Typecheck / build | `npm run typecheck` and `npm run build` passed |
 | Architecture | `scripts/check-invariants.sh` passed using Git Bash |
 | Constraints | N/A — schema and commands unchanged; existing database tests included above |
@@ -80,4 +80,4 @@ runtime network calls, `any`, constraint changes, or domain state in components.
 - `src/i18n/locales/en.json`, `src/i18n/locales/vi.json` (registration status copy)
 - `tests/modelContext.spec.ts`, `tests/handlers.spec.ts`
 - `docs/API_SCHEMA.md`, `docs/_arch_map.md`, `docs/task/README.md`
-- `docs/task/TASK-043-webmcp-reliability.md`, this log and JUnit evidence
+- `docs/task/TASK-046-webmcp-reliability.md`, this log and JUnit evidence
