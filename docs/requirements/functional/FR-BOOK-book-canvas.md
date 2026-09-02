@@ -168,3 +168,39 @@ built to make the archive useful. `floorCertainty` already exists and already ba
 
 No new agent tool. `descriptors.ts` stays frozen at eight. Answering is a human affordance, and the
 agent's half — `propose_followup_question` — has existed since `TASK-011`.
+
+## Amended 2026-08-31 (sixth) — one surface, no chrome
+
+Product owner: *"Bỏ tất cả các cái nút các cái giới thiệu đi. Style dạng liền mạch, hướng người
+dùng tự thao tác như trên các màn cảm ứng."*
+
+`FR-BOOK-08` said this about the book. It now holds for the whole application.
+
+| ID | Requirement |
+|---|---|
+| `FR-BOOK-12` | **New. The archive is one continuous surface, operated by touching it.** Nothing on screen may look like a control, and nothing may explain how to use it — no toolbar, no legend, no caption, no tagline, no button that announces itself as a button. What a person can act on is the thing itself: a light, a page edge, a ribbon, a name written on the page. |
+
+### The line that is not negotiable
+
+**Nothing visible is a control; everything is still reachable.** `NFR-A11Y-01` and `NFR-A11Y-03`
+are untouched by this amendment and cannot be traded against it. Every affordance stays a real
+focusable element with a real accessible name — what changes is that it stops *looking* like a
+widget. Removing a caption aimed at someone who can see the screen is not permission to remove the
+description for someone who cannot.
+
+### What replaces the legend, and why it can go at all
+
+`NFR-A11Y-02` forbids carrying meaning by colour alone, and `tests/certainty.spec.ts` enforces it.
+The legend was how the forest satisfied that, so it cannot simply be deleted.
+
+It does not have to be. `GLYPH` already gives the ladder five distinct **shapes** — `○ ◔ ◑ ◈ ●` —
+and a firefly can be drawn as its shape rather than as a plain dot. The certainty is then carried
+by the light's **form**, which survives greyscale, colour blindness and a screen reader alike, with
+no text on screen at all. The ladder moves from a caption into the picture, which is what it should
+have been.
+
+### What this amendment knowingly costs
+
+Removing the agent's tool line undoes `FR-MCP`'s visibility gain from `TASK-040`, which the same
+product owner asked for. That trade is recorded rather than hidden, and the replacement is stated
+in `TASK-045`: the agent is shown by **acting**, not by a sentence about itself.
