@@ -67,7 +67,7 @@ function useStageWidth(): number {
   return width;
 }
 
-export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
+export function Forest({ nav, onGuided }: { nav: SpreadNavigation; onGuided: (index: number) => void }): JSX.Element {
   const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const people = useStore((s) => s.model?.people) ?? [];
@@ -77,6 +77,10 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const setOpenYear = useStore((s) => s.setOpenYear);
 
   const { spreads, index, openAt } = nav;
+  const grandma = people.find((person) => person.display_name === 'Bà ngoại');
+  const storyIndex = spreads.findIndex(
+    (spread) => spread.subjectId === grandma?.id && spread.predicate === 'moved_to',
+  );
   const width = useStageWidth();
   const layers = glowLayers(width);
   const stage = useRef<HTMLDivElement>(null);
@@ -181,6 +185,13 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         }}
         onPointerLeave={() => setPointer(CENTRE)}
       >
+        {storyIndex >= 0 && storyIndex < nav.lockedFrom && (
+          <button type="button" className="guided-entry" onClick={() => onGuided(storyIndex)}>
+            <span>{t('journey.entryKicker')}</span>
+            <strong>{t('journey.entry')}</strong>
+            <small>{t('journey.entryTime')}</small>
+          </button>
+        )}
         {PLANE_INDEXES.map((plane) => {
           const lean = parallaxShift(pointer, plane);
           const walk = travelShift(travel, plane, true);

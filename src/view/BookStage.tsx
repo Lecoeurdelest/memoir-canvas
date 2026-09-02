@@ -21,6 +21,7 @@ import { CssBook } from './CssBook';
 import { BlankPage } from './BlankPage';
 import { Forest } from './Forest';
 import { FrontPage } from './FrontPage';
+import { GuidedStory } from './GuidedStory';
 import { Volume } from './Volume';
 import { useSpreadNavigation } from './useSpreadNavigation';
 import { flatRequested } from './webgl';
@@ -33,6 +34,7 @@ export function BookStage(): JSX.Element {
   const [flat, setFlat] = useState(flatRequested);
   const [bound, setBound] = useState(true);
   const [atFront, setAtFront] = useState(false);
+  const [guided, setGuided] = useState(false);
   const { open, close, spread } = nav;
   const questions = useStore((s) => s.model?.questions) ?? [];
   const openQuestion = useStore((s) => s.openQuestion);
@@ -50,10 +52,10 @@ export function BookStage(): JSX.Element {
   // Every trip out of the forest starts at the closed book again.
   useEffect(() => {
     if (open) {
-      setBound(true);
+      setBound(!guided);
       setAtFront(false);
     }
-  }, [open]);
+  }, [open, guided]);
 
   // Escape closes from anywhere inside. FR-BOOK-08 wants the pointer route to be a drag; the
   // keyboard route is the one NFR-A11Y-03 actually requires.
@@ -93,10 +95,22 @@ export function BookStage(): JSX.Element {
     );
   }
 
-  if (!open) return <Forest nav={nav} />;
+  if (!open) {
+    return (
+      <Forest
+        nav={nav}
+        onGuided={(index) => {
+          setGuided(true);
+          setBound(false);
+          nav.openAt(index);
+        }}
+      />
+    );
+  }
 
   return (
-    <div className={`reading ${flat ? 'reading-flat' : 'reading-book'}`}>
+    <div className={`reading ${flat ? 'reading-flat' : 'reading-book'}${guided ? ' reading-guided' : ''}`}>
+      {guided && <GuidedStory nav={nav} onLeave={() => { setGuided(false); close(); }} />}
       {flat ? (
         <CssBook nav={nav} />
       ) : bound && spread ? (
