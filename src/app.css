@@ -397,6 +397,22 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 }
 .fa-streak { opacity: 0; animation: fa-streak 13s linear infinite; }
 
+/* TASK-048 — the moon is the door to Backstage: a real button, exactly the moon's size, with
+   no chrome of its own. Pressing the picture is the only gesture; hovering brightens the halo
+   that is already painted there, which is hint enough. */
+.moon-door {
+  position: absolute;
+  z-index: 4;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  transition: box-shadow 260ms ease;
+}
+.moon-door:hover { box-shadow: 0 0 60px 18px rgba(214, 232, 255, 0.22); }
+.moon-door:focus-visible { outline: 2px solid #fffce8; outline-offset: 6px; }
+
 /* The three.js firefly swarm — decoration between the scenery and the lights. It takes no
    clicks and says nothing; the buttons above it carry every fact. */
 .forest-gl { position: absolute; inset: 0; pointer-events: none; }

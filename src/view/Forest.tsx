@@ -10,8 +10,8 @@
  *
  * The world is a RING of SCENE_COUNT scenes: three scenery strips (sky, meadow, foreground)
  * each loop at their own parallax rate, so dragging sideways walks an endless night; the lights
- * ride the meadow's loop, laid along the world's whole timeline. Every firefly answers a press;
- * a double-click on scenery opens Backstage; only the vertical walk still meets a wall.
+ * ride the meadow's loop, laid along the world's whole timeline. Every firefly answers a press,
+ * and the moon is the one door to the machinery; only the vertical walk still meets a wall.
  *
  * Ambient motion is a decoration-only three.js canvas with a CSS fallback (NFR-PORT-01). Every
  * interactive light stays a DOM button: 44px target, keyboard order, hover-only name. What is
@@ -25,7 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import { FirefliesGL } from './FirefliesGL';
 import type { FirefliesHandle } from './FirefliesGL';
-import { ForegroundArt, H as ART_H, MeadowArt, SkyArt, designWidth } from './forestArt';
+import { ForegroundArt, H as ART_H, MeadowArt, SkyArt, designWidth, moonAt } from './forestArt';
 import {
   CENTRE,
   FIREFLY_TONES,
@@ -128,12 +128,27 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const groundT = wrapOffset(travel.x, STRIP_RATES[1], loopPx) + groundLean.x;
   const groundTy = travel.y * 0.95 + groundLean.y;
 
-  /** A world-percent position, wrapped onto the screen; things just left of the seam appear
-   *  just left of the screen instead of a whole world away. */
-  const screenX = (worldPercent: number): number => {
-    const wx = (worldPercent / 100) * loopPx;
-    const sx = (((wx + groundT) % loopPx) + loopPx) % loopPx;
-    return sx > loopPx - 200 ? sx - loopPx : sx;
+  /** A world x (px) on some strip, wrapped onto the screen; things just left of the seam
+   *  appear just left of the screen instead of a whole world away. */
+  const wrapToView = (worldX: number, stripT: number, margin: number): number => {
+    const sx = (((worldX + stripT) % loopPx) + loopPx) % loopPx;
+    return sx > loopPx - margin ? sx - loopPx : sx;
+  };
+
+  const screenX = (worldPercent: number): number =>
+    wrapToView((worldPercent / 100) * loopPx, groundT, 200);
+
+  // TASK-048 — the moon is the door to the machinery (owner's rule): the one thing in the
+  // picture you may press that is not a memory. It hangs in scene 0 of the sky strip, so it
+  // wraps at the sky's own rate — walk the ring and it comes back around. A torn night has no
+  // moon painted, and then the ghost door in Archive.tsx is the only way in.
+  const skyLean = parallaxShift(pointer, 0);
+  const moon = moonAt(aspect);
+  const moonR = moon.r * unit;
+  const moonDoor = {
+    x: wrapToView(moon.x * unit, wrapOffset(travel.x, STRIP_RATES[0], loopPx) + skyLean.x, moonR * 2 + 60),
+    y: -0.03 * height + travel.y * 0.6 + skyLean.y + moon.y * unit,
+    r: moonR,
   };
 
   // A whole sentence, because "moved to · 1972" names no destination and reads as a fragment.
@@ -184,13 +199,6 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         className={`forest-stage${torn ? ' forest-torn' : ''}`}
         ref={stage}
         onKeyDown={onKeyDown}
-        // TASK-048 — the surface carries no controls, so the machinery's mouse entrance is the
-        // surface itself: a double-click on scenery (never on a light) opens Backstage. The
-        // keyboard route is the ghost door in Archive.tsx.
-        onDoubleClick={(e) => {
-          if ((e.target as HTMLElement).closest('button')) return;
-          setBackstage(true);
-        }}
         // Every firefly is a place a memory could live (owner's rule): press one — not a walk,
         // not a light, the ambient swarm itself — and the blank page opens on the year that
         // point of the WORLD's timeline names, wherever the ring has been dragged to.
@@ -302,6 +310,21 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
             lean={pointer}
             travel={travel}
             onLost={() => setGlOk(false)}
+          />
+        )}
+
+        {!torn && (
+          <button
+            type="button"
+            className="moon-door"
+            aria-label={t('backstage.open')}
+            style={{
+              left: `${(moonDoor.x - moonDoor.r).toFixed(1)}px`,
+              top: `${(moonDoor.y - moonDoor.r).toFixed(1)}px`,
+              width: `${(moonDoor.r * 2).toFixed(1)}px`,
+              height: `${(moonDoor.r * 2).toFixed(1)}px`,
+            }}
+            onClick={() => setBackstage(true)}
           />
         )}
 

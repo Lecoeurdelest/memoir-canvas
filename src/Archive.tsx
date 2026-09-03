@@ -8,7 +8,7 @@
  * TASK-031 · TASK-037 · TASK-048 — a family member opening this should see their family, and
  * ONLY their family: the owner removed everything below the forest, so the archive is one
  * surface and every way in is a mouse gesture. The machinery did not go away; it lives in
- * Backstage, reached by double-clicking the forest itself (Forest.tsx) — and by the ghost door
+ * Backstage, reached by pressing the MOON (Forest.tsx) — and by the ghost door
  * below, which no eye sees but every Tab key finds, because a mouse-only entrance would lock
  * out exactly the readers NFR-A11Y-03 exists for. The language switch moved into Backstage.
  *

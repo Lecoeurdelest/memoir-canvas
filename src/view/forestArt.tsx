@@ -37,6 +37,14 @@ export function designWidth(aspect: number): number {
   return Math.round(clamp(H * aspect, 1150, 3600));
 }
 
+/**
+ * Where the moon hangs, in the strip's design units — scene 0 only, since that is the scene
+ * that carries it. `Forest.tsx` puts the door to the machinery here (TASK-048).
+ */
+export function moonAt(aspect: number): { x: number; y: number; r: number } {
+  return { x: designWidth(aspect) * 0.67, y: HY * 0.3, r: H * 0.072 };
+}
+
 /** A per-call deterministic stream over the shared hash. */
 function stream(seed: string): () => number {
   let i = 0;
