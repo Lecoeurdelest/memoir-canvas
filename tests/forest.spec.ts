@@ -25,6 +25,7 @@ import {
   placeLights,
   span,
   travelShift,
+  yearAtX,
 } from '../src/view/forestLayout';
 import type { Spread } from '../src/store/projection';
 
@@ -219,6 +220,30 @@ describe('the summary line', () => {
   it('says nothing rather than guessing when no year is known', () => {
     const undated = [{ key: 'k', claims: [{ year_value: null }] }] as unknown as Spread[];
     expect(span(undated)).toBeNull();
+  });
+});
+
+describe('TASK-048 — every firefly is a place a memory could live', () => {
+  it('reads the year straight off the timeline axis the lights use', async () => {
+    const { spreads } = await buildReadModel();
+    const years = span(spreads);
+    expect(yearAtX(spreads, 9)).toBe(years?.from);
+    expect(yearAtX(spreads, 91)).toBe(years?.to);
+    const mid = yearAtX(spreads, 50);
+    expect(mid).toBeGreaterThan(years!.from);
+    expect(mid).toBeLessThan(years!.to);
+  });
+
+  it('clamps a click outside the margins instead of inventing years', async () => {
+    const { spreads } = await buildReadModel();
+    const years = span(spreads);
+    expect(yearAtX(spreads, 0)).toBe(years?.from);
+    expect(yearAtX(spreads, 100)).toBe(years?.to);
+  });
+
+  it('names no year when the archive holds none', () => {
+    const undated = [{ key: 'k', claims: [{ year_value: null }] }] as unknown as Spread[];
+    expect(yearAtX(undated, 50)).toBeNull();
   });
 });
 

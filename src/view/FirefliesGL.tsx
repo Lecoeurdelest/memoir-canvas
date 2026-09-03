@@ -14,7 +14,7 @@
  * R5: draws, decides nothing, writes nothing.
  */
 
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import * as THREE from 'three';
 import { ambientCount, hash } from './forestLayout';
 
@@ -116,11 +116,63 @@ interface FirefliesProps {
   onLost: () => void;
 }
 
-export function FirefliesGL({ torn, lean, travel, onLost }: FirefliesProps): JSX.Element {
+/** The one question the swarm answers the view: is there a firefly under this point right now? */
+export interface FirefliesHandle {
+  hitTest(x: number, y: number): boolean;
+}
+
+interface SwarmWorld {
+  uniforms: {
+    uTime: { value: number };
+    uRes: { value: THREE.Vector2 };
+    uLean: { value: THREE.Vector2 };
+    uTravel: { value: THREE.Vector2 };
+  };
+  positions: Float32Array;
+  seeds: Float32Array;
+  sizes: Float32Array;
+  depths: Float32Array;
+}
+
+export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function FirefliesGL(
+  { torn, lean, travel, onLost }: FirefliesProps,
+  handle,
+): JSX.Element {
   const holder = useRef<HTMLDivElement>(null);
   const dimUniform = useRef<{ value: number } | null>(null);
   const leanUniform = useRef<THREE.Vector2 | null>(null);
   const travelUniform = useRef<THREE.Vector2 | null>(null);
+  const world = useRef<SwarmWorld | null>(null);
+
+  // The same arithmetic the vertex shader runs, replayed on the CPU for one point — a hit-test
+  // against a moving swarm has to move with it, drift, gust, parallax and all.
+  useImperativeHandle(handle, () => ({
+    hitTest(x: number, y: number): boolean {
+      const w = world.current;
+      if (!w) return false;
+      const t = w.uniforms.uTime.value;
+      const res = w.uniforms.uRes.value;
+      const ln = w.uniforms.uLean.value;
+      const tv = w.uniforms.uTravel.value;
+      for (let i = 0; i < w.seeds.length; i += 1) {
+        const seed = w.seeds[i];
+        let fx = w.positions[i * 3] * res.x;
+        let fy = w.positions[i * 3 + 1] * res.y;
+        fx += Math.sin(t * 0.12 + seed * 17) * 26 + Math.sin(t * 0.043 + seed * 31) * 40;
+        fy += Math.cos(t * 0.1 + seed * 23) * 9 + Math.sin(t * 0.05 + seed * 13) * 13;
+        const g = 0.5 + 0.5 * Math.sin(t * 0.32 - fx * 0.0045 + seed * 0.6);
+        const gust = g * g;
+        fx += gust * 26;
+        fy -= gust * 7;
+        const depth = w.depths[i];
+        fx += -ln.x * (44 + depth * 53) + tv.x * (0.85 + depth * 0.12);
+        fy += -ln.y * (16 + depth * 16) + tv.y * (0.85 + depth * 0.12);
+        const r = w.sizes[i] * 0.5 + 8;
+        if ((fx - x) ** 2 + (fy - y) ** 2 <= r * r) return true;
+      }
+      return false;
+    },
+  }), []);
   // The parent hands a fresh closure every render; going through a ref keeps the ONE renderer
   // effect below on empty-ish deps — rebuilding a WebGL context per pointer-move leaks contexts
   // until the browser starts killing them.
@@ -180,6 +232,7 @@ export function FirefliesGL({ torn, lean, travel, onLost }: FirefliesProps): JSX
     dimUniform.current = uniforms.uDim;
     leanUniform.current = uniforms.uLean.value;
     travelUniform.current = uniforms.uTravel.value;
+    world.current = { uniforms, positions, seeds, sizes, depths };
 
     const material = new THREE.ShaderMaterial({
       uniforms,
@@ -239,9 +292,10 @@ export function FirefliesGL({ torn, lean, travel, onLost }: FirefliesProps): JSX
       dimUniform.current = null;
       leanUniform.current = null;
       travelUniform.current = null;
+      world.current = null;
     };
     // Mounts exactly once: torn rides its own effect through dimUniform, onLost through lostRef.
   }, []);
 
   return <div ref={holder} className="forest-gl" aria-hidden="true" />;
-}
+});

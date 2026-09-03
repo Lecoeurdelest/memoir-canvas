@@ -363,6 +363,20 @@ export function placeSilences(
   });
 }
 
+/**
+ * TASK-048 — every firefly is a place a memory could live. The forest lays time left-to-right
+ * (placeLights), so a click anywhere across the stage names a year: the same MARGIN-to-MARGIN
+ * axis, inverted. Outside the margins clamps to the nearest end rather than inventing years the
+ * family never lived.
+ */
+export function yearAtX(spreads: readonly Spread[], xPercent: number): number | null {
+  const years = span(spreads);
+  if (!years) return null;
+  const usable = 100 - MARGIN * 2;
+  const t = Math.min(1, Math.max(0, (xPercent - MARGIN) / usable));
+  return Math.round(years.from + t * (years.to - years.from));
+}
+
 /** The years the forest covers, for the one line of text that summarises the whole picture. */
 export function span(spreads: readonly Spread[]): { from: number; to: number } | null {
   const years = spreads

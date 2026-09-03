@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import { FirefliesGL } from './FirefliesGL';
+import type { FirefliesHandle } from './FirefliesGL';
 import { ForegroundArt, MeadowArt, SkyArt } from './forestArt';
 import {
   CENTRE,
@@ -38,6 +39,7 @@ import {
   storyGlow,
   storyLength,
   travelShift,
+  yearAtX,
 } from './forestLayout';
 import { hasWebGL } from './webgl';
 import type { Pointer } from './forestLayout';
@@ -88,6 +90,9 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const [blooming, setBlooming] = useState<number | null>(null);
   // The GL swarm is an enhancement; a lost context hands the stage back to the CSS one.
   const [glOk, setGlOk] = useState(() => typeof window !== 'undefined' && hasWebGL());
+  const flies = useRef<FirefliesHandle>(null);
+  // A walk is not a click: the distance a pointer wanders between down and up decides.
+  const wandered = useRef(0);
 
   const lights = useMemo(() => placeLights(spreads, index), [spreads, index]);
   const ambient = useMemo(() => ambientLights(width), [width]);
@@ -156,9 +161,31 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
           if ((e.target as HTMLElement).closest('button')) return;
           setBackstage(true);
         }}
+        // Every firefly is a place a memory could live (owner's rule): press one — not a walk,
+        // not a light, the ambient swarm itself — and the blank page opens on the year that
+        // point of the timeline names. GL answers precisely; the CSS fallback answers by its
+        // own layout table.
+        onClick={(e) => {
+          if ((e.target as HTMLElement).closest('button')) return;
+          if (wandered.current > 6) return;
+          const r = e.currentTarget.getBoundingClientRect();
+          const cx = e.clientX - r.left;
+          const cy = e.clientY - r.top;
+          const onFly = glOk
+            ? flies.current?.hitTest(cx, cy)
+            : ambient.some((a) => {
+                const ax = (a.x / 100) * r.width;
+                const ay = (a.y / 100) * r.height;
+                return (ax - cx) ** 2 + (ay - cy) ** 2 <= (a.size * 0.5 + 12) ** 2;
+              });
+          if (!onFly) return;
+          const year = yearAtX(spreads, (cx / r.width) * 100);
+          if (year !== null) setOpenYear(year);
+        }}
         onPointerDown={(e) => {
           if ((e.target as HTMLElement).closest('button')) return;
           from.current = { x: e.clientX, y: e.clientY, travel };
+          wandered.current = 0;
           setWalking(true);
           try {
             e.currentTarget.setPointerCapture(e.pointerId);
@@ -170,6 +197,10 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
           const r = e.currentTarget.getBoundingClientRect();
           if (from.current) {
             const start = from.current;
+            wandered.current = Math.max(
+              wandered.current,
+              Math.abs(e.clientX - start.x) + Math.abs(e.clientY - start.y),
+            );
             setTravel(
               clampTravel(
                 {
@@ -240,7 +271,13 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         })}
 
         {glOk && (
-          <FirefliesGL torn={torn} lean={pointer} travel={travel} onLost={() => setGlOk(false)} />
+          <FirefliesGL
+            ref={flies}
+            torn={torn}
+            lean={pointer}
+            travel={travel}
+            onLost={() => setGlOk(false)}
+          />
         )}
 
         {/* The lights ride their own layers, sized exactly to the stage, so a per-cent is a
