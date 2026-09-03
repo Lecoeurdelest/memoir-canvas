@@ -1241,29 +1241,109 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   background-position: 0 76px;
 }
 
+/* ── TASK-048 · the book as a book ──────────────────────────────────────────────
+   No headings, no chips, no bordered groups: prose on paper. In the book skin the entry runs
+   as two columns across the spread, so what will not fit the near leaf continues on the far
+   one — a page of a book does not scroll. The flat list keeps one plain column. */
+.entry-open {
+  margin: 0 0 18px;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 1.25;
+  break-after: avoid;
+}
+.entry-year {
+  margin: 20px 0 8px;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--leaf-label, var(--ink-soft));
+  break-after: avoid;
+  break-inside: avoid;
+}
+.entry-source {
+  margin: 0 0 12px;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 16px;
+  line-height: 1.65;
+  break-inside: avoid;
+}
+.entry-source .stance { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.stance-contradicts .stance { color: var(--lacquer); }
+.stance-supports .stance { color: var(--ok); }
+.entry-source .kind { color: var(--ink-soft); font-size: 13px; }
+.entry-source .title { font-weight: 600; }
+.entry-source .verbatim,
+.entry-source .excerpt { display: block; font-style: italic; quotes: '“' '”'; }
+.entry-source .excerpt { font-size: 14px; color: var(--ink-soft); }
+.entry-source .hand { display: block; font-size: 13px; color: var(--ink-soft); }
+.entry-source.quiet { font-style: italic; color: var(--ink-soft); }
+
+/* The whole apparatus of the old page — its labels, chips, group borders and the dashed rule
+   round the photograph drop — is gone from the book. */
+.entry .photo-drop { border: 0; padding: 0; margin: 10px 0 0; background: none; }
+
+.reading-book .spread.entry {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  columns: 2;
+  column-gap: 92px;
+  padding: 34px 44px;
+}
+.reading-book .entry-source .hand,
+.reading-book .entry-source .kind,
+.reading-book .entry-source .excerpt,
+.reading-book .entry-year { color: var(--leaf-label); }
+.reading-book .entry-open,
+.reading-book .entry-source { color: var(--leaf-ink); }
+
 /* TASK-048 — the writing stays on ONE leaf at every width. The fold is painted down the middle
    of the book whatever the window does, so a spread that collapses to a single column would put
    the family's own hand across the gutter. */
 .reading-book .blank-page .spread { grid-template-columns: 1fr 1fr; }
 
-.write-on { display: block; margin: 0; }
-.write-on textarea {
-  width: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  resize: vertical;
-  min-height: 42vh;
+/* TASK-048 — the page is written on, not typed into: a bare editable surface with the book's
+   own hand, whose words run off the near leaf onto the far one. */
+.write-on {
+  min-height: 1.6em;
   font-family: Newsreader, Georgia, serif;
   font-size: 18px;
   line-height: 28px;
   color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.write-on:empty::before {
+  content: attr(data-placeholder);
+  color: var(--ink-soft);
+  opacity: 0.6;
+  font-style: italic;
 }
 /* The browser's blue ring is a form control's ring, and this is a page of a book. The warm one
    stays for anyone arriving by keyboard — a focus nobody can see is the older, worse bug. */
-.write-on textarea:focus { outline: none; }
-.write-on textarea:focus-visible { outline: 2px solid rgba(106, 84, 16, 0.75); outline-offset: 8px; }
-.write-on textarea::placeholder { color: var(--ink-soft); opacity: 0.6; font-style: italic; }
+.write-on:focus { outline: none; }
+.write-on:focus-visible { outline: none; }
+.blank-entry:focus-within .paper-flow { box-shadow: none; }
+
+.reading-book .spread.blank-entry {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 34px 44px;
+}
+.blank-entry .paper-flow {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  columns: 2;
+  column-gap: 92px;
+  cursor: text;
+}
+.blank-entry .signing-row { flex: 0 0 auto; padding-top: 10px; }
+.reading-book .blank-entry .write-on { color: var(--leaf-ink); }
 
 /* Faint ink, the way a note pencilled in a margin looks. It is the assistant's voice, and it is
    visibly not the family's hand. */
@@ -1283,7 +1363,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
    the page will not file an account until it is. */
 .signing-name {
   display: block;
-  margin: 20px 0 0;
+  margin: 0;
   max-width: 100%;
   padding: 3px 2px;
   border: 0;

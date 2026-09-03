@@ -57,7 +57,7 @@ export function BlankPage({
 
   // The book arrives shut. Nothing is written until a hand opens it.
   const [opened, setOpened] = useState(false);
-  const [text, setText] = useState('');
+  const paper = useRef<HTMLDivElement>(null);
   const [teller, setTeller] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +73,7 @@ export function BlankPage({
     setBusy(true);
     setError(null);
     try {
+      const text = paper.current?.innerText ?? '';
       if (question) {
         await commands.answerFollowupQuestion(
           { question_id: question.id, answer_text: text.trim(), told_by: teller },
@@ -100,7 +101,7 @@ export function BlankPage({
    */
   async function leave(): Promise<void> {
     if (busy) return;
-    if (text.trim().length === 0) return onClose();
+    if ((paper.current?.innerText ?? '').trim().length === 0) return onClose();
     if (teller === '') {
       // After this handler the browser finishes its own focus move for the press that got us
       // here, which would take the cursor straight back off the line. Ask once it has.
@@ -157,27 +158,33 @@ export function BlankPage({
           <span className="gutter" />
         </div>
 
-        <article className="spread">
-          {/* Everything the page has to say lives on this one leaf. */}
-          <div className="page page-left ruled">
+        <article className="spread blank-entry">
+          <div className="paper-flow" onPointerDown={() => paper.current?.focus()}>
             {asked && (
-              <p className="margin-note" lang={lang}>
+              <p className="entry-year" lang={lang}>
                 {asked}
               </p>
             )}
 
-            <label className="write-on">
-              <span className="visually-hidden">{t('blank.writeHere')}</span>
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                rows={7}
-                lang={lang}
-                autoFocus
-                placeholder={t('blank.writeHere')}
-              />
-            </label>
+            {/* Contenteditable, not a textarea: a textarea is a box with its own scrollbar, and
+                the owner asked for a page — words that outgrow the near leaf continue on the far
+                one. Uncontrolled on purpose; re-rendering it on every keystroke is what makes a
+                caret jump. What was written is read off the paper when the book is left. */}
+            <div
+              ref={paper}
+              className="write-on"
+              contentEditable
+              suppressContentEditableWarning
+              spellCheck={false}
+              role="textbox"
+              aria-multiline="true"
+              aria-label={t('blank.writeHere')}
+              data-placeholder={t('blank.writeHere')}
+              lang={lang}
+            />
+          </div>
 
+          <div className="signing-row">
             <select
               ref={name}
               className="signing-name"
@@ -199,9 +206,6 @@ export function BlankPage({
               </p>
             )}
           </div>
-
-          {/* The facing leaf stays paper: blank, because the page is. */}
-          <div className="page page-right ruled" aria-hidden="true" />
         </article>
       </div>
     </section>

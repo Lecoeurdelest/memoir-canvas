@@ -76,32 +76,22 @@ export function FrontPage({
 
         <div className="flyleaf-spread">
           <div className="page page-left">
-            <p className="page-label">{t('front.name')}</p>
-            <h3 className="flyleaf-ask">{t('front.askTheBook')}</h3>
-            {/* Written straight onto the page — the design's flyleaf, not a form control. */}
+            {/* Written straight onto the page — the design's flyleaf, not a form control, and
+                since TASK-048 not labelled either: a ruled line under a cursor asks for itself. */}
             <input
               className="flyleaf-line"
               type="search"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               aria-label={t('front.askTheBook')}
+              placeholder={t('front.askTheBook')}
               lang={lang}
             />
-            <p className="hint">{t('front.count', { volumes: spreads.length })}</p>
-            <p className="folio">— i —</p>
           </div>
 
           <div className="page page-right">
-            {!asked ? (
-              <p className="hint">{t('front.nothingAskedYet')}</p>
-            ) : answer.marked.length === 0 ? (
-              <p className="hint">{t('front.nothingFound')}</p>
-            ) : (
+            {!asked || answer.marked.length === 0 ? null : (
               <>
-                <p className="page-label">
-                  {t('front.marked', { count: answer.marked.length })}
-                </p>
-
                 <ul className="ribbons">
                   {answer.marked.map((m) => (
                     <li key={m.key}>

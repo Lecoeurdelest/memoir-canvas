@@ -16,7 +16,7 @@ import { useStore } from '../store/store';
 import type { Claim, Evidence, Source, Stance } from '../domain/types';
 
 /** contradicts first, then supports, then mentions — the disagreement is never below the fold. */
-const STANCE_ORDER: Stance[] = ['contradicts', 'supports', 'mentions'];
+export const STANCE_ORDER: Stance[] = ['contradicts', 'supports', 'mentions'];
 
 function SourceRow({
   evidence,
