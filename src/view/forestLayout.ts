@@ -11,18 +11,23 @@
 
 import { floorCertainty } from '../domain/types';
 import { jumpTarget } from './useSpreadNavigation';
-import type { Certainty, FollowupQuestion } from '../domain/types';
+import type { Certainty, FollowupQuestion, StoryCard } from '../domain/types';
 import type { Spread } from '../store/projection';
 
 /**
- * Three planes, and how far each slides across a full pointer sweep — measured in the design
- * canvas. The near plane travels roughly 4.4× the far one; that RATIO is what reads as depth.
- * Equal rates would move the whole picture and look like a broken scroll.
+ * Three planes, and how far each slides across a full pointer sweep. The near plane travels
+ * roughly 5× the far one; that RATIO is what reads as depth. Equal rates would move the whole
+ * picture and look like a broken scroll.
+ *
+ * TASK-048 shrank every rate by an order of magnitude: the trunk wall was a tileable texture
+ * that could sweep half a screen, but the meadow is ONE composed picture — sweep it 750px and
+ * the moon leaves the frame. The plane overscan in the stylesheet is sized to exactly these
+ * numbers plus TRAVEL_LIMIT; change one and change the other.
  */
 export const PLANES = [
-  { x: 340, y: 90 },
-  { x: 820, y: 190 },
-  { x: 1500, y: 320 },
+  { x: 18, y: 6 },
+  { x: 42, y: 12 },
+  { x: 96, y: 22 },
 ] as const;
 
 /**
@@ -75,7 +80,7 @@ export function lightShift(pointer: Pointer, plane: Plane): Pointer {
  * — and is clamped, because a forest you can lose every light in is not exploration, it is a
  * missing feature that looks like an empty wood.
  */
-export const TRAVEL_LIMIT = 0.34;
+export const TRAVEL_LIMIT = 0.05;
 
 export function clampTravel(travel: Pointer, stage: { width: number; height: number }): Pointer {
   const limitX = stage.width * TRAVEL_LIMIT;
@@ -119,12 +124,12 @@ const between = (key: string, lo: number, hi: number): number => lo + hash(key) 
 /**
  * Decorative fireflies — the ones that are NOT memories. They exist so a four-memory archive
  * still looks like a forest, and they scale with the viewport because every one of them is an
- * animated box-shadow, which is the most fill-rate-expensive thing on a weak phone (NFR-PERF).
+ * animated glow, which is the most fill-rate-expensive thing on a weak phone (NFR-PERF).
  */
 export function ambientCount(width: number): number {
-  if (width < 700) return 44;
-  if (width < 1100) return 92;
-  return 170;
+  if (width < 700) return 280;
+  if (width < 1100) return 600;
+  return 1200;
 }
 
 /** Under a phone width the glow drops to a single shadow layer rather than two. */
@@ -138,6 +143,7 @@ export interface Ambient {
   x: number;
   y: number;
   size: number;
+  colour: string;
   duration: number;
   delay: number;
 }
@@ -149,8 +155,19 @@ export function ambientLights(width: number): Ambient[] {
       key,
       plane: Math.floor(hash(`${key}:plane`) * PLANE_COUNT) as Plane,
       x: between(`${key}:x`, 0, 100),
-      y: between(`${key}:y`, 18, 92),
-      size: between(`${key}:size`, 1.5, 2.9),
+      // Fireflies gather lower in the wood. A smaller high band keeps the canopy alive without
+      // turning the whole sky into stars.
+      y:
+        hash(`${key}:band`) > 0.28
+          ? between(`${key}:low-y`, 58, 99)
+          : between(`${key}:high-y`, 26, 78),
+      size: between(`${key}:size`, 1.35, 3.2),
+      colour:
+        hash(`${key}:tone`) < 0.28
+          ? '#8fd59a'
+          : hash(`${key}:tone`) < 0.78
+            ? '#c6e579'
+            : '#e3e879',
       duration: between(`${key}:dur`, 2.4, 6.9),
       delay: between(`${key}:delay`, 0, 7),
     };
@@ -210,7 +227,9 @@ export function placeLights(spreads: readonly Spread[], at: number): ForestLight
       index,
       plane: Math.floor(hash(`${key}:plane`) * PLANE_COUNT) as Plane,
       x: MARGIN + index * step + between(`${key}:jitter`, -2.5, 2.5),
-      y: between(`${key}:y`, 26, 82),
+      // TASK-048: the lights live in the meadow — below the horizon seam at 56%, above the
+      // foreground grass. A memory floating in the sky reads as a star, not a firefly.
+      y: between(`${key}:y`, 60, 84),
       size: between(`${key}:size`, 11, 17),
       certainty: certaintyOf(spread),
       reachable: jumpTarget(spreads, at, index) === index,
@@ -262,7 +281,7 @@ export function placeGaps(
       const free = {
         plane: Math.floor(hash(`${q.id}:plane`) * PLANE_COUNT) as Plane,
         x: between(`${q.id}:x`, MARGIN, 100 - MARGIN),
-        y: between(`${q.id}:y`, 26, 82),
+        y: between(`${q.id}:y`, 60, 84),
       };
       return {
         id: q.id,
@@ -336,7 +355,7 @@ export function placeSilences(
       year: silence.at,
       plane: Math.floor(hash(`${silence.id}:plane`) * PLANE_COUNT) as Plane,
       x: MARGIN + across * usable + between(`${silence.id}:jitter`, -2, 2),
-      y: between(`${silence.id}:y`, 28, 80),
+      y: between(`${silence.id}:y`, 60, 82),
       size: between(`${silence.id}:size`, 10, 15),
       duration: between(`${silence.id}:dur`, 5.8, 9.5),
       delay: between(`${silence.id}:delay`, 0, 6),
@@ -352,28 +371,56 @@ export function span(spreads: readonly Spread[]): { from: number; to: number } |
   return years.length === 0 ? null : { from: Math.min(...years), to: Math.max(...years) };
 }
 
-export interface Tree {
-  key: string;
-  x: number;
-  width: number;
-  height: number;
-  tilt: number;
+/**
+ * TASK-048 — the owner's firefly language. In the meadow, hue answers "is there a story here"
+ * before it answers anything else:
+ *
+ * - `create`  — white: an empty place (open question or silent years); clicking it writes
+ * - `conflict` — the same orange the badges call `conflicting`; the wood flinches at it
+ * - `story`   — green, and BRIGHTER green is a LONGER story
+ *
+ * Certainty does not leave the product: the cards and the book keep NIGHT_PALETTE, and every
+ * light still announces its certainty in its accessible name. Only the picture's first question
+ * changed.
+ */
+export type FireflyTone = 'create' | 'conflict' | 'story';
+
+export const FIREFLY_TONES = {
+  create: '#fff6d8',
+  conflict: '#ff9a76',
+} as const;
+
+export function toneOf(spread: Spread): FireflyTone {
+  return spread.conflict ? 'conflict' : 'story';
 }
 
 /**
- * Trunks. Scenery, and nothing else — every one is `aria-hidden`, because a forest that hid
- * information in its trees would be a forest a screen reader cannot walk.
+ * How much of this memory has actually been TOLD: the cards written over its claims, plus what
+ * the claims themselves carry. Card bodies dominate on purpose — a story is prose, not a row.
  */
-export function trees(plane: Plane, width: number): Tree[] {
-  const count = width < 700 ? 10 + plane * 4 : 18 + plane * 8;
-  return Array.from({ length: count }, (_, i) => {
-    const key = `tree-${plane}-${i}`;
-    return {
-      key,
-      x: between(`${key}:x`, -4, 104),
-      width: between(`${key}:w`, 4 + plane * 1.6, 10 + plane * 3),
-      height: between(`${key}:h`, 47 + plane * 6, 84 + plane * 8),
-      tilt: between(`${key}:tilt`, -0.7, 0.7),
-    };
-  });
+export function storyLength(spread: Spread, cards: readonly StoryCard[]): number {
+  const claimIds = new Set(spread.claims.map((c) => c.id));
+  const told = cards
+    .filter((card) => card.claim_ids.some((id) => claimIds.has(id)))
+    .reduce((sum, card) => sum + card.body_vi.length + card.body_en.length, 0);
+  const asserted = spread.claims.reduce((sum, c) => sum + (c.object_text?.length ?? 0), 0);
+  return told + asserted;
+}
+
+/**
+ * Glow in [0.35, 1], log-scaled: one epic story must not make every other light look dead, and
+ * a memory holding only a bare claim still has to be visibly alive.
+ */
+export function storyGlow(length: number): number {
+  const t = Math.log1p(Math.max(0, length)) / Math.log1p(2000);
+  return 0.35 + 0.65 * Math.min(1, t);
+}
+
+/** One green family; only luminance rides the glow — "xanh sáng là câu chuyện dài". */
+export function storyColour(glow: number): string {
+  const t = Math.min(1, Math.max(0, (glow - 0.35) / 0.65));
+  const mix = (a: number, b: number) => Math.round(a + (b - a) * t);
+  return `#${[mix(0x4a, 0xb8), mix(0x8a, 0xe8), mix(0x62, 0x78)]
+    .map((v) => v.toString(16).padStart(2, '0'))
+    .join('')}`;
 }

@@ -25,7 +25,6 @@ import {
   placeLights,
   span,
   travelShift,
-  trees,
 } from '../src/view/forestLayout';
 import type { Spread } from '../src/store/projection';
 
@@ -80,7 +79,7 @@ describe('one light per memory', () => {
   });
 });
 
-describe('colour carries certainty', () => {
+describe('certainty remains findable without forest chrome', () => {
   it('takes the weakest claim holding a memory up', async () => {
     const { spreads } = await buildReadModel();
     const oral = spreads.find((s) => s.claims.some((c) => c.certainty === 'oral'));
@@ -194,9 +193,6 @@ describe('the budget stated before building', () => {
     expect(glowLayers(1440)).toBe(2);
   });
 
-  it('plants fewer trees on a phone', () => {
-    expect(trees(2, 390).length).toBeLessThan(trees(2, 1440).length);
-  });
 });
 
 describe('depth', () => {
@@ -304,7 +300,9 @@ describe('TASK-040 — walking the forest, not leaning at it', () => {
   });
 
   it('leaves a short drag exactly where it was put', () => {
+    // TASK-048 tightened the walk: the meadow is one composed picture, not a tileable wall,
+    // so travel is a gentle push (5% of the stage) rather than a third of it.
     const stage = { width: 1440, height: 900 };
-    expect(clampTravel({ x: 120, y: 30 }, stage)).toEqual({ x: 120, y: 30 });
+    expect(clampTravel({ x: 40, y: 10 }, stage)).toEqual({ x: 40, y: 10 });
   });
 });

@@ -82,17 +82,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
-.guided-entry {
-  position: absolute; z-index: 8; left: max(24px, 5vw); bottom: max(28px, 7vh);
-  width: min(390px, calc(100vw - 48px)); padding: 17px 20px; text-align: left;
-  color: #fffbed; background: rgba(10, 27, 30, 0.88); border: 1px solid rgba(244, 207, 105, 0.65);
-  box-shadow: 0 14px 48px rgba(0, 0, 0, 0.45); cursor: pointer; backdrop-filter: blur(8px);
-}
-.guided-entry span, .guided-entry small { display: block; color: #d8c587; }
-.guided-entry span { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
-.guided-entry strong { display: block; margin: 3px 0; font: 600 22px/1.25 Georgia, serif; }
-.guided-entry small { font-size: 12px; }
-
 .guided-story {
   position: absolute; z-index: 12; top: 16px; left: 16px; width: min(390px, calc(100vw - 32px));
   max-height: calc(100vh - 82px); overflow: auto; padding: 18px;
@@ -312,42 +301,72 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
    100vh is the height with the toolbar HIDDEN, so the bottom of the forest would sit underneath
    the browser chrome. The vh line is the fallback for anything that does not know dvh. */
 .forest {
-  background: #071319;
+  background: #01040f;
   height: 100vh;
   height: 100dvh;
 }
 
+/* TASK-048 — direction C: the sky runs to a bright band at 56%, the meadow falls away under it,
+   and the horizon glow sits exactly on the seam. The painted scenery (forestArt) rides the
+   planes; this is the non-moving ground truth behind them. */
 .forest-stage {
   position: relative;
   height: 100%;
-  cursor: grab;
   overflow: hidden;
   cursor: crosshair;
   background:
-    radial-gradient(40% 38% at 32% 16%, #1c4653 0%, #102b34 34%, #0a1c23 60%, #071319 80%),
-    radial-gradient(34% 34% at 74% 12%, #17414c 0%, #0d242c 36%, #071319 68%),
-    /* A wide, weak lift through the middle band. Without something behind them the trunks are
-       a silhouette against their own colour, which is no silhouette at all. */
-    radial-gradient(90% 60% at 50% 78%, #0c2029 0%, #081820 48%, #071319 100%);
+    radial-gradient(ellipse 64% 26% at 50% 56%, rgba(116, 196, 255, 0.5) 0%, rgba(52, 124, 224, 0.24) 42%, transparent 74%),
+    radial-gradient(ellipse 70% 18% at 50% 60%, rgba(52, 124, 224, 0.22) 0%, transparent 70%),
+    linear-gradient(180deg, #01040f 0%, #030d26 22%, #071e42 40%, #0d3c6e 50%, #17558a 56%, #174a33 56.4%, #0a2820 72%, #020c08 100%);
   touch-action: pan-y;
 }
 .forest-stage:active { cursor: grabbing; }
 
-/* Oversized on purpose: the planes slide by up to 750px, and a plane the size of the
-   stage would drag its own edge into view. */
+/* The wedge, painted across the whole picture: while a contradiction is open the night itself
+   goes grey (the SVG art swaps to its torn palette; this swaps the ground under it). */
+.forest-stage.forest-torn {
+  background:
+    radial-gradient(ellipse 60% 20% at 50% 56%, rgba(90, 120, 110, 0.14) 0%, transparent 70%),
+    linear-gradient(180deg, #03060c 0%, #070f17 30%, #0b141a 56%, #1e2a22 56.4%, #111a14 74%, #04070a 100%);
+}
+
+/* Corner vignette. A pseudo-element paints after the children, which is exactly right: the
+   night closes over the edges of everything, lights included. Clicks pass through. */
+.forest-stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 76% 66% at 50% 44%, transparent 55%, rgba(1, 4, 8, 0.62) 100%);
+  pointer-events: none;
+}
+
+/* Overscanned just enough to cover its own parallax: each plane's margin is sized to that
+   plane's PLANES rate plus TRAVEL_LIMIT (forestLayout.ts), because the meadow is one composed
+   picture — a 240% plane under `slice` would blow the art up and crop the framing trees out,
+   which is exactly the bug this replaced. */
 .forest-plane {
   position: absolute;
-  left: -70%;
-  top: -8%;
-  width: 240%;
-  height: 116%;
+  left: -4%;
+  top: -3%;
+  width: 108%;
+  height: 106%;
   transition: transform 520ms cubic-bezier(0.18, 0.72, 0.28, 1);
   will-change: transform;
 }
-.forest-plane.plane-1 { left: -80%; top: -10%; width: 260%; height: 120%; }
-.forest-plane.plane-2 { left: -95%; top: -14%; width: 290%; height: 128%; }
+.forest-plane.plane-1 { left: -8%; top: -4%; width: 116%; height: 108%; }
+.forest-plane.plane-2 { left: -12%; top: -5%; width: 124%; height: 110%; }
 
-.forest-trees, .forest-ambient { position: absolute; inset: 0; }
+.forest-ambient { position: absolute; inset: 0; }
+
+/* The painted scenery: deterministic SVG, one sheet per plane, cropped by `slice` so the
+   oversized planes never show an edge mid-walk. */
+.forest-art-holder { position: absolute; inset: 0; }
+.forest-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* The three.js firefly swarm — decoration between the scenery and the lights. It takes no
+   clicks and says nothing; the buttons above it carry every fact. */
+.forest-gl { position: absolute; inset: 0; pointer-events: none; }
+.forest-gl canvas { display: block; width: 100%; height: 100%; }
 
 /* Sized to the stage, unlike the scenery planes: a per-cent here is a per-cent of what the
    reader can actually see, which is the only way a light stays clickable.
@@ -367,37 +386,12 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 /* While the hand is down the forest must track it, not glide after it. */
 .forest-lights.walking, .forest-plane.walking { transition: none; }
 
-/* A silhouette, so DARKER than the ground it stands on. Built the other way first and the
-   forest came out looking like a barcode of pale vertical bars. */
-.trunk {
-  position: absolute;
-  bottom: -2%;
-  transform-origin: 50% 100%;
-  border-radius: 5px 5px 0 0;
-  background: linear-gradient(to top, #01080c 0%, #06171f 50%, rgba(20, 52, 62, 0.18) 100%);
-}
-
-/* Distance, done the cheap way: the far trees are faint and slightly out of focus. */
-.plane-0 .forest-trees { opacity: 0.6; filter: blur(1.6px); }
-.plane-1 .forest-trees { opacity: 0.85; filter: blur(0.7px); }
-.plane-2 .forest-trees { opacity: 1; }
-
-/* The floor. Without it the trunks hang in the air. */
-.forest-stage::after {
-  content: '';
-  position: absolute;
-  inset: auto 0 0;
-  height: 20%;
-  background: linear-gradient(to top, rgba(2, 7, 11, 0.92) 0%, rgba(3, 9, 13, 0.45) 48%, transparent 100%);
-  pointer-events: none;
-}
-
-.fly, .memory, .ring { position: absolute; border-radius: 50%; }
+.fly, .memory { position: absolute; border-radius: 50%; }
 
 /* A 12px dot is not a target. The glow stays small; the reachable area does not — WCAG puts the
    floor at 24px and comfort at 44. The ::before is invisible and carries the hit. */
-.memory, .ring { pointer-events: auto; }
-.memory::before, .ring::before {
+.memory { pointer-events: auto; }
+.memory::before {
   content: '';
   position: absolute;
   left: 50%;
@@ -408,11 +402,39 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   border-radius: 50%;
 }
 
+/* Memory lights use the same soft bokeh language as the distant fireflies. The hit target stays
+   circular and invisible; the visible light has no edge, core, ray, or icon. */
+.memory::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300%;
+  height: 300%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff9cf 0%, currentColor 18%, transparent 70%);
+  filter: blur(1.2px);
+  pointer-events: none;
+}
+
 .fly {
   opacity: 0.28;
+  background: transparent !important;
   animation-name: blink;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
+}
+
+/* A firefly is an unfocused pool of light: bright in the middle, then dissolving into the wood. */
+.fly::before {
+  content: '';
+  position: absolute;
+  inset: -150%;
+  border-radius: 50%;
+  background: radial-gradient(circle, #f5f2ad 0%, currentColor 18%, transparent 70%);
+  filter: blur(0.7px);
+  pointer-events: none;
 }
 
 /* Ambient fireflies may scale — nothing clicks them. */
@@ -422,38 +444,39 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   62%      { opacity: 0.5;  transform: scale(0.92); }
 }
 
-/* An absence, drawn as an absence: an outline with nothing inside it. */
-.ring {
-  background: transparent;
-  border: 1px solid;
-  animation-name: waiting;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-/* A ring is clickable too, so it holds still for the same reason. */
-@keyframes waiting {
-  0%, 100% { opacity: 0.28; }
-  50%      { opacity: 0.7; }
+/* TASK-048 — an absence is now a WHITE firefly: the one light that invites a hand rather than
+   reporting a fact. Whiter core, calmer breath; the slow duration comes inline from placeGaps. */
+.memory.create-light::after {
+  background: radial-gradient(circle, #ffffff 0%, currentColor 34%, transparent 72%);
 }
 
 .memory {
   padding: 0;
   border: 0;
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  animation-name: breathe;
+  animation-name: firefly;
   animation-timing-function: ease-in-out;
   animation-iteration-count: infinite;
 }
 
-/* A memory only breathes, and it breathes WITHOUT MOVING.
+/* A memory flashes like a firefly, but WITHOUT MOVING.
    A target that changes size is a target that slips out from under the pointer — the automated
    check refused to click one outright ("element is not stable"), and a person aiming at a dot
-   that grows and shrinks has the same problem with less patience. So the pulse lives entirely in
-   opacity and in the glow, neither of which touches the hit box. */
-@keyframes breathe {
-  0%, 100% { opacity: 0.74; }
-  50%      { opacity: 1; }
+   that grows and shrinks has the same problem with less patience. The irregular double-pulse
+   lives entirely in opacity, neither of which touches the hit box. */
+@keyframes firefly {
+  0%, 100% { opacity: 0.22; }
+  8%       { opacity: 0.34; }
+  13%      { opacity: 1; }
+  18%      { opacity: 0.42; }
+  23%      { opacity: 0.92; }
+  31%      { opacity: 0.54; }
+  52%      { opacity: 0.28; }
+  67%      { opacity: 0.76; }
+  74%      { opacity: 0.34; }
+  86%      { opacity: 0.2; }
 }
 
 /* Out of time with everything else, so the eye finds it without reading a word — and still
@@ -513,7 +536,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   100% { transform: scale(26); opacity: 0; }
 }
 
-/* No text on a light at rest — the forest is a picture until you point at it. */
+/* No memory name on a light at rest — the forest is a picture until you point at it. */
 .memory-name {
   position: absolute;
   left: 50%;
@@ -532,45 +555,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 }
 .memory:hover .memory-name, .memory:focus-visible .memory-name { opacity: 1; }
 
-.forest-chrome {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  padding: clamp(20px, 3.4vw, 44px) clamp(20px, 3.6vw, 52px);
-  display: flex;
-  flex-direction: column;
-  pointer-events: none;
-}
-
-.forest-title {
-  margin: 0;
-  font-size: clamp(22px, 2.6vw, 34px);
-  font-weight: 400;
-  color: #fffce8;
-  font-family: Newsreader, Georgia, serif;
-}
-.forest-agent {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: #e8d46a;
-  font-variant-numeric: tabular-nums;
-}
-.forest-count { margin: 4px 0 0; font-size: 13px; color: #7e9a9a; font-variant-numeric: tabular-nums; }
-
-.forest-legend {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  margin: 10px 0 0;
-  padding: 0;
-  font-size: 11px;
-}
-.forest-legend li { display: inline-flex; align-items: center; gap: 5px; }
-.forest-legend .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
-.forest-legend .dot.hollow { background: transparent; border: 1px solid currentColor; }
-.forest-legend .glyph { font-size: 12px; }
-
 .forest-empty { margin: 0; padding: 48px 24px; color: #cfdcd7; text-align: center; }
 
 .reading { max-width: 900px; margin: 0 auto; padding: 32px 20px 0; }
@@ -580,7 +564,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .stage-controls { display: flex; gap: 14px; flex-wrap: wrap; margin: 14px 0 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .fly, .ring, .memory { animation: none; opacity: 0.85; }
+  .fly, .memory { animation: none; opacity: 0.85; }
   .memory { opacity: 1; }
   .memory.blooming { animation: none; }
   .memory.out-of-reach { opacity: 0.22; }
@@ -590,7 +574,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 /* A phone gets a shorter stage and no hover label — there is no pointer to hover with. */
 @media (max-width: 700px) {
   .memory-name { display: none; }
-  .forest-chrome { padding: 16px 16px 14px; }
 }
 
 
@@ -1235,11 +1218,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   cursor: pointer;
 }
 .whose-words { margin: 18px 0 0; max-width: 46ch; }
-
-/* A ring is a target now, not decoration. */
-.ring { padding: 0; cursor: pointer; }
-.ring:hover, .ring:focus-visible { opacity: 1; animation: none; transform: scale(1.4); }
-.ring:focus-visible { outline: 2px solid #fffce8; outline-offset: 4px; }
 
 @media (max-width: 700px) {
   .blank-page .spread { grid-template-columns: 1fr; }
