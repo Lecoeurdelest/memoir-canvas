@@ -19,6 +19,7 @@
 
 import { useMemo } from 'react';
 import { SCENE_COUNT, hash } from './forestLayout';
+import { WIND_BANDS } from './wind';
 
 export const H = 900;
 const HY = Math.round(H * 0.56);
@@ -28,6 +29,23 @@ const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.m
 const px = (n: number): number => Number(n.toFixed(1));
 const pickOf = (rand: () => number, xs: readonly string[]): string =>
   xs[Math.floor(rand() * xs.length)];
+
+/**
+ * Which delayed copy of the wind this thing leans with — left of the scene gets the gust first,
+ * right of it a beat later, so weather crosses the meadow instead of hitting it all at once.
+ */
+function windBand(x: number, sceneW: number): number {
+  const local = ((x % sceneW) + sceneW) % sceneW;
+  return Math.min(WIND_BANDS - 1, Math.floor((local / sceneW) * WIND_BANDS));
+}
+
+/** Everything that leans in the wind is wrapped in one of these. `stiff` is how much it gives. */
+function gust(x: number, sceneW: number, originX: number, originY: number, stiff: number, body: string): string {
+  return (
+    `<g class="fa-gust fa-w${windBand(x, sceneW)}" style="transform-origin:${px(originX)}px ${px(originY)}px;` +
+    `--stiff:${stiff.toFixed(2)}">${body}</g>`
+  );
+}
 
 /**
  * The design-space width of ONE scene follows the stage's aspect so each scene is composed for
@@ -276,10 +294,17 @@ function tufts(
           ` fill="none" stroke-linecap="round" opacity="${(0.5 + rand() * 0.45).toFixed(2)}"/>`,
       );
     }
+    // Two rotations compose: the wrapper is the weather, the inner group the blade's own
+    // restlessness. A keyframe animation owns `transform` outright, so they cannot share an
+    // element — this nesting is what lets grass flutter AND lean at the same time.
+    const root = ry + o.lenMax * 0.2;
     out.push(
-      `<g class="fa-sway" style="transform-origin:${px(rx)}px ${px(ry + o.lenMax * 0.2)}px;` +
-        `animation-delay:-${(((rx % o.sceneW) / o.sceneW) * 4.5 + rand() * 1.5).toFixed(2)}s;` +
-        `animation-duration:${(6.5 + rand() * 3.5).toFixed(2)}s">${blades.join('')}</g>`,
+      gust(
+        rx, o.sceneW, rx, root, 1,
+        `<g class="fa-sway" style="transform-origin:${px(rx)}px ${px(root)}px;` +
+          `animation-delay:-${(((rx % o.sceneW) / o.sceneW) * 4.5 + rand() * 1.5).toFixed(2)}s;` +
+          `animation-duration:${(6.5 + rand() * 3.5).toFixed(2)}s">${blades.join('')}</g>`,
+      ),
     );
   }
   return out.join('');
@@ -412,9 +437,14 @@ function meadowMarkup(p: Palette, sparse: boolean, sceneW: number): string {
 
   const midPines = SCENES.map((scene, s) =>
     scene.midPines
-      .map(([fx, fy, fh]) =>
-        `<path d="${pinePaths(rand, (s + fx) * sceneW, HY + H * fy, H * fh, H * fh * 0.64, 5)}"/>`,
-      )
+      .map(([fx, fy, fh]) => {
+        const cx = (s + fx) * sceneW;
+        const topY = HY + H * fy;
+        return gust(
+          cx, sceneW, cx, topY + H * fh * 1.04, 0.34,
+          `<path d="${pinePaths(rand, cx, topY, H * fh, H * fh * 0.64, 5)}"/>`,
+        );
+      })
       .join(''),
   ).join('');
 
@@ -449,7 +479,7 @@ function meadowMarkup(p: Palette, sparse: boolean, sceneW: number): string {
   return svgStrip(
     'fa-mid', totalW, '',
     `${hills}<g fill="#0b2233" filter="url(#fa-mid-blur1)">${midPines}</g><g>${speckles.join('')}</g><g>${drift.join('')}</g>` +
-      `<g class="fa-breeze" style="transform-origin:${px(totalW / 2)}px ${H}px"><g>${grass}</g></g>`,
+      `<g>${grass}</g>`,
   );
 }
 
@@ -472,18 +502,25 @@ function foregroundMarkup(p: Palette, sparse: boolean, sceneW: number): string {
         blobs.push(`<ellipse cx="${px(bx)}" cy="${px(by)}" rx="${px(br)}" ry="${px(br * (0.72 + rand() * 0.25))}"/>`);
       }
       pieces.push(
-        `<g class="fa-sway fa-sway-soft" style="transform-origin:${px(x0)}px 0px">` +
-          `<g fill="${p.pine}" filter="url(#fa-fore-leafy)">${blobs.join('')}</g></g>`,
+        gust(
+          x0, sceneW, x0, 0, 0.85,
+          `<g class="fa-sway fa-sway-soft" style="transform-origin:${px(x0)}px 0px">` +
+            `<g fill="${p.pine}" filter="url(#fa-fore-leafy)">${blobs.join('')}</g></g>`,
+        ),
       );
     }
 
-    pieces.push(
-      `<g fill="${p.pine}" filter="url(#fa-fore-rough)">` +
-        scene.pines
-          .map(([fx, fy, fh, fw]) => `<path d="${pinePaths(rand, x0 + sceneW * fx, H * fy, H * fh, pineW * fw, 8)}"/>`)
-          .join('') +
-        `</g>`,
-    );
+    scene.pines.forEach(([fx, fy, fh, fw]) => {
+      const cx = x0 + sceneW * fx;
+      const topY = H * fy;
+      pieces.push(
+        gust(
+          cx, sceneW, cx, topY + H * fh * 1.04, 0.2 + rand() * 0.14,
+          `<g fill="${p.pine}" filter="url(#fa-fore-rough)">` +
+            `<path d="${pinePaths(rand, cx, topY, H * fh, pineW * fw, 8)}"/></g>`,
+        ),
+      );
+    });
 
     const clusters = Math.max(2, Math.round(6 * scene.flowers));
     for (let c = 0; c < clusters; c += 1) {
@@ -507,8 +544,11 @@ function foregroundMarkup(p: Palette, sparse: boolean, sceneW: number): string {
         );
       }
       pieces.push(
-        `<g class="fa-sway fa-sway-soft" style="transform-origin:${px(cx)}px ${px(cy + 30)}px;` +
-          `animation-delay:-${(((cx % sceneW) / sceneW) * 2.4 + rand()).toFixed(2)}s">${cluster.join('')}</g>`,
+        gust(
+          cx, sceneW, cx, cy + 30, 0.9,
+          `<g class="fa-sway fa-sway-soft" style="transform-origin:${px(cx)}px ${px(cy + 30)}px;` +
+            `animation-delay:-${(((cx % sceneW) / sceneW) * 2.4 + rand()).toFixed(2)}s">${cluster.join('')}</g>`,
+        ),
       );
     }
   });
@@ -536,7 +576,7 @@ function foregroundMarkup(p: Palette, sparse: boolean, sceneW: number): string {
   return svgStrip(
     'fa-fore', totalW, '',
     `${pieces.join('')}<path d="${rim}" transform="translate(0 ${H - rimH})" fill="#02100a"/>` +
-      `<g class="fa-breeze" style="transform-origin:${px(totalW / 2)}px ${H}px"><g>${grass}</g></g>`,
+      `<g>${grass}</g>`,
   );
 }
 

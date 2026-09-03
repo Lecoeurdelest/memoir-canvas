@@ -370,16 +370,19 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 }
 .fa-sway-soft { animation-duration: 12s; }
 
-/* On top of each clump's own sway, the whole field takes one long breath — the very slow wind
-   under the gusts. */
-@keyframes fa-breeze {
-  0%, 100% { transform: rotate(-0.3deg); }
-  50%      { transform: rotate(0.45deg); }
-}
-.fa-breeze {
-  animation: fa-breeze 23s ease-in-out infinite;
+/* The wind itself (wind.ts) arrives as --wind-0..2 on the stage: one signal, three delays, so
+   a gust crosses the meadow left to right. Every swaying thing wraps in `.fa-gust` and declares
+   how much it gives — a trunk barely, a hanging canopy a lot. This is a plain transform, not an
+   animation, precisely so the keyframe flutter can keep running on the child inside it. */
+.forest-stage { --wind-0: 0; --wind-1: 0; --wind-2: 0; }
+
+.fa-gust {
   transform-box: view-box;
+  transform: rotate(calc(var(--w, 0) * var(--stiff, 1) * 3deg));
 }
+.fa-w0 { --w: var(--wind-0); }
+.fa-w1 { --w: var(--wind-1); }
+.fa-w2 { --w: var(--wind-2); }
 
 /* Clouds cross the sky the way clouds do: barely, and forever — each on its own clock
    (durations and phases come inline from the art). */
@@ -619,7 +622,8 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   .memory.blooming { animation: none; }
   .memory.out-of-reach { opacity: 0.22; }
   .forest-plane, .forest-lights { transition: none; }
-  .fa-sway, .fa-drift, .fa-breeze { animation: none; }
+  .fa-sway, .fa-drift { animation: none; }
+  .fa-gust { transform: none; }
   .fa-streak { animation: none; opacity: 0.3; }
 }
 

@@ -44,6 +44,7 @@ import {
   yearAtX,
 } from './forestLayout';
 import { hasWebGL } from './webgl';
+import { WIND_BANDS, windBands } from './wind';
 import type { Plane, Pointer } from './forestLayout';
 import type { SpreadNavigation } from './useSpreadNavigation';
 
@@ -65,6 +66,38 @@ function useStageSize(): { width: number; height: number } {
     return () => window.removeEventListener('resize', onResize);
   }, []);
   return size;
+}
+
+/**
+ * Publishes the wind onto the stage as the CSS variables every swaying thing in the art reads.
+ * Throttled to ~15 samples a second: the weather turns far slower than a frame, and each write
+ * restyles a few hundred SVG groups. Reduced motion pins it to a dead calm.
+ */
+function useWind(stage: React.RefObject<HTMLElement>, ready: boolean): void {
+  useEffect(() => {
+    const el = stage.current;
+    if (!el) return undefined;
+
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (still) {
+      for (let i = 0; i < WIND_BANDS; i += 1) el.style.setProperty(`--wind-${i}`, '0');
+      return undefined;
+    }
+
+    const born = performance.now();
+    let frame = 0;
+    let last = -1;
+    const tick = (): void => {
+      const t = (performance.now() - born) / 1000;
+      if (t - last > 0.066) {
+        last = t;
+        windBands(t).forEach((w, i) => el.style.setProperty(`--wind-${i}`, w.toFixed(3)));
+      }
+      frame = window.requestAnimationFrame(tick);
+    };
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, [stage, ready]);
 }
 
 export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
@@ -104,6 +137,8 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const flies = useRef<FirefliesHandle>(null);
   // A walk is not a click: the distance a pointer wanders between down and up decides.
   const wandered = useRef(0);
+
+  useWind(stage, spreads.length > 0);
 
   const lights = useMemo(() => placeLights(spreads, index), [spreads, index]);
   const ambient = useMemo(() => ambientLights(width), [width]);
