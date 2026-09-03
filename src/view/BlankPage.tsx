@@ -16,8 +16,13 @@
  * answered_at) ON followup_question` names `app_human` and no agent, so an assistant that tried to
  * answer its own question would be refused exactly as it is at `resolve_claim`.
  *
- * Leaving is a gesture, not a button: press anywhere off the paper, or move focus off it, and the
- * page resolves itself — nothing written closes it, something written is filed. Escape does the
+ * A firefly does not become a page. It becomes a CLOSED book, and the book opens when it is
+ * pressed — the same beat `Cover` gives a memory, because arriving at an empty page you are
+ * about to write on deserves the same pause as arriving at one somebody already filled.
+ *
+ * Leaving is a gesture, not a button: press off THE BOOK — not merely off the paper, so the
+ * boards and the fore-edge are still the book — or move focus out of it, and the page resolves
+ * itself: nothing written closes it, something written and signed is filed. Escape does the
  * same, because a mouse-only exit would lock out the readers NFR-A11Y-03 exists for.
  *
  * R5: reads the projection, writes only through `commands.answerFollowupQuestion` / `tellMemory`.
@@ -25,6 +30,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import * as commands from '../domain/commands';
+import { Cover } from './Cover';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import type { FollowupQuestion } from '../domain/types';
@@ -49,6 +55,8 @@ export function BlankPage({
   // enforces in source_oral_needs_a_voice, offered rather than discovered by refusal.
   const tellers = people.filter((p) => p.created_by === 'human');
 
+  // The book arrives shut. Nothing is written until a hand opens it.
+  const [opened, setOpened] = useState(false);
   const [text, setText] = useState('');
   const [teller, setTeller] = useState('');
   const [busy, setBusy] = useState(false);
@@ -94,7 +102,9 @@ export function BlankPage({
     if (busy) return;
     if (text.trim().length === 0) return onClose();
     if (teller === '') {
-      name.current?.focus();
+      // After this handler the browser finishes its own focus move for the press that got us
+      // here, which would take the cursor straight back off the line. Ask once it has.
+      window.setTimeout(() => name.current?.focus(), 0);
       return;
     }
     await write();
@@ -106,7 +116,8 @@ export function BlankPage({
 
   useEffect(() => {
     const onDown = (e: PointerEvent): void => {
-      if ((e.target as HTMLElement | null)?.closest('.spread')) return;
+      // The whole volume counts as inside — boards, fore-edge and all, shut or open.
+      if ((e.target as HTMLElement | null)?.closest('.book-body, .cover-stage')) return;
       void latest.current();
     };
     const onKey = (e: KeyboardEvent): void => {
@@ -120,9 +131,27 @@ export function BlankPage({
     };
   }, [onClose]);
 
+  if (!opened) {
+    return (
+      <section className="blank-page blank-shut" aria-label={t('blank.name')}>
+        <Cover label={t('blank.name')} onOpen={() => setOpened(true)} />
+      </section>
+    );
+  }
+
   return (
     <section className="blank-page" aria-label={t('blank.name')}>
-      <div className="book-body">
+      <div
+        className="book-body"
+        onBlur={(e) => {
+          // Focus going NOWHERE — a press on the boards, on the paper's margin — is not
+          // leaving the book; only focus landing on something outside it is. Presses that
+          // land off the book entirely are the pointer listener's business, not this one's.
+          const next = e.relatedTarget as Node | null;
+          if (!next || e.currentTarget.contains(next)) return;
+          void latest.current();
+        }}
+      >
         <div className="page-block" aria-hidden="true">
           <span className="block-under" />
           <span className="gutter" />
@@ -130,13 +159,7 @@ export function BlankPage({
 
         <article className="spread">
           {/* Everything the page has to say lives on this one leaf. */}
-          <div
-            className="page page-left ruled"
-            onBlur={(e) => {
-              if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
-              void latest.current();
-            }}
-          >
+          <div className="page page-left ruled">
             {asked && (
               <p className="margin-note" lang={lang}>
                 {asked}

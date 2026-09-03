@@ -1245,7 +1245,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
    of the book whatever the window does, so a spread that collapses to a single column would put
    the family's own hand across the gutter. */
 .reading-book .blank-page .spread { grid-template-columns: 1fr 1fr; }
-.blank-page .page-right { visibility: hidden; }
 
 .write-on { display: block; margin: 0; }
 .write-on textarea {

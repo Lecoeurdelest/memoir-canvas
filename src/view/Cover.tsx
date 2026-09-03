@@ -15,29 +15,46 @@ import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import type { Spread } from '../store/projection';
 
-export function Cover({ spread, onOpen }: { spread: Spread; onOpen: () => void }): JSX.Element {
+export function Cover({
+  spread,
+  label,
+  onOpen,
+}: {
+  /** The memory this volume holds. Absent for the blank book, which has nothing on it yet. */
+  spread?: Spread;
+  /** What a screen reader should call a coverless book. */
+  label?: string;
+  onOpen: () => void;
+}): JSX.Element {
   const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const people = useStore((s) => s.model?.people) ?? [];
 
-  const subject = people.find((p) => p.id === spread.subjectId)?.display_name ?? '';
-  const year = spread.claims[0]?.year_value;
+  const subject = spread ? (people.find((p) => p.id === spread.subjectId)?.display_name ?? '') : '';
+  const year = spread?.claims[0]?.year_value;
+  const named = spread
+    ? `${subject} ${t(`predicate.${spread.predicate}`, spread.predicate)}${year ? ` · ${year}` : ''}`
+    : (label ?? '');
 
   return (
     <div className="cover-stage">
       <button
         type="button"
-        className={`cover${spread.conflict ? ' cover-torn' : ''}`}
+        className={`cover${spread?.conflict ? ' cover-torn' : ''}`}
         onClick={onOpen}
-        aria-label={`${subject} ${t(`predicate.${spread.predicate}`, spread.predicate)}${year ? ` · ${year}` : ''} — ${t('volume.openIt')}`}
+        aria-label={`${named} — ${t('volume.openIt')}`}
         lang={lang}
       >
         <span className="cover-board" aria-hidden="true">
           <span className="cover-spine" />
           <span className="cover-rule" />
-          <span className="cover-title">{subject}</span>
-          <span className="cover-sub">{t(`predicate.${spread.predicate}`, spread.predicate)}</span>
-          {year !== null && year !== undefined && <span className="cover-year">{year}</span>}
+          {spread && (
+            <>
+              <span className="cover-title">{subject}</span>
+              <span className="cover-sub">{t(`predicate.${spread.predicate}`, spread.predicate)}</span>
+              {year !== null && year !== undefined && <span className="cover-year">{year}</span>}
+            </>
+          )}
         </span>
       </button>
     </div>
