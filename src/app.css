@@ -364,22 +364,34 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
    gust reads as travelling across the meadow rather than the picture rocking in one piece.
    `view-box` transform-box is what makes the inline px origins mean design-space units. */
 @keyframes fa-sway {
-  0%, 100% { transform: rotate(-0.9deg); }
-  55%      { transform: rotate(1.3deg); }
+  0%, 100% { transform: rotate(-0.7deg); }
+  55%      { transform: rotate(1deg); }
 }
 .fa-sway {
-  animation: fa-sway 4s ease-in-out infinite;
+  animation: fa-sway 7s ease-in-out infinite;
   transform-box: view-box;
   will-change: transform;
 }
-.fa-sway-soft { animation-duration: 7.5s; }
+.fa-sway-soft { animation-duration: 12s; }
 
-/* Clouds cross the sky the way clouds do: barely, and forever. */
-@keyframes fa-drift {
-  0%, 100% { transform: translateX(-16px); }
-  50%      { transform: translateX(20px); }
+/* On top of each clump's own sway, the whole field takes one long breath — the very slow wind
+   under the gusts. */
+@keyframes fa-breeze {
+  0%, 100% { transform: rotate(-0.3deg); }
+  50%      { transform: rotate(0.45deg); }
 }
-.fa-drift { animation: fa-drift 90s ease-in-out infinite; }
+.fa-breeze {
+  animation: fa-breeze 23s ease-in-out infinite;
+  transform-box: view-box;
+}
+
+/* Clouds cross the sky the way clouds do: barely, and forever — each on its own clock
+   (durations and phases come inline from the art). */
+@keyframes fa-drift {
+  0%, 100% { transform: translateX(-44px); }
+  50%      { transform: translateX(52px); }
+}
+.fa-drift { animation: fa-drift 200s ease-in-out infinite; }
 
 /* A shooting star exists for half a second every few, not as a standing scratch. */
 @keyframes fa-streak {
@@ -595,7 +607,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   .memory.blooming { animation: none; }
   .memory.out-of-reach { opacity: 0.22; }
   .forest-plane, .forest-lights { transition: none; }
-  .fa-sway, .fa-drift { animation: none; }
+  .fa-sway, .fa-drift, .fa-breeze { animation: none; }
   .fa-streak { animation: none; opacity: 0.3; }
 }
 

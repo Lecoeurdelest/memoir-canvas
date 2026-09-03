@@ -198,8 +198,8 @@ function tufts(
     }
     out.push(
       `<g class="fa-sway" style="transform-origin:${px(rx)}px ${px(ry + o.lenMax * 0.2)}px;` +
-        `animation-delay:-${((rx / o.W) * 2.4 + rand() * 0.8).toFixed(2)}s;` +
-        `animation-duration:${(3.4 + rand() * 2.2).toFixed(2)}s">${blades.join('')}</g>`,
+        `animation-delay:-${((rx / o.W) * 4.5 + rand() * 1.5).toFixed(2)}s;` +
+        `animation-duration:${(6.5 + rand() * 3.5).toFixed(2)}s">${blades.join('')}</g>`,
     );
   }
   return out.join('');
@@ -283,7 +283,12 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
     [W * 0.32, HY * 0.34, W * 0.2],
     [W * 0.7, HY * 0.4, W * 0.17],
   ];
-  const clouds = spots.map(([cx, cy, cw]) => cloud(rand, cx, cy, cw, cw * (0.2 + rand() * 0.06), p.cloudBody, p.cloudRim));
+  // Each cloud drifts alone, minutes per crossing, phases scattered — the sky breathes without
+  // ever visibly "animating".
+  const clouds = spots.map(([cx, cy, cw]) =>
+    `<g class="fa-drift" style="animation-duration:${(140 + rand() * 120).toFixed(0)}s;animation-delay:-${(rand() * 200).toFixed(0)}s">` +
+      `${cloud(rand, cx, cy, cw, cw * (0.2 + rand() * 0.06), p.cloudBody, p.cloudRim)}</g>`,
+  );
 
   // The horizon is mountains and hills, not trees (owner's call): a hazy far range with sharp
   // peaks behind a darker, rounder near ridge. Both still sink toward the centre so the middle
@@ -335,7 +340,7 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
     W,
     defs,
     `<g>${stars.join('')}</g>${nebula}${moon}${shooting.join('')}` +
-      `<g class="fa-drift" filter="url(#fa-sky-blur1)" opacity="0.95">${clouds.join('')}</g>${rows.join('')}`,
+      `<g filter="url(#fa-sky-blur1)" opacity="0.95">${clouds.join('')}</g>${rows.join('')}`,
   );
 }
 
@@ -386,7 +391,14 @@ function meadowMarkup(p: Palette, sparse: boolean, W: number): string {
     widthScale: 1,
   });
 
-  return svgOf('fa-mid', W, '', `${hills}${midPines}<g>${speckles.join('')}</g><g>${drift.join('')}</g><g>${grass}</g>`);
+  // The whole grass layer takes one very slow extra breath on top of each clump's own sway.
+  return svgOf(
+    'fa-mid',
+    W,
+    '',
+    `${hills}${midPines}<g>${speckles.join('')}</g><g>${drift.join('')}</g>` +
+      `<g class="fa-breeze" style="transform-origin:${px(W / 2)}px ${H}px"><g>${grass}</g></g>`,
+  );
 }
 
 function foregroundMarkup(p: Palette, sparse: boolean, W: number): string {
@@ -476,7 +488,8 @@ function foregroundMarkup(p: Palette, sparse: boolean, W: number): string {
     '',
     `<g class="fa-sway fa-sway-soft" style="transform-origin:0px 0px">` +
       `<g fill="${p.pine}" filter="url(#fa-fore-leafy)">${canopyBlobs.join('')}</g></g>${pines}` +
-      `<g>${flowers.join('')}</g><path d="${rim}" transform="translate(0 ${H - rimH})" fill="#02100a"/><g>${grass}</g>`,
+      `<g>${flowers.join('')}</g><path d="${rim}" transform="translate(0 ${H - rimH})" fill="#02100a"/>` +
+      `<g class="fa-breeze" style="transform-origin:${px(W / 2)}px ${H}px"><g>${grass}</g></g>`,
   );
 }
 

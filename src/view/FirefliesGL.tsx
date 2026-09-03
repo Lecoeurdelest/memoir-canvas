@@ -41,11 +41,12 @@ const VERTEX = /* glsl */ `
     p.x += sin(uTime * 0.12 + aSeed * 17.0) * 26.0 + sin(uTime * 0.043 + aSeed * 31.0) * 40.0;
     p.y += cos(uTime * 0.10 + aSeed * 23.0) * 9.0 + sin(uTime * 0.05 + aSeed * 13.0) * 13.0;
 
-    // A gust travelling left-to-right across the meadow: every fly leans with it as it passes.
-    float gust = 0.5 + 0.5 * sin(uTime * 0.32 - p.x * 0.0045 + aSeed * 0.6);
+    // A gust travelling left-to-right across the meadow, very slowly: every fly leans with it
+    // as it passes. Change these constants together with hitTest's replica above.
+    float gust = 0.5 + 0.5 * sin(uTime * 0.13 - p.x * 0.003 + aSeed * 0.6);
     gust = gust * gust;
-    p.x += gust * 26.0;
-    p.y -= gust * 7.0;
+    p.x += gust * 22.0;
+    p.y -= gust * 6.0;
 
     // The swarm belongs to the terrain: the same lean-and-travel parallax the light layers
     // ride (LIGHT_PLANES rates), keyed by each fly's depth, so a drag carries the flies too.
@@ -160,10 +161,10 @@ export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function 
         let fy = w.positions[i * 3 + 1] * res.y;
         fx += Math.sin(t * 0.12 + seed * 17) * 26 + Math.sin(t * 0.043 + seed * 31) * 40;
         fy += Math.cos(t * 0.1 + seed * 23) * 9 + Math.sin(t * 0.05 + seed * 13) * 13;
-        const g = 0.5 + 0.5 * Math.sin(t * 0.32 - fx * 0.0045 + seed * 0.6);
+        const g = 0.5 + 0.5 * Math.sin(t * 0.13 - fx * 0.003 + seed * 0.6);
         const gust = g * g;
-        fx += gust * 26;
-        fy -= gust * 7;
+        fx += gust * 22;
+        fy -= gust * 6;
         const depth = w.depths[i];
         fx += -ln.x * (44 + depth * 53) + tv.x * (0.85 + depth * 0.12);
         fy += -ln.y * (16 + depth * 16) + tv.y * (0.85 + depth * 0.12);
