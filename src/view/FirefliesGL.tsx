@@ -30,6 +30,7 @@ const VERTEX = /* glsl */ `
   attribute float aSeed;
   attribute float aSize;
   attribute float aDepth;
+  attribute float aDrift;
   attribute vec3 aColor;
   varying float vAlpha;
   varying vec3 vColor;
@@ -37,9 +38,14 @@ const VERTEX = /* glsl */ `
   void main() {
     vec2 p = position.xy * uRes;
 
+    // Each fly is on its own slow current across the meadow — WITHOUT this the wander below
+    // is a leash: every firefly orbits one fixed point and the swarm reads as pinned. The
+    // travel is wrapped before it is added, so precision holds however long the tab is open.
+    p.x += mod(aDrift * uTime, uRes.x);
+
     // Hover, not fall: wide lazy figure-eights, with far less vertical travel than lateral.
     p.x += sin(uTime * 0.12 + aSeed * 17.0) * 26.0 + sin(uTime * 0.043 + aSeed * 31.0) * 40.0;
-    p.y += cos(uTime * 0.10 + aSeed * 23.0) * 9.0 + sin(uTime * 0.05 + aSeed * 13.0) * 13.0;
+    p.y += cos(uTime * 0.10 + aSeed * 23.0) * 13.0 + sin(uTime * 0.05 + aSeed * 13.0) * 17.0;
 
     // A gust travelling left-to-right across the meadow, very slowly: every fly leans with it
     // as it passes. Change these constants together with hitTest's replica above.
@@ -85,30 +91,39 @@ function swarm(count: number): {
   seeds: Float32Array;
   sizes: Float32Array;
   depths: Float32Array;
+  drifts: Float32Array;
   colours: Float32Array;
 } {
   const positions = new Float32Array(count * 3);
   const seeds = new Float32Array(count);
   const sizes = new Float32Array(count);
   const depths = new Float32Array(count);
+  const drifts = new Float32Array(count);
   const colours = new Float32Array(count * 3);
   const tone = new THREE.Color();
   for (let i = 0; i < count; i += 1) {
     const key = `gl-fly-${i}`;
     positions[i * 3] = hash(`${key}:x`);
-    // The swarm lives in the meadow: below the horizon seam, denser toward the ground.
-    positions[i * 3 + 1] = 0.57 + 0.41 * hash(`${key}:y`) ** 0.8;
+    // The swarm lives in the meadow, never over the mountains: the floor clears the horizon
+    // seam (0.56) by the full upward reach of the wander and the gust above.
+    positions[i * 3 + 1] = 0.605 + 0.38 * hash(`${key}:y`) ** 0.8;
     positions[i * 3 + 2] = 0;
     seeds[i] = hash(`${key}:seed`) * 6.28318;
     // Bigger than life on purpose (owner's ask): a firefly the size of a pixel is a dead star.
     sizes[i] = hash(`${key}:bokeh`) < 0.16 ? 26 + hash(`${key}:size`) * 16 : 9 + hash(`${key}:size`) * 11;
     depths[i] = Math.floor(hash(`${key}:plane`) * 3);
+    // px per second across the meadow. Most go with the wind, a few against it; the nearer
+    // the fly, the faster it crosses, which is parallax the eye reads without being told.
+    drifts[i] =
+      (hash(`${key}:against`) < 0.18 ? -1 : 1) *
+      (16 + hash(`${key}:speed`) * 34) *
+      (0.7 + depths[i] * 0.25);
     tone.set(WARM[Math.floor(hash(`${key}:tone`) * (hash(`${key}:blue`) < 0.12 ? WARM.length : WARM.length - 1))]);
     colours[i * 3] = tone.r;
     colours[i * 3 + 1] = tone.g;
     colours[i * 3 + 2] = tone.b;
   }
-  return { positions, seeds, sizes, depths, colours };
+  return { positions, seeds, sizes, depths, drifts, colours };
 }
 
 interface FirefliesProps {
@@ -136,6 +151,7 @@ interface SwarmWorld {
   seeds: Float32Array;
   sizes: Float32Array;
   depths: Float32Array;
+  drifts: Float32Array;
 }
 
 export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function FirefliesGL(
@@ -162,8 +178,9 @@ export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function 
         const seed = w.seeds[i];
         let fx = w.positions[i * 3] * res.x;
         let fy = w.positions[i * 3 + 1] * res.y;
+        fx += ((w.drifts[i] * t) % res.x + res.x) % res.x;
         fx += Math.sin(t * 0.12 + seed * 17) * 26 + Math.sin(t * 0.043 + seed * 31) * 40;
-        fy += Math.cos(t * 0.1 + seed * 23) * 9 + Math.sin(t * 0.05 + seed * 13) * 13;
+        fy += Math.cos(t * 0.1 + seed * 23) * 13 + Math.sin(t * 0.05 + seed * 13) * 17;
         const g = 0.5 + 0.5 * Math.sin(t * 0.13 - fx * 0.003 + seed * 0.6);
         const gust = g * g;
         fx += gust * 22;
@@ -216,7 +233,7 @@ export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function 
 
     // A third of the CSS budget: on the GPU each point costs nothing, but a thousand of them
     // reads as noise where the approved canvas reads as a handful of drifting embers.
-    const { positions, seeds, sizes, depths, colours } = swarm(
+    const { positions, seeds, sizes, depths, drifts, colours } = swarm(
       Math.round(ambientCount(host.clientWidth || window.innerWidth) * 0.35),
     );
     const geometry = new THREE.BufferGeometry();
@@ -224,6 +241,7 @@ export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function 
     geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
     geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
     geometry.setAttribute('aDepth', new THREE.BufferAttribute(depths, 1));
+    geometry.setAttribute('aDrift', new THREE.BufferAttribute(drifts, 1));
     geometry.setAttribute('aColor', new THREE.BufferAttribute(colours, 3));
 
     const uniforms = {
@@ -237,7 +255,7 @@ export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function 
     dimUniform.current = uniforms.uDim;
     leanUniform.current = uniforms.uLean.value;
     travelUniform.current = uniforms.uTravel.value;
-    world.current = { uniforms, positions, seeds, sizes, depths };
+    world.current = { uniforms, positions, seeds, sizes, depths, drifts };
 
     const material = new THREE.ShaderMaterial({
       uniforms,
