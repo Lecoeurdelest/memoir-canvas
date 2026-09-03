@@ -1,22 +1,29 @@
 /**
- * TASK-038 — the page nobody has written yet.
+ * TASK-038 · TASK-048 — the page nobody has written yet.
  *
- * The forest already draws an unlit ring for every question nobody has answered. This is what a
- * ring opens: a ruled page, with the assistant's question written in the margin in faint ink, and
- * room for the family to write the answer straight onto it.
+ * The forest opens this when a reader presses an empty place. The owner stripped it back to the
+ * one thing it is for: a ruled page and an invitation to write on it. No heading, no folio, no
+ * explanation, no buttons — what is left is the paper, the words, and the name they go under.
  *
  * The line this view exists to hold, from the design canvas:
  *
  *   *Trợ lý đặt câu hỏi; chữ là của người kể.* — the assistant asks; the words are the family's.
  *
+ * It is no longer written on the page, because the page now demonstrates it instead: the only
+ * prose here is whatever the assistant asked, and the only writing is the family's.
+ *
  * Postgres has enforced that since the schema froze. `GRANT UPDATE (status, answer_text,
  * answered_at) ON followup_question` names `app_human` and no agent, so an assistant that tried to
  * answer its own question would be refused exactly as it is at `resolve_claim`.
  *
- * R5: reads the projection, writes only through `commands.answerFollowupQuestion`.
+ * Leaving is a gesture, not a button: press anywhere off the paper, or move focus off it, and the
+ * page resolves itself — nothing written closes it, something written is filed. Escape does the
+ * same, because a mouse-only exit would lock out the readers NFR-A11Y-03 exists for.
+ *
+ * R5: reads the projection, writes only through `commands.answerFollowupQuestion` / `tellMemory`.
  */
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as commands from '../domain/commands';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
@@ -36,7 +43,6 @@ export function BlankPage({
   const { t } = useTranslation();
   const lang = useStore((s) => s.lang);
   const people = useStore((s) => s.model?.people) ?? [];
-  const claims = useStore((s) => s.model?.claims) ?? [];
   const refresh = useStore((s) => s.refresh);
 
   // Only a person a human entered may put their name to an account — the same rule the database
@@ -47,14 +53,13 @@ export function BlankPage({
   const [teller, setTeller] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const name = useRef<HTMLSelectElement>(null);
 
-  const about = claims.find((c) => c.id === question?.claim_id);
   const asked = question
     ? lang === 'vi'
       ? question.question_vi
       : (question.question_en ?? question.question_vi)
     : null;
-  const ready = text.trim().length > 0 && teller !== '' && !busy;
 
   async function write(): Promise<void> {
     setBusy(true);
@@ -80,6 +85,41 @@ export function BlankPage({
     }
   }
 
+  /**
+   * What leaving the paper means. Written but unsigned is the one case that must NOT resolve:
+   * filing an account under a guessed name is the very thing this archive refuses to do, so the
+   * page stays open and puts the cursor where the answer is missing.
+   */
+  async function leave(): Promise<void> {
+    if (busy) return;
+    if (text.trim().length === 0) return onClose();
+    if (teller === '') {
+      name.current?.focus();
+      return;
+    }
+    await write();
+  }
+
+  // The listener needs the CURRENT draft, and re-binding on every keystroke would be silly.
+  const latest = useRef(leave);
+  latest.current = leave;
+
+  useEffect(() => {
+    const onDown = (e: PointerEvent): void => {
+      if ((e.target as HTMLElement | null)?.closest('.spread')) return;
+      void latest.current();
+    };
+    const onKey = (e: KeyboardEvent): void => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('pointerdown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('pointerdown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [onClose]);
+
   return (
     <section className="blank-page" aria-label={t('blank.name')}>
       <div className="book-body">
@@ -89,16 +129,19 @@ export function BlankPage({
         </div>
 
         <article className="spread">
-          {/* The recto: ruled, empty, and honest about being empty. */}
-          <div className="page page-left ruled">
-            <p className="page-label">
-              {year !== undefined
-                ? t('blank.emptyYear', { year })
-                : about?.year_value
-                  ? t('evidence.circa', { year: about.year_value })
-                  : t('blank.someYear')}
-            </p>
-            <h3>{t('blank.stillBlank')}</h3>
+          {/* Everything the page has to say lives on this one leaf. */}
+          <div
+            className="page page-left ruled"
+            onBlur={(e) => {
+              if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+              void latest.current();
+            }}
+          >
+            {asked && (
+              <p className="margin-note" lang={lang}>
+                {asked}
+              </p>
+            )}
 
             <label className="write-on">
               <span className="visually-hidden">{t('blank.writeHere')}</span>
@@ -107,49 +150,25 @@ export function BlankPage({
                 onChange={(e) => setText(e.target.value)}
                 rows={7}
                 lang={lang}
+                autoFocus
                 placeholder={t('blank.writeHere')}
               />
             </label>
 
-            <p className="folio">— {t('blank.page')} —</p>
-          </div>
-
-          {/* The verso: the assistant's note, in the margin, in the assistant's own voice. */}
-          <div className="page page-right">
-            {asked ? (
-              <>
-                <p className="page-label">{t('blank.margin')}</p>
-                <p className="margin-note" lang={lang}>
-                  {asked}
-                </p>
-              </>
-            ) : (
-              // Nobody asked. The page states the silence it stands in, which is the whole
-              // invitation — a fact about the family rather than a prompt.
-              <p className="margin-note" lang={lang}>
-                {t('blank.nobodyTold', { from: (year ?? 0) - 2, to: (year ?? 0) + 2 })}
-              </p>
-            )}
-
-            <div className="signing">
-              <label>
-                <span>{t('blank.whoTells')}</span>
-                <select value={teller} onChange={(e) => setTeller(e.target.value)}>
-                  <option value="">{t('tear.pick')}</option>
-                  {tellers.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.display_name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <button type="button" className="write-it" disabled={!ready} onClick={() => void write()}>
-                {busy ? t('tear.working') : t(question ? 'blank.writeIt' : 'blank.tellIt')}
-              </button>
-            </div>
-
-            <p className="hint whose-words">{t('blank.whoseWords')}</p>
+            <select
+              ref={name}
+              className="signing-name"
+              value={teller}
+              aria-label={t('blank.whoTells')}
+              onChange={(e) => setTeller(e.target.value)}
+            >
+              <option value="">{t('tear.pick')}</option>
+              {tellers.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.display_name}
+                </option>
+              ))}
+            </select>
 
             {error && (
               <p className="result refused-error" role="alert">
@@ -157,6 +176,9 @@ export function BlankPage({
               </p>
             )}
           </div>
+
+          {/* The facing leaf stays paper: blank, because the page is. */}
+          <div className="page page-right ruled" aria-hidden="true" />
         </article>
       </div>
     </section>

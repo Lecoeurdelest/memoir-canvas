@@ -57,18 +57,9 @@
   },
   "blank": {
     "name": "Trang còn trắng",
-    "stillBlank": "Trang này còn trắng.",
-    "someYear": "Chưa rõ năm",
-    "margin": "Trợ lý ghi bên lề",
     "writeHere": "Kể vào đây…",
     "whoTells": "Ai kể chuyện này?",
-    "writeIt": "Viết vào sổ",
-    "whoseWords": "Trợ lý đặt câu hỏi; chữ là của người kể. Kho ghi đúng nguyên văn, đứng tên người đó.",
-    "page": "trang còn trắng",
-    "gaps_other": "{{count}} chỗ chưa ai kể",
-    "emptyYear": "Khoảng {{year}}",
-    "nobodyTold": "Giữa {{from}} và {{to}} nhà mình chưa có mẩu nào.",
-    "tellIt": "Kể vào sổ"
+    "emptyYear": "Khoảng {{year}}"
   },
   "spread": {
     "recollection": "Lời kể",

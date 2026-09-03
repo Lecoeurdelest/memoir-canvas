@@ -58,19 +58,9 @@
   },
   "blank": {
     "name": "The blank page",
-    "stillBlank": "This page is still blank.",
-    "someYear": "Year unknown",
-    "margin": "The assistant wrote in the margin",
     "writeHere": "Tell it here…",
     "whoTells": "Who is telling this?",
-    "writeIt": "Write it into the book",
-    "whoseWords": "The assistant asks; the words are the family’s. The archive keeps them verbatim, in that person’s name.",
-    "page": "a blank page",
-    "gaps_one": "{{count}} place nobody has told",
-    "gaps_other": "{{count}} places nobody has told",
-    "emptyYear": "Around {{year}}",
-    "nobodyTold": "Between {{from}} and {{to}} the family has nothing.",
-    "tellIt": "Tell it into the book"
+    "emptyYear": "Around {{year}}"
   },
   "spread": {
     "recollection": "Recollection",

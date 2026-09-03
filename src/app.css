@@ -1240,21 +1240,30 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
     to bottom, transparent 0 27px, rgba(29, 35, 33, 0.09) 27px 28px);
   background-position: 0 76px;
 }
-.page.ruled h3 { font-weight: 400; color: var(--ink-soft); font-style: italic; }
 
-.write-on { display: block; margin: 14px 0 0; }
+/* TASK-048 — the writing stays on ONE leaf at every width. The fold is painted down the middle
+   of the book whatever the window does, so a spread that collapses to a single column would put
+   the family's own hand across the gutter. */
+.reading-book .blank-page .spread { grid-template-columns: 1fr 1fr; }
+.blank-page .page-right { visibility: hidden; }
+
+.write-on { display: block; margin: 0; }
 .write-on textarea {
   width: 100%;
   padding: 0;
   border: 0;
   background: transparent;
   resize: vertical;
+  min-height: 42vh;
   font-family: Newsreader, Georgia, serif;
   font-size: 18px;
   line-height: 28px;
   color: var(--ink);
-  outline-offset: 6px;
 }
+/* The browser's blue ring is a form control's ring, and this is a page of a book. The warm one
+   stays for anyone arriving by keyboard — a focus nobody can see is the older, worse bug. */
+.write-on textarea:focus { outline: none; }
+.write-on textarea:focus-visible { outline: 2px solid rgba(106, 84, 16, 0.75); outline-offset: 8px; }
 .write-on textarea::placeholder { color: var(--ink-soft); opacity: 0.6; font-style: italic; }
 
 /* Faint ink, the way a note pencilled in a margin looks. It is the assistant's voice, and it is
@@ -1270,31 +1279,28 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   max-width: 40ch;
 }
 
-.signing { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; }
-.signing label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--ink-soft); }
-.signing select { font: inherit; font-size: 14px; padding: 5px 8px; }
-
-.write-it {
-  font: inherit;
-  font-size: 14px;
-  padding: 7px 16px;
-  border: 1px solid var(--rule);
-  border-radius: 3px;
-  background: var(--paper);
-  color: var(--ink-soft);
-  cursor: not-allowed;
-}
-.write-it:not(:disabled) {
-  border-color: var(--ok);
-  background: var(--ok);
-  color: #f2f1ec;
+/* The one control left on the page: whose words these are. It reads as a line signed at the
+   foot of an entry rather than as a form field — but it is never filled in for the family, and
+   the page will not file an account until it is. */
+.signing-name {
+  display: block;
+  margin: 20px 0 0;
+  max-width: 100%;
+  padding: 3px 2px;
+  border: 0;
+  border-bottom: 1px solid rgba(114, 96, 64, 0.4);
+  border-radius: 0;
+  appearance: none;
+  background: transparent;
+  font-family: Newsreader, Georgia, serif;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--leaf-label);
   cursor: pointer;
 }
-.whose-words { margin: 18px 0 0; max-width: 46ch; }
-
-@media (max-width: 700px) {
-  .blank-page .spread { grid-template-columns: 1fr; }
-}
+.signing-name:hover,
+.signing-name:focus-visible { color: var(--leaf-ink); border-bottom-color: var(--leaf-ink); }
+.signing-name option { font-style: normal; color: var(--ink); }
 
 /* T4 — the agent's tool count, on the page a reader is actually on. It is the same string the
    forest carries, so the number is seen CHANGING rather than being asserted. */

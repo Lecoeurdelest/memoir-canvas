@@ -85,12 +85,9 @@ export function BookStage(): JSX.Element {
     };
     return (
       <div className="reading reading-book">
+        {/* No way out but the gestures the page itself carries (TASK-048): press off the
+            paper, move focus off it, or press Escape. */}
         <BlankPage question={question} year={openYear ?? undefined} onClose={shut} />
-        <div className="stage-controls">
-          <button type="button" className="skin-toggle" onClick={shut}>
-            {t('forest.back')}
-          </button>
-        </div>
       </div>
     );
   }
