@@ -31,6 +31,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as commands from '../domain/commands';
 import { Cover } from './Cover';
+import { fold } from './bookSearch';
 import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import type { FollowupQuestion } from '../domain/types';
@@ -60,10 +61,22 @@ export function BlankPage({
   // An empty page asks for nothing: the name line appears only once there are words to sign.
   const [written, setWritten] = useState(false);
   const paper = useRef<HTMLDivElement>(null);
-  const [teller, setTeller] = useState('');
+
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const name = useRef<HTMLSelectElement>(null);
+  const name = useRef<HTMLDivElement>(null);
+
+  /**
+   * Who signed it. An entry is signed in the writer's own hand, and the name has to be a person
+   * this family already entered — the archive may not invent one, and two people answering to
+   * the same written name is not a choice a program gets to make either.
+   */
+  function signedBy(): string | null {
+    const written = fold(name.current?.innerText.trim() ?? '');
+    if (written.length === 0) return null;
+    const matches = tellers.filter((p) => fold(p.display_name) === written);
+    return matches.length === 1 ? matches[0].id : null;
+  }
 
   const asked = question
     ? lang === 'vi'
@@ -76,6 +89,7 @@ export function BlankPage({
     setError(null);
     try {
       const text = paper.current?.innerText ?? '';
+      const teller = signedBy() ?? '';
       if (question) {
         await commands.answerFollowupQuestion(
           { question_id: question.id, answer_text: text.trim(), told_by: teller },
@@ -104,7 +118,7 @@ export function BlankPage({
   async function leave(): Promise<void> {
     if (busy) return;
     if ((paper.current?.innerText ?? '').trim().length === 0) return onClose();
-    if (teller === '') {
+    if (signedBy() === null) {
       // After this handler the browser finishes its own focus move for the press that got us
       // here, which would take the cursor straight back off the line. Ask once it has.
       window.setTimeout(() => name.current?.focus(), 0);
@@ -188,20 +202,19 @@ export function BlankPage({
           </div>
 
           <div className="signing-row" hidden={!written}>
-            <select
+            {/* A ruled line at the foot of a written page, signed in the same hand. No list to
+                pick from and nothing written on it: what a diary asks for here is obvious, and
+                the cursor is put on it at the moment it is wanted. */}
+            <div
               ref={name}
               className="signing-name"
-              value={teller}
+              contentEditable
+              suppressContentEditableWarning
+              spellCheck={false}
+              role="textbox"
               aria-label={t('blank.whoTells')}
-              onChange={(e) => setTeller(e.target.value)}
-            >
-              <option value="">{t('tear.pick')}</option>
-              {tellers.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.display_name}
-                </option>
-              ))}
-            </select>
+              lang={lang}
+            />
 
             {error && (
               <p className="result refused-error" role="alert">

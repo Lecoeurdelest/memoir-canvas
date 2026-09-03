@@ -15,8 +15,7 @@
  * page along with every other control.
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import { toolsOnOffer } from '../bootstrap';
+import { useEffect, useState } from 'react';
 import { Cover } from './Cover';
 import { CssBook } from './CssBook';
 import { BlankPage } from './BlankPage';
@@ -26,11 +25,9 @@ import { GuidedStory } from './GuidedStory';
 import { Volume } from './Volume';
 import { useSpreadNavigation } from './useSpreadNavigation';
 import { flatRequested } from './webgl';
-import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 
 export function BookStage(): JSX.Element {
-  const { t } = useTranslation();
   const nav = useSpreadNavigation();
   const [flat] = useState(flatRequested);
   const [bound, setBound] = useState(true);
@@ -43,12 +40,6 @@ export function BookStage(): JSX.Element {
   const question = questions.find((q) => q.id === openQuestion && q.status === 'open');
   const openYear = useStore((s) => s.openYear);
   const setOpenYear = useStore((s) => s.setOpenYear);
-
-  // T4 — the same line the forest carries, so a reader watches the number CHANGE as they move.
-  // That change IS the claim: the registry is a pure function of what is open (R4), and a count
-  // that visibly grows when you open a contradiction says it better than any paragraph.
-  const ui = useStore((s) => s.ui);
-  const toolCount = useMemo(() => toolsOnOffer().length, [ui]);
 
   // Every trip out of the forest starts at the closed book again.
   useEffect(() => {
@@ -115,15 +106,6 @@ export function BookStage(): JSX.Element {
       ) : (
         <Volume nav={nav} onBeforeFirst={() => setAtFront(true)} onClose={close} />
       )}
-      {/* The only words left under the book are the ones that ARGUE: the count changes as the
-          reader opens things, which is R4 shown rather than claimed. The flat list is still the
-          NFR-PORT-01 escape hatch, now reached deliberately with `?flat=1` rather than by a
-          control sitting under every page. */}
-      <div className="stage-controls">
-        <p className="reading-agent" role="status">
-          {t('forest.agentHolds', { count: toolCount })}
-        </p>
-      </div>
     </div>
   );
 }

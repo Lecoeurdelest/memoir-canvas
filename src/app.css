@@ -1292,6 +1292,9 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   overflow: hidden;
   columns: 2;
   column-gap: 92px;
+  /* Fill the near leaf before starting the far one. Balanced columns — the default — split the
+     text evenly down both leaves, which is why a half-written page already ran onto page two. */
+  column-fill: auto;
   padding: 34px 44px;
 }
 .reading-book .entry-source .hand,
@@ -1342,6 +1345,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   overflow: hidden;
   columns: 2;
   column-gap: 92px;
+  column-fill: auto;
   cursor: text;
 }
 .blank-entry .signing-row { flex: 0 0 auto; padding-top: 10px; }
@@ -1360,28 +1364,23 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   max-width: 40ch;
 }
 
-/* The one control left on the page: whose words these are. It reads as a line signed at the
-   foot of an entry rather than as a form field — but it is never filled in for the family, and
-   the page will not file an account until it is. */
+/* Where an entry gets signed: a ruled line at the foot of the page, written in the same hand.
+   Not a list to pick from — the archive matches what is written against the family it already
+   knows, and files nothing until one name answers to it. */
 .signing-name {
   display: block;
-  margin: 0;
-  max-width: 100%;
-  padding: 3px 2px;
-  border: 0;
-  border-bottom: 1px solid rgba(114, 96, 64, 0.4);
-  border-radius: 0;
-  appearance: none;
-  background: transparent;
+  min-width: 12ch;
+  max-width: 32ch;
+  min-height: 1.5em;
+  padding: 2px 2px 3px;
+  border-bottom: 1px solid rgba(114, 96, 64, 0.45);
   font-family: Newsreader, Georgia, serif;
-  font-size: 15px;
+  font-size: 16px;
   font-style: italic;
-  color: var(--leaf-label);
-  cursor: pointer;
+  color: var(--leaf-ink);
+  cursor: text;
+  outline: none;
 }
-.signing-name:hover,
-.signing-name:focus-visible { color: var(--leaf-ink); border-bottom-color: var(--leaf-ink); }
-.signing-name option { font-style: normal; color: var(--ink); }
 
 /* T4 — the agent's tool count, on the page a reader is actually on. It is the same string the
    forest carries, so the number is seen CHANGING rather than being asserted. */

@@ -91,9 +91,12 @@ describe('i18next itself', () => {
     expect(i18n.t('card.claim', { count: 3 })).toBe('lời kể');
   });
 
-  it('falls back to Vietnamese, because English is the translation here', async () => {
+  it('falls back to English, the one language the interface now speaks', async () => {
+    // TASK-048 — the owner took the interface to English only. The Vietnamese catalogue stays
+    // and is still held to the same keys above, because the archive's paired `*_vi` / `*_en`
+    // content columns are the schema's and outlive any choice about the surface.
     await i18n.changeLanguage('en');
-    expect(i18n.options.fallbackLng).toContain('vi');
+    expect(i18n.options.fallbackLng).toContain('en');
   });
 
   it('narrows a regional tag to a supported language', async () => {
