@@ -97,14 +97,7 @@ export function BookStage(): JSX.Element {
 
   if (!open) {
     return (
-      <Forest
-        nav={nav}
-        onGuided={(index) => {
-          setGuided(true);
-          setBound(false);
-          nav.openAt(index);
-        }}
-      />
+      <Forest nav={nav} />
     );
   }
 

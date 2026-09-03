@@ -1,8 +1,5 @@
 {
   "journey": {
-    "entryKicker": "A story to follow",
-    "entry": "Walk through Grandma's story",
-    "entryTime": "recollection → evidence → family answer → keepsake",
     "kicker": "Family interview · step {{stage}} of 4",
     "title": "When did Grandma move to Đà Nẵng?",
     "stage1": "Two accounts remember the same move differently. Ask the assistant to show what does not add up.",
@@ -34,7 +31,7 @@
   "forest": {
     "name": "The forest of memories",
     "empty": "The forest is dark. Nothing has been told yet.",
-    "summary": "{{memories}} memories · {{gaps}} gaps · {{from}}–{{to}}",
+    "a11yLabel": "The forest of memories, {{memories}} memories, {{gaps}} gaps, spanning {{from}} to {{to}}.",
     "unanswered": "Nobody has told it",
     "locked": "out of reach, something ahead does not add up",
     "back": "Back to the forest",

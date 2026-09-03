@@ -63,8 +63,8 @@ export const PALETTE: Record<Certainty, { ink: string; bg: string }> = {
  * unreadable on it, so the rungs get a second set of colours — measured against NIGHT, not
  * eyeballed, and asserted in tests/certainty.spec.ts exactly like the light one.
  *
- * A firefly is a colour with no word beside it, which would break NFR-A11Y-02 on its own. The
- * forest pays that back with a legend that spells every rung out, and with a hover name.
+ * The forest keeps the full certainty in each target's accessible name and reveals its memory name
+ * on hover or focus; visually, every memory remains a simple firefly.
  */
 export const NIGHT = '#071319';
 

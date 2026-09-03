@@ -57,7 +57,7 @@ describe('TASK-021 — certainty badges', () => {
     }
   });
 
-  it('does not rely on colour alone — every label carries a word and a distinct glyph', () => {
+  it('does not rely on colour alone — every badge label carries a distinct glyph', () => {
     const glyphs = CERTAINTY_ORDER.map((c) => LABELS[c].glyph);
     expect(glyphs).toHaveLength(CERTAINTY_ORDER.length);
     expect(new Set(glyphs).size, 'glyphs must be distinct').toBe(glyphs.length);
@@ -90,9 +90,8 @@ describe('TASK-034 — the same ladder after dark', () => {
   });
 
   it('keeps the rungs apart in greyscale here too', () => {
-    // A firefly has no room for a glyph, so in the forest colour is doing more work than it does
-    // on a badge. If two rungs collapse to the same grey the forest lies to a colour-blind reader
-    // even with the legend beside it.
+    // The forest is intentionally a field of fireflies; its glow colours still need to stay
+    // distinct so the visual certainty ladder remains readable at a glance.
     const greys = CERTAINTY_ORDER.map((c) => luminance(NIGHT_PALETTE[c]));
     expect(new Set(greys.map((g) => g.toFixed(3))).size).toBe(CERTAINTY_ORDER.length);
   });
