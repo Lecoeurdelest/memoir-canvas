@@ -1,10 +1,16 @@
 /**
  * TASK-048 — the approved meadow, painted.
  *
- * The whole scene is deterministic inline SVG in a fixed 1440×900 design space, seeded from
- * `hash` so a re-render never reshuffles a single blade of grass. Three components, one per
- * parallax plane: sky (far), meadow (mid), foreground (near). All of it is `aria-hidden`
- * scenery — nothing here is knowable only by looking (TASK-034's rule still holds).
+ * The whole scene is deterministic inline SVG, seeded from `hash` so a re-render never
+ * reshuffles a single blade of grass. Three components, one per parallax plane: sky (far),
+ * meadow (mid), foreground (near). All of it is `aria-hidden` scenery — nothing here is
+ * knowable only by looking (TASK-034's rule still holds).
+ *
+ * The height is a fixed 900-unit design space; the WIDTH follows the stage's aspect, because a
+ * fixed 1440-wide frame under `slice` on an ultrawide monitor blew the treeline up into sparse
+ * shark fins. Wind lives in CSS: clumps, clouds and canopies carry `fa-sway`/`fa-drift`
+ * classes whose keyframes (app.css) breathe them, staggered by position so a gust reads as
+ * travelling across the meadow rather than the whole picture rocking at once.
  *
  * Element ids are prefixed per layer because SVG ids are global to the document.
  *
@@ -14,21 +20,28 @@
 import { useMemo } from 'react';
 import { hash } from './forestLayout';
 
-const W = 1440;
 const H = 900;
 const HY = Math.round(H * 0.56);
-
-/** A per-call deterministic stream over the shared hash. */
-function stream(seed: string): () => number {
-  let i = 0;
-  return () => hash(`${seed}:${(i += 1)}`);
-}
 
 const lerp = (a: number, b: number, t: number): number => a + (b - a) * t;
 const clamp = (v: number, lo: number, hi: number): number => Math.min(hi, Math.max(lo, v));
 const px = (n: number): number => Number(n.toFixed(1));
 const pickOf = (rand: () => number, xs: readonly string[]): string =>
   xs[Math.floor(rand() * xs.length)];
+
+/**
+ * The design-space width follows the stage's aspect so the picture is COMPOSED for the screen
+ * it is on, not cropped to it.
+ */
+export function designWidth(aspect: number): number {
+  return Math.round(clamp(H * aspect, 1150, 3600));
+}
+
+/** A per-call deterministic stream over the shared hash. */
+function stream(seed: string): () => number {
+  let i = 0;
+  return () => hash(`${seed}:${(i += 1)}`);
+}
 
 interface Palette {
   treeFar: string;
@@ -129,7 +142,7 @@ function cloud(rand: () => number, cx: number, cy: number, w: number, h: number,
 }
 
 /** A rolling ridge: a readable dark band under a wide, faint moonlit crest. */
-function hill(rand: () => number, yBase: number, amp: number, fill: string, crest: string, prefix: string): string {
+function hill(rand: () => number, W: number, yBase: number, amp: number, fill: string, crest: string, prefix: string): string {
   const n = 6;
   const ys = Array.from({ length: n + 1 }, () => yBase + (rand() - 0.5) * amp * 2);
   let edge = `M-20 ${px(ys[0])}`;
@@ -144,21 +157,26 @@ function hill(rand: () => number, yBase: number, amp: number, fill: string, cres
   );
 }
 
-/** Clumped grass blades sharing a root and a lean, coloured by distance from the glow. */
+/**
+ * Clumped grass blades sharing a root and a lean, coloured by distance from the glow. Each
+ * clump is a `fa-sway` group rooted at its own base; the delay follows x so one gust appears
+ * to travel across the field.
+ */
 function tufts(
   rand: () => number,
-  o: { clumps: number; bladesPer: number; y0: number; y1: number; lenMin: number; lenMax: number; lit: string[]; midG: string[]; dark: string[]; widthScale: number },
+  o: { W: number; clumps: number; bladesPer: number; y0: number; y1: number; lenMin: number; lenMax: number; lit: string[]; midG: string[]; dark: string[]; widthScale: number },
 ): string {
   const out: string[] = [];
-  const glowX = W * 0.5;
-  const glowR = W * 0.56;
+  const glowX = o.W * 0.5;
+  const glowR = o.W * 0.56;
   for (let c = 0; c < o.clumps; c += 1) {
-    const rx = lerp(-10, W + 10, rand());
+    const rx = lerp(-10, o.W + 10, rand());
     const ry = lerp(o.y0, o.y1, rand() ** 0.85);
     const lean = (rand() - 0.5) * 0.9;
     const depth = clamp((ry - o.y0) / Math.max(1, o.y1 - o.y0), 0, 1);
     const glow = clamp(1 - Math.abs(rx - glowX) / glowR, 0, 1) * (1 - depth * 0.8);
     const n = Math.round(o.bladesPer * (0.6 + rand() * 0.8));
+    const blades: string[] = [];
     for (let i = 0; i < n; i += 1) {
       const bx = rx + (rand() - 0.5) * o.lenMax * 1.1;
       const by = ry + (rand() - 0.5) * o.lenMax * 0.24;
@@ -166,21 +184,26 @@ function tufts(
       const bend = (lean + (rand() - 0.5) * 0.5) * len * 0.55;
       const t = glow * (0.7 + rand() * 0.5);
       const col = t > 0.5 ? pickOf(rand, o.lit) : t > 0.24 ? pickOf(rand, o.midG) : pickOf(rand, o.dark);
-      out.push(
+      blades.push(
         `<path d="M${px(bx)} ${px(by)} q${px(bend * 0.35)} ${px(-len * 0.6)} ${px(bend)} ${px(-len)}"` +
           ` stroke="${col}" stroke-width="${px((0.7 + rand() * 0.7 + depth * 1.1) * o.widthScale)}"` +
           ` fill="none" stroke-linecap="round" opacity="${(0.5 + rand() * 0.45).toFixed(2)}"/>`,
       );
     }
+    out.push(
+      `<g class="fa-sway" style="transform-origin:${px(rx)}px ${px(ry + o.lenMax * 0.2)}px;` +
+        `animation-delay:-${((rx / o.W) * 2.4 + rand() * 0.8).toFixed(2)}s;` +
+        `animation-duration:${(3.4 + rand() * 2.2).toFixed(2)}s">${blades.join('')}</g>`,
+    );
   }
   return out.join('');
 }
 
-function svgOf(prefix: string, defs: string, body: string): string {
+function svgOf(prefix: string, W: number, defs: string, body: string): string {
   return (
     `<svg class="forest-art" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" aria-hidden="true">` +
     `<defs>` +
-    `<filter id="${prefix}-rough" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter>` +
+    `<filter id="${prefix}-rough" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="4" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="8"/></filter>` +
     `<filter id="${prefix}-leafy" x="-15%" y="-15%" width="130%" height="130%"><feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="3" seed="9" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="18"/></filter>` +
     `<filter id="${prefix}-blur1"><feGaussianBlur stdDeviation="1.1"/></filter>` +
     `<filter id="${prefix}-blur2"><feGaussianBlur stdDeviation="2"/></filter>` +
@@ -191,10 +214,11 @@ function svgOf(prefix: string, defs: string, body: string): string {
   );
 }
 
-function skyMarkup(p: Palette, sparse: boolean): string {
+function skyMarkup(p: Palette, sparse: boolean, W: number): string {
   const rand = stream('sky');
+  const wide = W / 1440;
   const stars: string[] = [];
-  const starN = Math.round((sparse ? 90 : 150) * p.stars);
+  const starN = Math.round((sparse ? 90 : 150) * p.stars * wide);
   for (let i = 0; i < starN; i += 1) {
     const onBand = rand() < 0.4;
     const bx = rand() * W;
@@ -205,7 +229,7 @@ function skyMarkup(p: Palette, sparse: boolean): string {
       `<circle cx="${px(bx)}" cy="${px(by)}" r="${px(0.4 + rand() ** 2 * 1.5)}" fill="#e8f1ff" opacity="${(0.25 + rand() * 0.7).toFixed(2)}"/>`,
     );
   }
-  for (let i = 0; i < Math.round(7 * p.stars); i += 1) {
+  for (let i = 0; i < Math.round(7 * p.stars * wide); i += 1) {
     const sx = rand() * W;
     const sy = rand() * HY * 0.7;
     const s = px(3 + rand() * 5);
@@ -241,7 +265,7 @@ function skyMarkup(p: Palette, sparse: boolean): string {
       const sy = HY * (0.06 + rand() * 0.42);
       const len = W * (0.035 + rand() * 0.03);
       shooting.push(
-        `<line x1="${px(sx)}" y1="${px(sy)}" x2="${px(sx + len)}" y2="${px(sy + len * 0.62)}" stroke="#cdddff" stroke-width="1.1" opacity="0.35"/>`,
+        `<line class="fa-streak" style="animation-delay:${(i * 4.2 + rand() * 2).toFixed(1)}s" x1="${px(sx)}" y1="${px(sy)}" x2="${px(sx + len)}" y2="${px(sy + len * 0.62)}" stroke="#cdddff" stroke-width="1.1"/>`,
       );
     }
   }
@@ -268,12 +292,12 @@ function skyMarkup(p: Palette, sparse: boolean): string {
       const edge = Math.abs(x - W / 2) / (W / 2);
       const env = 1 - DIP * (1 - edge ** 1.6);
       const th = hMax * env * (0.45 + rand() * 0.55) * (rand() < 0.12 && env > 0.6 ? 1.5 : 1);
-      const step = Math.max(6, th * (0.36 + rand() * 0.3));
+      const step = Math.max(6, th * (0.3 + rand() * 0.24));
       if (env < 0.4 && rand() < 0.55) {
         x += step + 10;
         continue;
       }
-      row.push(pinePaths(rand, x, HY - th + depth * 4, th, th * 0.62, 2));
+      row.push(pinePaths(rand, x, HY - th + depth * 4, th, th * 0.62, 3));
       x += step;
     }
     rows.push(`<g${blurred ? ` filter="url(#fa-sky-blur1)"` : ''}><path d="${row.join(' ')}" fill="${fill}"/></g>`);
@@ -288,23 +312,25 @@ function skyMarkup(p: Palette, sparse: boolean): string {
 
   return svgOf(
     'fa-sky',
+    W,
     defs,
     `<g>${stars.join('')}</g>${nebula}${moon}${shooting.join('')}` +
-      `<g filter="url(#fa-sky-blur1)" opacity="0.95">${clouds.join('')}</g>${rows.join('')}`,
+      `<g class="fa-drift" filter="url(#fa-sky-blur1)" opacity="0.95">${clouds.join('')}</g>${rows.join('')}`,
   );
 }
 
-function meadowMarkup(p: Palette, sparse: boolean): string {
+function meadowMarkup(p: Palette, sparse: boolean, W: number): string {
   const rand = stream('meadow');
+  const wide = W / 1440;
   const hills =
-    hill(rand, HY + H * 0.045, H * 0.012, p.hills[0], p.crest, 'fa-mid') +
-    hill(rand, HY + H * 0.13, H * 0.022, p.hills[1], p.crest, 'fa-mid') +
-    hill(rand, HY + H * 0.24, H * 0.03, p.hills[2], p.crest, 'fa-mid') +
-    hill(rand, HY + H * 0.4, H * 0.038, p.hills[2], p.crest, 'fa-mid');
+    hill(rand, W, HY + H * 0.045, H * 0.012, p.hills[0], p.crest, 'fa-mid') +
+    hill(rand, W, HY + H * 0.13, H * 0.022, p.hills[1], p.crest, 'fa-mid') +
+    hill(rand, W, HY + H * 0.24, H * 0.03, p.hills[2], p.crest, 'fa-mid') +
+    hill(rand, W, HY + H * 0.4, H * 0.038, p.hills[2], p.crest, 'fa-mid');
 
   const speckles: string[] = [];
   const glowX = W * 0.5;
-  for (let i = 0; i < (sparse ? 260 : 520); i += 1) {
+  for (let i = 0; i < Math.round((sparse ? 260 : 520) * wide); i += 1) {
     const x = rand() * W;
     const y = lerp(HY + 4, HY + H * 0.12, rand() ** 0.9);
     const t = clamp(1 - Math.abs(x - glowX) / (W * 0.52), 0, 1);
@@ -314,14 +340,15 @@ function meadowMarkup(p: Palette, sparse: boolean): string {
   }
 
   const drift: string[] = [];
-  for (let i = 0; i < (sparse ? 60 : 130); i += 1) {
+  for (let i = 0; i < Math.round((sparse ? 60 : 130) * wide); i += 1) {
     drift.push(
       `<circle cx="${px(rand() * W)}" cy="${px(lerp(HY + H * 0.06, H * 0.8, rand()))}" r="${px(1 + rand() * 1.8)}" fill="${pickOf(rand, p.flowerCols)}" opacity="${(0.5 + rand() * 0.5).toFixed(2)}"/>`,
     );
   }
 
   const grass = tufts(rand, {
-    clumps: sparse ? 24 : 48,
+    W,
+    clumps: Math.round((sparse ? 24 : 48) * wide),
     bladesPer: 11,
     y0: HY + H * 0.12,
     y1: H * 0.84,
@@ -333,34 +360,38 @@ function meadowMarkup(p: Palette, sparse: boolean): string {
     widthScale: 1,
   });
 
-  return svgOf('fa-mid', '', `${hills}<g>${speckles.join('')}</g><g>${drift.join('')}</g><g>${grass}</g>`);
+  return svgOf('fa-mid', W, '', `${hills}<g>${speckles.join('')}</g><g>${drift.join('')}</g><g>${grass}</g>`);
 }
 
-function foregroundMarkup(p: Palette, sparse: boolean): string {
+function foregroundMarkup(p: Palette, sparse: boolean, W: number): string {
   const rand = stream('fore');
+  const wide = W / 1440;
 
   const canopyBlobs: string[] = [];
+  const cw = Math.min(W * 0.3, 450);
   for (let i = 0; i < 30; i += 1) {
-    const bx = -W * 0.04 + rand() ** 1.25 * W * 0.3;
+    const bx = -cw * 0.14 + rand() ** 1.25 * cw;
     const by = -H * 0.05 + rand() ** 1.4 * H * 0.26;
-    const br = lerp(W * 0.018, W * 0.042, rand()) * (1 - (bx + W * 0.04) / (W * 0.54)) + W * 0.012;
+    const br = lerp(cw * 0.06, cw * 0.14, rand()) * (1 - (bx + cw * 0.14) / (cw * 1.8)) + cw * 0.04;
     canopyBlobs.push(`<ellipse cx="${px(bx)}" cy="${px(by)}" rx="${px(br)}" ry="${px(br * (0.72 + rand() * 0.25))}"/>`);
   }
 
   // Inward of the outer 12%: the plane overscan crops that band off-screen at rest.
+  const pineW = Math.min(W * 0.13, 210);
   const pines =
     `<g fill="${p.pine}" filter="url(#fa-fore-rough)">` +
-    `<path d="${pinePaths(rand, W * 0.14, H * 0.1, H * 0.58, W * 0.13, 8)}"/>` +
-    `<path d="${pinePaths(rand, W * 0.865, H * 0.02, H * 0.72, W * 0.155, 9)}"/>` +
-    `<path d="${pinePaths(rand, W * 0.78, H * 0.24, H * 0.44, W * 0.095, 7)}"/></g>`;
+    `<path d="${pinePaths(rand, W * 0.14, H * 0.1, H * 0.58, pineW, 8)}"/>` +
+    `<path d="${pinePaths(rand, W * 0.865, H * 0.02, H * 0.72, pineW * 1.2, 9)}"/>` +
+    `<path d="${pinePaths(rand, W * 0.78, H * 0.24, H * 0.44, pineW * 0.73, 7)}"/></g>`;
 
   const flowers: string[] = [];
-  for (let c = 0; c < 8; c += 1) {
+  for (let c = 0; c < Math.round(8 * wide); c += 1) {
     const cx = rand() * W;
     const cy = lerp(H * 0.72, H * 0.97, rand());
     const n = 4 + Math.floor(rand() * 5);
+    const cluster: string[] = [];
     for (let i = 0; i < n; i += 1) {
-      const fx = cx + (rand() - 0.5) * W * 0.1;
+      const fx = cx + (rand() - 0.5) * Math.min(W * 0.1, 150);
       const fy = cy + (rand() - 0.5) * H * 0.05;
       const r = 4.5 + rand() * 4.5;
       const col = pickOf(rand, p.flowerCols);
@@ -369,15 +400,22 @@ function foregroundMarkup(p: Palette, sparse: boolean): string {
         (_, j) =>
           `<ellipse cx="0" cy="${px(-r * 0.62)}" rx="${px(r * 0.34)}" ry="${px(r * 0.62)}" transform="rotate(${j * 72 + rand() * 14})"/>`,
       ).join('');
-      flowers.push(
+      cluster.push(
         `<g transform="translate(${px(fx)} ${px(fy)})"><circle r="${px(r * 1.9)}" fill="${col}" opacity="0.22" filter="url(#fa-fore-blur3)"/>` +
           `<g fill="${col}" opacity="0.92">${petals}</g><circle r="${px(r * 0.2)}" fill="#ffe9a8"/></g>`,
       );
     }
+    // The sway wrapper is OUTSIDE the translated flowers: animating transform on the inner
+    // group would overwrite its translate and pile every flower at the origin.
+    flowers.push(
+      `<g class="fa-sway fa-sway-soft" style="transform-origin:${px(cx)}px ${px(cy + 30)}px;` +
+        `animation-delay:-${((cx / W) * 2.4 + rand()).toFixed(2)}s">${cluster.join('')}</g>`,
+    );
   }
 
   const grass = tufts(rand, {
-    clumps: sparse ? 14 : 26,
+    W,
+    clumps: Math.round((sparse ? 14 : 26) * wide),
     bladesPer: 12,
     y0: H * 0.86,
     y1: H + 6,
@@ -402,8 +440,10 @@ function foregroundMarkup(p: Palette, sparse: boolean): string {
 
   return svgOf(
     'fa-fore',
+    W,
     '',
-    `<g fill="${p.pine}" filter="url(#fa-fore-leafy)">${canopyBlobs.join('')}</g>${pines}` +
+    `<g class="fa-sway fa-sway-soft" style="transform-origin:0px 0px">` +
+      `<g fill="${p.pine}" filter="url(#fa-fore-leafy)">${canopyBlobs.join('')}</g></g>${pines}` +
       `<g>${flowers.join('')}</g><path d="${rim}" transform="translate(0 ${H - rimH})" fill="#02100a"/><g>${grass}</g>`,
   );
 }
@@ -411,6 +451,8 @@ function foregroundMarkup(p: Palette, sparse: boolean): string {
 interface ArtProps {
   torn: boolean;
   sparse: boolean;
+  /** Stage width / height, pre-bucketed by the caller so a 1px resize does not repaint. */
+  aspect: number;
 }
 
 function ArtLayer({ markup }: { markup: string }): JSX.Element {
@@ -418,17 +460,17 @@ function ArtLayer({ markup }: { markup: string }): JSX.Element {
   return <div className="forest-art-holder" aria-hidden="true" dangerouslySetInnerHTML={{ __html: markup }} />;
 }
 
-export function SkyArt({ torn, sparse }: ArtProps): JSX.Element {
-  const markup = useMemo(() => skyMarkup(torn ? TORN : NIGHT, sparse), [torn, sparse]);
+export function SkyArt({ torn, sparse, aspect }: ArtProps): JSX.Element {
+  const markup = useMemo(() => skyMarkup(torn ? TORN : NIGHT, sparse, designWidth(aspect)), [torn, sparse, aspect]);
   return <ArtLayer markup={markup} />;
 }
 
-export function MeadowArt({ torn, sparse }: ArtProps): JSX.Element {
-  const markup = useMemo(() => meadowMarkup(torn ? TORN : NIGHT, sparse), [torn, sparse]);
+export function MeadowArt({ torn, sparse, aspect }: ArtProps): JSX.Element {
+  const markup = useMemo(() => meadowMarkup(torn ? TORN : NIGHT, sparse, designWidth(aspect)), [torn, sparse, aspect]);
   return <ArtLayer markup={markup} />;
 }
 
-export function ForegroundArt({ torn, sparse }: ArtProps): JSX.Element {
-  const markup = useMemo(() => foregroundMarkup(torn ? TORN : NIGHT, sparse), [torn, sparse]);
+export function ForegroundArt({ torn, sparse, aspect }: ArtProps): JSX.Element {
+  const markup = useMemo(() => foregroundMarkup(torn ? TORN : NIGHT, sparse, designWidth(aspect)), [torn, sparse, aspect]);
   return <ArtLayer markup={markup} />;
 }

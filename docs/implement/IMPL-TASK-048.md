@@ -55,10 +55,19 @@ decoration that falls back to the TASK-034 CSS fireflies when WebGL is missing o
 
 - The torn (grey) meadow state is covered by tests and palette-swapped art, but was not
   screenshot-verified against the mockup's ConflictState artboard.
-- The GL swarm ignores the parallax planes: fireflies drift in stage space. Deliberate for now —
-  they read as living air rather than a glued-on layer — revisit only if the owner notices.
 - `storyLength` counts characters of both language bodies; a card written in one language only
   glows about half as bright as a fully bilingual one. Acceptable while seed content is bilingual.
+
+## Follow-up (same day, owner feedback on the live app)
+
+Three fixes after the owner ran it on an ultrawide screen: the art's design-space width now
+follows the stage aspect (`designWidth`) instead of a fixed 1440 — the fixed frame under `slice`
+had blown the treeline into sparse shark fins; the GL swarm now rides the same lean-and-travel
+parallax as the light layers (per-fly depth attribute), so dragging the terrain carries the
+fireflies, and their vertical wander was halved so they hover instead of appearing to sink; and
+wind arrived — grass clumps, flower clusters and the hanging canopy sway on CSS keyframes with
+x-staggered delays so gusts travel across the meadow, clouds drift, shooting stars flash briefly
+instead of standing as scratches. All wind stops under `prefers-reduced-motion`.
 
 ## Invariant check
 

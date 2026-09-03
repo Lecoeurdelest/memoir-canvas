@@ -46,17 +46,19 @@ import type { SpreadNavigation } from './useSpreadNavigation';
 const PLANE_INDEXES = [0, 1, 2] as const;
 const PLANE_ART = [SkyArt, MeadowArt, ForegroundArt] as const;
 
-/** Viewport width, watched because the art density and the firefly budget hang off it. */
-function useStageWidth(): number {
-  const [width, setWidth] = useState(() =>
-    typeof window === 'undefined' ? 1280 : window.innerWidth,
+/** Viewport size, watched because the art composition and the firefly budget hang off it. */
+function useStageSize(): { width: number; height: number } {
+  const [size, setSize] = useState(() =>
+    typeof window === 'undefined'
+      ? { width: 1280, height: 800 }
+      : { width: window.innerWidth, height: window.innerHeight },
   );
   useEffect(() => {
-    const onResize = (): void => setWidth(window.innerWidth);
+    const onResize = (): void => setSize({ width: window.innerWidth, height: window.innerHeight });
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
-  return width;
+  return size;
 }
 
 export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
@@ -70,8 +72,10 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const setOpenYear = useStore((s) => s.setOpenYear);
 
   const { spreads, index, openAt } = nav;
-  const width = useStageWidth();
+  const { width, height } = useStageSize();
   const sparse = width < 700;
+  // Bucketed to one decimal so a 1px resize never repaints three SVG sheets.
+  const aspect = Math.round((width / Math.max(1, height)) * 10) / 10;
   const stage = useRef<HTMLDivElement>(null);
 
   const [pointer, setPointer] = useState<Pointer>(CENTRE);
@@ -148,7 +152,11 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
           if ((e.target as HTMLElement).closest('button')) return;
           from.current = { x: e.clientX, y: e.clientY, travel };
           setWalking(true);
-          e.currentTarget.setPointerCapture(e.pointerId);
+          try {
+            e.currentTarget.setPointerCapture(e.pointerId);
+          } catch {
+            /* a pointer already gone (or synthetic) cannot be captured — the walk still works */
+          }
         }}
         onPointerMove={(e) => {
           const r = e.currentTarget.getBoundingClientRect();
@@ -194,7 +202,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
                 ).toFixed(0)}px)`,
               }}
             >
-              <Art torn={torn} sparse={sparse} />
+              <Art torn={torn} sparse={sparse} aspect={aspect} />
 
               {!glOk && (
                 <div className="forest-ambient" aria-hidden="true">
@@ -223,7 +231,9 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
           );
         })}
 
-        {glOk && <FirefliesGL torn={torn} onLost={() => setGlOk(false)} />}
+        {glOk && (
+          <FirefliesGL torn={torn} lean={pointer} travel={travel} onLost={() => setGlOk(false)} />
+        )}
 
         {/* The lights ride their own layers, sized exactly to the stage, so a per-cent is a
             per-cent OF WHAT YOU CAN SEE. */}

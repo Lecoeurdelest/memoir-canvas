@@ -25,16 +25,32 @@ const VERTEX = /* glsl */ `
   uniform float uDim;
   uniform vec2 uRes;
   uniform float uDpr;
+  uniform vec2 uLean;
+  uniform vec2 uTravel;
   attribute float aSeed;
   attribute float aSize;
+  attribute float aDepth;
   attribute vec3 aColor;
   varying float vAlpha;
   varying vec3 vColor;
 
   void main() {
     vec2 p = position.xy * uRes;
+
+    // Hover, not fall: wide lazy figure-eights, with far less vertical travel than lateral.
     p.x += sin(uTime * 0.12 + aSeed * 17.0) * 26.0 + sin(uTime * 0.043 + aSeed * 31.0) * 40.0;
-    p.y += cos(uTime * 0.10 + aSeed * 23.0) * 18.0 + sin(uTime * 0.037 + aSeed * 13.0) * 28.0;
+    p.y += cos(uTime * 0.10 + aSeed * 23.0) * 9.0 + sin(uTime * 0.05 + aSeed * 13.0) * 13.0;
+
+    // A gust travelling left-to-right across the meadow: every fly leans with it as it passes.
+    float gust = 0.5 + 0.5 * sin(uTime * 0.32 - p.x * 0.0045 + aSeed * 0.6);
+    gust = gust * gust;
+    p.x += gust * 26.0;
+    p.y -= gust * 7.0;
+
+    // The swarm belongs to the terrain: the same lean-and-travel parallax the light layers
+    // ride (LIGHT_PLANES rates), keyed by each fly's depth, so a drag carries the flies too.
+    vec2 rate = vec2(44.0, 16.0) + aDepth * vec2(53.0, 16.0);
+    p += -uLean * rate + uTravel * (0.85 + aDepth * 0.12);
 
     float blink = 0.25 + 0.75 * pow(0.5 + 0.5 * sin(uTime * (0.6 + aSeed) * 1.4 + aSeed * 40.0), 3.0);
     float bokeh = mix(1.0, 0.35, step(18.0, aSize));
@@ -60,10 +76,17 @@ const FRAGMENT = /* glsl */ `
   }
 `;
 
-function swarm(count: number): { positions: Float32Array; seeds: Float32Array; sizes: Float32Array; colours: Float32Array } {
+function swarm(count: number): {
+  positions: Float32Array;
+  seeds: Float32Array;
+  sizes: Float32Array;
+  depths: Float32Array;
+  colours: Float32Array;
+} {
   const positions = new Float32Array(count * 3);
   const seeds = new Float32Array(count);
   const sizes = new Float32Array(count);
+  const depths = new Float32Array(count);
   const colours = new Float32Array(count * 3);
   const tone = new THREE.Color();
   for (let i = 0; i < count; i += 1) {
@@ -74,17 +97,29 @@ function swarm(count: number): { positions: Float32Array; seeds: Float32Array; s
     positions[i * 3 + 2] = 0;
     seeds[i] = hash(`${key}:seed`) * 6.28318;
     sizes[i] = hash(`${key}:bokeh`) < 0.16 ? 18 + hash(`${key}:size`) * 12 : 5 + hash(`${key}:size`) * 8;
+    depths[i] = Math.floor(hash(`${key}:plane`) * 3);
     tone.set(WARM[Math.floor(hash(`${key}:tone`) * (hash(`${key}:blue`) < 0.12 ? WARM.length : WARM.length - 1))]);
     colours[i * 3] = tone.r;
     colours[i * 3 + 1] = tone.g;
     colours[i * 3 + 2] = tone.b;
   }
-  return { positions, seeds, sizes, colours };
+  return { positions, seeds, sizes, depths, colours };
 }
 
-export function FirefliesGL({ torn, onLost }: { torn: boolean; onLost: () => void }): JSX.Element {
+interface FirefliesProps {
+  torn: boolean;
+  /** Pointer lean, centred on zero — the same value the parallax planes ride. */
+  lean: { x: number; y: number };
+  /** Accumulated drag travel in px, already clamped by the stage. */
+  travel: { x: number; y: number };
+  onLost: () => void;
+}
+
+export function FirefliesGL({ torn, lean, travel, onLost }: FirefliesProps): JSX.Element {
   const holder = useRef<HTMLDivElement>(null);
   const dimUniform = useRef<{ value: number } | null>(null);
+  const leanUniform = useRef<THREE.Vector2 | null>(null);
+  const travelUniform = useRef<THREE.Vector2 | null>(null);
   // The parent hands a fresh closure every render; going through a ref keeps the ONE renderer
   // effect below on empty-ish deps — rebuilding a WebGL context per pointer-move leaks contexts
   // until the browser starts killing them.
@@ -94,6 +129,11 @@ export function FirefliesGL({ torn, onLost }: { torn: boolean; onLost: () => voi
   useEffect(() => {
     if (dimUniform.current) dimUniform.current.value = torn ? 1 : 0;
   }, [torn]);
+
+  useEffect(() => {
+    leanUniform.current?.set(lean.x, lean.y);
+    travelUniform.current?.set(travel.x, travel.y);
+  }, [lean.x, lean.y, travel.x, travel.y]);
 
   useEffect(() => {
     const host = holder.current;
@@ -118,13 +158,14 @@ export function FirefliesGL({ torn, onLost }: { torn: boolean; onLost: () => voi
 
     // A third of the CSS budget: on the GPU each point costs nothing, but a thousand of them
     // reads as noise where the approved canvas reads as a handful of drifting embers.
-    const { positions, seeds, sizes, colours } = swarm(
+    const { positions, seeds, sizes, depths, colours } = swarm(
       Math.round(ambientCount(host.clientWidth || window.innerWidth) * 0.35),
     );
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
     geometry.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
+    geometry.setAttribute('aDepth', new THREE.BufferAttribute(depths, 1));
     geometry.setAttribute('aColor', new THREE.BufferAttribute(colours, 3));
 
     const uniforms = {
@@ -132,8 +173,12 @@ export function FirefliesGL({ torn, onLost }: { torn: boolean; onLost: () => voi
       uDim: { value: torn ? 1 : 0 },
       uRes: { value: new THREE.Vector2(1, 1) },
       uDpr: { value: dpr },
+      uLean: { value: new THREE.Vector2(0, 0) },
+      uTravel: { value: new THREE.Vector2(0, 0) },
     };
     dimUniform.current = uniforms.uDim;
+    leanUniform.current = uniforms.uLean.value;
+    travelUniform.current = uniforms.uTravel.value;
 
     const material = new THREE.ShaderMaterial({
       uniforms,
@@ -191,6 +236,8 @@ export function FirefliesGL({ torn, onLost }: { torn: boolean; onLost: () => voi
       renderer.forceContextLoss();
       host.removeChild(renderer.domElement);
       dimUniform.current = null;
+      leanUniform.current = null;
+      travelUniform.current = null;
     };
     // Mounts exactly once: torn rides its own effect through dimUniform, onLost through lostRef.
   }, []);

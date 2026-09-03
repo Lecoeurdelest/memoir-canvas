@@ -363,6 +363,36 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 .forest-art-holder { position: absolute; inset: 0; }
 .forest-art { position: absolute; inset: 0; width: 100%; height: 100%; }
 
+/* TASK-048 follow-up — wind. Each grass clump, flower cluster and the hanging canopy carries
+   `fa-sway` with an inline transform-origin at its own base and a delay that follows x, so a
+   gust reads as travelling across the meadow rather than the picture rocking in one piece.
+   `view-box` transform-box is what makes the inline px origins mean design-space units. */
+@keyframes fa-sway {
+  0%, 100% { transform: rotate(-0.9deg); }
+  55%      { transform: rotate(1.3deg); }
+}
+.fa-sway {
+  animation: fa-sway 4s ease-in-out infinite;
+  transform-box: view-box;
+  will-change: transform;
+}
+.fa-sway-soft { animation-duration: 7.5s; }
+
+/* Clouds cross the sky the way clouds do: barely, and forever. */
+@keyframes fa-drift {
+  0%, 100% { transform: translateX(-16px); }
+  50%      { transform: translateX(20px); }
+}
+.fa-drift { animation: fa-drift 90s ease-in-out infinite; }
+
+/* A shooting star exists for half a second every few, not as a standing scratch. */
+@keyframes fa-streak {
+  0%       { opacity: 0; }
+  4%       { opacity: 0.7; }
+  9%, 100% { opacity: 0; }
+}
+.fa-streak { opacity: 0; animation: fa-streak 13s linear infinite; }
+
 /* The three.js firefly swarm — decoration between the scenery and the lights. It takes no
    clicks and says nothing; the buttons above it carry every fact. */
 .forest-gl { position: absolute; inset: 0; pointer-events: none; }
@@ -569,6 +599,8 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   .memory.blooming { animation: none; }
   .memory.out-of-reach { opacity: 0.22; }
   .forest-plane, .forest-lights { transition: none; }
+  .fa-sway, .fa-drift { animation: none; }
+  .fa-streak { animation: none; opacity: 0.3; }
 }
 
 /* A phone gets a shorter stage and no hover label — there is no pointer to hover with. */
