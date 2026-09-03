@@ -279,29 +279,34 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
   ];
   const clouds = spots.map(([cx, cy, cw]) => cloud(rand, cx, cy, cw, cw * (0.2 + rand() * 0.06), p.cloudBody, p.cloudRim));
 
-  // The horizon opens in the middle: the rows sink and thin toward the centre (approved rev).
-  const rows: string[] = [];
-  const DIP = 0.82;
-  for (const [depth, fill, hMax, blurred] of [
-    [0, p.treeFar, H * 0.075, true],
-    [1, p.treeNear, H * 0.11, false],
-  ] as const) {
-    const row: string[] = [];
+  // The horizon forest is a CONTINUOUS band with pine-toothed peaks, not a picket line of
+  // separate trees — scattered silhouettes read as thorns. It still opens in the middle: the
+  // envelope sinks the band to a low distant ripple there instead of deleting trees.
+  const band = (hMax: number, baseY: number): string => {
+    let d = `M-20 ${px(baseY + 10)} L-20 ${px(baseY - hMax * 0.3)}`;
     let x = -20;
     while (x < W + 20) {
       const edge = Math.abs(x - W / 2) / (W / 2);
-      const env = 1 - DIP * (1 - edge ** 1.6);
-      const th = hMax * env * (0.45 + rand() * 0.55) * (rand() < 0.12 && env > 0.6 ? 1.5 : 1);
-      const step = Math.max(6, th * (0.3 + rand() * 0.24));
-      if (env < 0.4 && rand() < 0.55) {
-        x += step + 10;
-        continue;
-      }
-      row.push(pinePaths(rand, x, HY - th + depth * 4, th, th * 0.62, 3));
-      x += step;
+      const env = Math.max(0.07, 1 - 0.82 * (1 - edge ** 1.6));
+      const th = hMax * env * (0.5 + rand() * 0.5) * (rand() < 0.1 && env > 0.6 ? 1.4 : 1);
+      const wPeak = 10 + th * (0.5 + rand() * 0.4);
+      const xm = x + wPeak / 2;
+      const x1 = x + wPeak;
+      d +=
+        ` L${px(x + wPeak * 0.2)} ${px(baseY - th * 0.45)}` +
+        ` L${px(xm - wPeak * 0.12)} ${px(baseY - th * 0.55)}` +
+        ` L${px(xm)} ${px(baseY - th)}` +
+        ` L${px(xm + wPeak * 0.12)} ${px(baseY - th * 0.55)}` +
+        ` L${px(x1 - wPeak * 0.2)} ${px(baseY - th * 0.45)}` +
+        ` L${px(x1)} ${px(baseY - th * (0.15 + rand() * 0.2))}`;
+      x = x1;
     }
-    rows.push(`<g${blurred ? ` filter="url(#fa-sky-blur1)"` : ''}><path d="${row.join(' ')}" fill="${fill}"/></g>`);
-  }
+    return `${d} L${px(W + 20)} ${px(baseY + 10)} Z`;
+  };
+  const rows = [
+    `<g filter="url(#fa-sky-blur1)" opacity="0.9"><path d="${band(H * 0.06, HY + 2)}" fill="${p.treeFar}"/></g>`,
+    `<path d="${band(H * 0.1, HY + 4)}" fill="${p.treeNear}"/>`,
+  ];
 
   const defs =
     `<filter id="fa-sky-nebf"><feTurbulence type="fractalNoise" baseFrequency="0.004 0.009" numOctaves="4" seed="11"/><feColorMatrix type="matrix" values="0 0 0 0 0.58  0 0 0 0 0.7  0 0 0 0 1  0 0 0 1.1 -0.42"/></filter>` +
