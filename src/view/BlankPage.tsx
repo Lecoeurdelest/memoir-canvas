@@ -57,6 +57,8 @@ export function BlankPage({
 
   // The book arrives shut. Nothing is written until a hand opens it.
   const [opened, setOpened] = useState(false);
+  // An empty page asks for nothing: the name line appears only once there are words to sign.
+  const [written, setWritten] = useState(false);
   const paper = useRef<HTMLDivElement>(null);
   const [teller, setTeller] = useState('');
   const [busy, setBusy] = useState(false);
@@ -181,10 +183,11 @@ export function BlankPage({
               aria-label={t('blank.writeHere')}
               data-placeholder={t('blank.writeHere')}
               lang={lang}
+              onInput={() => setWritten((paper.current?.innerText ?? '').trim().length > 0)}
             />
           </div>
 
-          <div className="signing-row">
+          <div className="signing-row" hidden={!written}>
             <select
               ref={name}
               className="signing-name"
