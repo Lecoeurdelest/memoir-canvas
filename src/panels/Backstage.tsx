@@ -36,6 +36,8 @@ export function Backstage({
   const { t } = useTranslation();
   const model = useStore((s) => s.model);
   const webmcp = useStore((s) => s.webmcp);
+  const lang = useStore((s) => s.lang);
+  const setLang = useStore((s) => s.setLang);
   const dialog = useRef<HTMLDialogElement>(null);
 
   const conflicts = model?.conflicts.filter((c) => c.status === 'open') ?? [];
@@ -53,6 +55,15 @@ export function Backstage({
     <dialog className="backstage" ref={dialog} onClose={onClose} aria-labelledby="backstage-title">
       <div className="backstage-head">
         <h2 id="backstage-title">{t('backstage.title')}</h2>
+        {/* TASK-048 — the surface lost its last visible control, so the language switch lives
+            with the rest of the machinery. */}
+        <div className="lang" role="group" aria-label={t('app.language')}>
+          {(['vi', 'en'] as const).map((l) => (
+            <button key={l} type="button" aria-pressed={lang === l} onClick={() => setLang(l)}>
+              {l === 'vi' ? 'Tiếng Việt' : 'English'}
+            </button>
+          ))}
+        </div>
         <button type="button" className="backstage-close" onClick={onClose}>
           {t('backstage.close')}
         </button>

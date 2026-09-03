@@ -70,6 +70,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const cards = useStore((s) => s.model?.cards) ?? [];
   const setOpenQuestion = useStore((s) => s.setOpenQuestion);
   const setOpenYear = useStore((s) => s.setOpenYear);
+  const setBackstage = useStore((s) => s.setBackstage);
 
   const { spreads, index, openAt } = nav;
   const { width, height } = useStageSize();
@@ -148,6 +149,13 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         className={`forest-stage${torn ? ' forest-torn' : ''}`}
         ref={stage}
         onKeyDown={onKeyDown}
+        // TASK-048 — the surface carries no controls, so the machinery's mouse entrance is the
+        // surface itself: a double-click on scenery (never on a light) opens Backstage. The
+        // keyboard route is the ghost door in Archive.tsx.
+        onDoubleClick={(e) => {
+          if ((e.target as HTMLElement).closest('button')) return;
+          setBackstage(true);
+        }}
         onPointerDown={(e) => {
           if ((e.target as HTMLElement).closest('button')) return;
           from.current = { x: e.clientX, y: e.clientY, travel };

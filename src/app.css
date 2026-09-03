@@ -27,7 +27,6 @@ body {
 
 h1 { font-size: 28px; margin: 0 0 6px; letter-spacing: -0.01em; }
 h2 { font-size: 17px; margin: 0 0 4px; }
-.tagline { color: var(--ink-soft); margin: 0 0 18px; max-width: 60ch; }
 .hint { color: var(--ink-soft); font-size: 13px; }
 
 .boot { display: flex; flex-wrap: wrap; gap: 6px 28px; margin: 0 0 20px; }
@@ -151,9 +150,6 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
          color: var(--ink-soft); }
 .cited .predicate { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-size: 12px; }
 .cited.missing { font-style: italic; }
-
-.title-row { display: flex; align-items: center; justify-content: space-between; gap: 16px;
-             flex-wrap: wrap; }
 
 /* ── evidence (TASK-022) ────────────────────────────────────────────────────────────────────
    A contradicting source is listed first and marked. Burying what disagrees is the failure the
@@ -950,18 +946,35 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
    The machinery did not go away, it went into a drawer. Nothing here softens a
    Postgres refusal — the verbatim message is the evidence.                       */
 
-.backstage-door { margin: 26px 0 0; }
-.backstage-door button {
-  font: inherit;
-  font-size: 13px;
+/* TASK-048 — the surface carries no visible controls, but a mouse-only Backstage entrance
+   (double-click on the forest) would lock out keyboard and screen-reader users. The ghost door
+   is clipped to nothing until the Tab key lands on it, then it stands up and says its name. */
+.ghost-door {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  z-index: 30;
+  width: 1px;
+  height: 1px;
   padding: 0;
   border: 0;
-  border-bottom: 1px solid var(--rule);
-  background: none;
-  color: var(--ink-soft);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.ghost-door:focus-visible {
+  width: auto;
+  height: auto;
+  padding: 8px 14px;
+  clip-path: none;
+  overflow: visible;
+  font: inherit;
+  background: rgba(4, 13, 18, 0.92);
+  color: #cfdcd7;
+  border: 1px solid #cfdcd7;
+  border-radius: 3px;
   cursor: pointer;
 }
-.backstage-door button:hover { color: var(--ink); border-color: var(--ink-soft); }
 
 .backstage {
   width: min(880px, 94vw);
