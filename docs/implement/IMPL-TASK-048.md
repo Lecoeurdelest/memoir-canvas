@@ -58,6 +58,20 @@ decoration that falls back to the TASK-034 CSS fireflies when WebGL is missing o
 - `storyLength` counts characters of both language bodies; a card written in one language only
   glows about half as bright as a fully bilingual one. Acceptable while seed content is bilingual.
 
+## Follow-up: the ring (same day, owner's ask)
+
+The world became SCENE_COUNT (5) scenes of the same night joined in a loop: three scenery
+strips (sky 0.35×, meadow 1×, foreground 1.3×) each drawn once across the whole ring with a
+`<use>` clone one loop over, wrapped by `wrapOffset` at their own rate — so a horizontal drag
+pans forever with no visible seam, while the vertical walk stays clamped. Ridges and hills
+close their own loops (last point = first). Each scene keeps the shared style with its own
+furniture: the moon scene, the left grove, the flower field, the heavy canopy, the lone giant
+pine. The memory timeline now runs across the whole ring; lights wrap with the meadow, arrow
+keys carry the world to the focused light, click-to-year maps through the wrapped world
+position, and the GL swarm re-enters the opposite edge as it leaves. Verified by scripted mouse
+drags across 1.3 loops: strips diverge by rate, wrap numerically exactly, no seam artifacts,
+and the 1976 light stood at its world position after the crossing.
+
 ## Follow-up (same day, owner feedback on the live app)
 
 Three fixes after the owner ran it on an ultrawide screen: the art's design-space width now

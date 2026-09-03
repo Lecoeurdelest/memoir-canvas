@@ -336,28 +336,24 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   pointer-events: none;
 }
 
-/* Overscanned just enough to cover its own parallax: each plane's margin is sized to that
-   plane's PLANES rate plus TRAVEL_LIMIT (forestLayout.ts), because the meadow is one composed
-   picture — a 240% plane under `slice` would blow the art up and crop the framing trees out,
-   which is exactly the bug this replaced. */
-.forest-plane {
+/* TASK-048, the ring: each scenery layer is one strip of SCENE_COUNT scenes (plus a <use>
+   clone one loop over), tall as the stage and as wide as its own aspect makes it. The view
+   slides each strip inside its loop at its own rate — that is the whole infinite-pan trick. */
+.forest-strip {
   position: absolute;
-  left: -4%;
   top: -3%;
-  width: 108%;
+  left: 0;
   height: 106%;
   transition: transform 520ms cubic-bezier(0.18, 0.72, 0.28, 1);
   will-change: transform;
 }
-.forest-plane.plane-1 { left: -8%; top: -4%; width: 116%; height: 108%; }
-.forest-plane.plane-2 { left: -12%; top: -5%; width: 124%; height: 110%; }
 
 .forest-ambient { position: absolute; inset: 0; }
 
-/* The painted scenery: deterministic SVG, one sheet per plane, cropped by `slice` so the
-   oversized planes never show an edge mid-walk. */
-.forest-art-holder { position: absolute; inset: 0; }
-.forest-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+/* The painted scenery: deterministic SVG strips. The svg keeps its own intrinsic ratio from
+   the viewBox — height of the stage, width wherever that lands — so nothing is stretched. */
+.forest-art-holder { height: 100%; }
+.forest-art { display: block; height: 100%; width: auto; }
 
 /* TASK-048 follow-up — wind. Each grass clump, flower cluster and the hanging canopy carries
    `fa-sway` with an inline transform-origin at its own base and a delay that follows x, so a
@@ -422,7 +418,7 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 }
 
 /* While the hand is down the forest must track it, not glide after it. */
-.forest-lights.walking, .forest-plane.walking { transition: none; }
+.forest-lights.walking, .forest-strip.walking { transition: none; }
 
 .fly, .memory { position: absolute; border-radius: 50%; }
 

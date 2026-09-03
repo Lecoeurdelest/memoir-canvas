@@ -25,6 +25,7 @@ import {
   placeLights,
   span,
   travelShift,
+  wrapOffset,
   yearAtX,
 } from '../src/view/forestLayout';
 import type { Spread } from '../src/store/projection';
@@ -314,14 +315,30 @@ describe('TASK-040 — walking the forest, not leaning at it', () => {
     expect(Math.abs(scenery.x)).toBeGreaterThan(Math.abs(lights.x));
   });
 
-  it('refuses to carry the forest off its own edge', () => {
+  it('walks forever sideways but never above the sky', () => {
+    // The world is a ring of scenes: horizontal travel is unbounded BY DESIGN, and only the
+    // vertical walk still meets a wall.
     const stage = { width: 1440, height: 900 };
     const far = clampTravel({ x: 99999, y: 99999 }, stage);
-    expect(far.x).toBeLessThanOrEqual(stage.width * TRAVEL_LIMIT);
+    expect(far.x).toBe(99999);
     expect(far.y).toBeLessThanOrEqual(stage.height * TRAVEL_LIMIT);
 
     const back = clampTravel({ x: -99999, y: -99999 }, stage);
-    expect(back.x).toBeGreaterThanOrEqual(-stage.width * TRAVEL_LIMIT);
+    expect(back.x).toBe(-99999);
+    expect(back.y).toBeGreaterThanOrEqual(-stage.height * TRAVEL_LIMIT);
+  });
+
+  it('wraps each layer inside its own loop, whichever way and however far the hand goes', () => {
+    const loop = 8000;
+    for (const travel of [0, 123, -123, 7999, 8000, 8001, -8001, 123456, -123456]) {
+      for (const rate of [0.35, 1, 1.3]) {
+        const t = wrapOffset(travel, rate, loop);
+        expect(t, `travel ${travel} rate ${rate}`).toBeGreaterThanOrEqual(-loop);
+        expect(t, `travel ${travel} rate ${rate}`).toBeLessThanOrEqual(0);
+        // One full loop later the layer stands exactly where it stood — the ring closes.
+        expect(wrapOffset(travel + loop / rate, rate, loop)).toBeCloseTo(t, 6);
+      }
+    }
   });
 
   it('leaves a short drag exactly where it was put', () => {

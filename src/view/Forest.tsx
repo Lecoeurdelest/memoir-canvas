@@ -2,18 +2,20 @@
  * TASK-034 → TASK-048 — the archive as a moonlit meadow. One firefly per memory.
  *
  * This is the first screen, and it makes the project's argument as a picture. The owner's
- * firefly language (TASK-048): a WHITE light is an empty place you can press to tell a memory;
- * ORANGE-RED is a story in open conflict — it flickers, fast and out of time with everything
- * else, and the whole meadow goes grey behind it, because the wedge (FR-BOOK-03) refuses every
- * route forward and the forest is a route like any other; GREEN is a told story, and brighter
- * green is a longer one. Certainty still lives in every light's accessible name and on every
- * card — only the picture's first question changed.
+ * firefly language: a WHITE light is an empty place you can press to tell a memory; ORANGE-RED
+ * is a story in open conflict — it flickers, fast and out of time with everything else, and the
+ * whole meadow goes grey behind it, because the wedge (FR-BOOK-03) refuses every route forward
+ * and the forest is a route like any other; GREEN is a told story, and brighter green is a
+ * longer one. Certainty still lives in every light's accessible name and on every card.
  *
- * The scenery is deterministic SVG on three CSS planes; the ambient fireflies move on a
- * decoration-only three.js canvas when the browser has WebGL, and fall back to the CSS swarm
- * when it does not (NFR-PORT-01). Every interactive light stays a DOM button: 44px target,
- * keyboard order, hover-only name. What is scenery is `aria-hidden`; every fact it carries is
- * also written in the accessible name of the forest or its target.
+ * The world is a RING of SCENE_COUNT scenes: three scenery strips (sky, meadow, foreground)
+ * each loop at their own parallax rate, so dragging sideways walks an endless night; the lights
+ * ride the meadow's loop, laid along the world's whole timeline. Every firefly answers a press;
+ * a double-click on scenery opens Backstage; only the vertical walk still meets a wall.
+ *
+ * Ambient motion is a decoration-only three.js canvas with a CSS fallback (NFR-PORT-01). Every
+ * interactive light stays a DOM button: 44px target, keyboard order, hover-only name. What is
+ * scenery is `aria-hidden`; every fact it carries is also written in an accessible name.
  *
  * R5: reads the projection, writes nothing but UI state.
  */
@@ -23,13 +25,13 @@ import { useTranslation } from 'react-i18next';
 import { useStore } from '../store/store';
 import { FirefliesGL } from './FirefliesGL';
 import type { FirefliesHandle } from './FirefliesGL';
-import { ForegroundArt, MeadowArt, SkyArt } from './forestArt';
+import { ForegroundArt, H as ART_H, MeadowArt, SkyArt, designWidth } from './forestArt';
 import {
   CENTRE,
   FIREFLY_TONES,
+  SCENE_COUNT,
   ambientLights,
   clampTravel,
-  lightShift,
   parallaxShift,
   placeGaps,
   placeLights,
@@ -38,15 +40,17 @@ import {
   storyColour,
   storyGlow,
   storyLength,
-  travelShift,
+  wrapOffset,
   yearAtX,
 } from './forestLayout';
 import { hasWebGL } from './webgl';
-import type { Pointer } from './forestLayout';
+import type { Plane, Pointer } from './forestLayout';
 import type { SpreadNavigation } from './useSpreadNavigation';
 
-const PLANE_INDEXES = [0, 1, 2] as const;
-const PLANE_ART = [SkyArt, MeadowArt, ForegroundArt] as const;
+/** How fast each strip walks relative to the hand: sky far behind, meadow AS the ground the
+ *  lights stand on, foreground sweeping past. */
+const STRIP_RATES = [0.35, 1, 1.3] as const;
+const STRIP_ART = [SkyArt, MeadowArt, ForegroundArt] as const;
 
 /** Viewport size, watched because the art composition and the firefly budget hang off it. */
 function useStageSize(): { width: number; height: number } {
@@ -77,12 +81,19 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
   const { spreads, index, openAt } = nav;
   const { width, height } = useStageSize();
   const sparse = width < 700;
-  // Bucketed to one decimal so a 1px resize never repaints three SVG sheets.
+  // Bucketed to one decimal so a 1px resize never repaints three SVG strips.
   const aspect = Math.round((width / Math.max(1, height)) * 10) / 10;
   const stage = useRef<HTMLDivElement>(null);
 
+  // The ring, in on-screen pixels: SCENE_COUNT scenes, each composed for this stage. The 1.06
+  // is the strips' vertical overscan in the stylesheet (`.forest-strip` height: 106%) — the art
+  // is scaled by the STRIP's height, so the loop must be measured with it or every pixel of
+  // translate lands ~6% short.
+  const unit = (height * 1.06) / ART_H;
+  const loopPx = SCENE_COUNT * designWidth(aspect) * unit;
+
   const [pointer, setPointer] = useState<Pointer>(CENTRE);
-  // T2 — travel accumulates, so the forest can be walked rather than leaned at.
+  // T2 — travel accumulates, and sideways it never ends: the world is a ring.
   const [travel, setTravel] = useState<Pointer>(CENTRE);
   const [walking, setWalking] = useState(false);
   const from = useRef<{ x: number; y: number; travel: Pointer } | null>(null);
@@ -111,6 +122,20 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
     to: years?.to ?? '—',
   });
 
+  // Where the ground stands inside its loop right now — the lights and the click-to-year
+  // mapping both hang off this exact number.
+  const groundLean = parallaxShift(pointer, 1);
+  const groundT = wrapOffset(travel.x, STRIP_RATES[1], loopPx) + groundLean.x;
+  const groundTy = travel.y * 0.95 + groundLean.y;
+
+  /** A world-percent position, wrapped onto the screen; things just left of the seam appear
+   *  just left of the screen instead of a whole world away. */
+  const screenX = (worldPercent: number): number => {
+    const wx = (worldPercent / 100) * loopPx;
+    const sx = (((wx + groundT) % loopPx) + loopPx) % loopPx;
+    return sx > loopPx - 200 ? sx - loopPx : sx;
+  };
+
   // A whole sentence, because "moved to · 1972" names no destination and reads as a fragment.
   const nameOf = (spreadIndex: number): string => {
     const spread = spreads[spreadIndex];
@@ -128,8 +153,8 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
     return storyColour(storyGlow(storyLength(spread, cards)));
   };
 
-  // Arrow keys walk the forest in the order the family lived it. The lights are scattered across
-  // three planes, so DOM order is not time order and focus has to be moved by hand.
+  // Arrow keys walk the forest in the order the family lived it — and carry the world along, so
+  // the light that takes focus is also the light in front of you.
   function onKeyDown(e: React.KeyboardEvent<HTMLDivElement>): void {
     const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
     if (step === 0) return;
@@ -137,6 +162,11 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
     const to = Math.min(Math.max(at + step, 0), lights.length - 1);
     if (to === at) return;
     e.preventDefault();
+    const target = lights[to];
+    if (target) {
+      const wx = (target.x / 100) * loopPx;
+      setTravel((prev) => ({ x: width / 2 - wx, y: prev.y }));
+    }
     stage.current?.querySelector<HTMLButtonElement>(`[data-light="${to}"]`)?.focus();
   }
 
@@ -163,8 +193,7 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         }}
         // Every firefly is a place a memory could live (owner's rule): press one — not a walk,
         // not a light, the ambient swarm itself — and the blank page opens on the year that
-        // point of the timeline names. GL answers precisely; the CSS fallback answers by its
-        // own layout table.
+        // point of the WORLD's timeline names, wherever the ring has been dragged to.
         onClick={(e) => {
           if ((e.target as HTMLElement).closest('button')) return;
           if (wandered.current > 6) return;
@@ -179,7 +208,8 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
                 return (ax - cx) ** 2 + (ay - cy) ** 2 <= (a.size * 0.5 + 12) ** 2;
               });
           if (!onFly) return;
-          const year = yearAtX(spreads, (cx / r.width) * 100);
+          const worldPercent = (((((cx - groundT) % loopPx) + loopPx) % loopPx) / loopPx) * 100;
+          const year = yearAtX(spreads, worldPercent);
           if (year !== null) setOpenYear(year);
         }}
         onPointerDown={(e) => {
@@ -227,48 +257,43 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
         }}
         onPointerLeave={() => setPointer(CENTRE)}
       >
-        {PLANE_INDEXES.map((plane) => {
-          const lean = parallaxShift(pointer, plane);
-          const walk = travelShift(travel, plane, true);
-          const Art = PLANE_ART[plane];
+        {STRIP_RATES.map((rate, strip) => {
+          const lean = parallaxShift(pointer, strip as Plane);
+          const tx = wrapOffset(travel.x, rate, loopPx) + lean.x;
+          const ty = travel.y * (0.6 + strip * 0.35) + lean.y;
+          const Art = STRIP_ART[strip];
           return (
             <div
-              key={plane}
-              className={`forest-plane plane-${plane}${walking ? ' walking' : ''}`}
-              style={{
-                transform: `translate(${(lean.x + walk.x).toFixed(0)}px, ${(
-                  lean.y + walk.y
-                ).toFixed(0)}px)`,
-              }}
+              key={strip}
+              className={`forest-strip strip-${strip}${walking ? ' walking' : ''}`}
+              style={{ transform: `translate(${tx.toFixed(1)}px, ${ty.toFixed(1)}px)` }}
             >
               <Art torn={torn} sparse={sparse} aspect={aspect} />
-
-              {!glOk && (
-                <div className="forest-ambient" aria-hidden="true">
-                  {ambient
-                    .filter((a) => a.plane === plane)
-                    .map((a) => (
-                      <span
-                        key={a.key}
-                        className="fly"
-                        style={{
-                          left: `${a.x}%`,
-                          top: `${a.y}%`,
-                          width: `${a.size.toFixed(2)}px`,
-                          height: `${a.size}px`,
-                          background: 'transparent',
-                          color: a.colour,
-                          boxShadow: 'none',
-                          animationDuration: `${a.duration.toFixed(1)}s`,
-                          animationDelay: `${a.delay.toFixed(1)}s`,
-                        }}
-                      />
-                    ))}
-                </div>
-              )}
             </div>
           );
         })}
+
+        {!glOk && (
+          <div className="forest-ambient" aria-hidden="true">
+            {ambient.map((a) => (
+              <span
+                key={a.key}
+                className="fly"
+                style={{
+                  left: `${a.x}%`,
+                  top: `${a.y}%`,
+                  width: `${a.size.toFixed(2)}px`,
+                  height: `${a.size}px`,
+                  background: 'transparent',
+                  color: a.colour,
+                  boxShadow: 'none',
+                  animationDuration: `${a.duration.toFixed(1)}s`,
+                  animationDelay: `${a.delay.toFixed(1)}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         {glOk && (
           <FirefliesGL
@@ -280,105 +305,90 @@ export function Forest({ nav }: { nav: SpreadNavigation }): JSX.Element {
           />
         )}
 
-        {/* The lights ride their own layers, sized exactly to the stage, so a per-cent is a
-            per-cent OF WHAT YOU CAN SEE. */}
-        {PLANE_INDEXES.map((plane) => {
-          const lean = lightShift(pointer, plane);
-          const walk = travelShift(travel, plane, false);
-          return (
-            <div
-              key={`lights-${plane}`}
-              className={`forest-lights lights-${plane}${walking ? ' walking' : ''}`}
-              style={{
-                transform: `translate(${(lean.x + walk.x).toFixed(0)}px, ${(
-                  lean.y + walk.y
-                ).toFixed(0)}px)`,
-              }}
-            >
-              {gaps
-                .filter((g) => g.plane === plane)
-                .map((g) => {
-                  const question = questions.find((q) => q.id === g.id);
-                  const asked =
-                    g.kind === 'silence'
-                      ? t('blank.emptyYear', { year: g.year })
-                      : lang === 'vi'
-                        ? (question?.question_vi ?? '')
-                        : (question?.question_en ?? question?.question_vi ?? '');
-                  return (
-                    <button
-                      key={g.id}
-                      type="button"
-                      className="memory create-light"
-                      lang={lang}
-                      aria-label={`${t('forest.unanswered')} — ${asked}`}
-                      style={{
-                        left: `${g.x}%`,
-                        top: `${g.y}%`,
-                        width: `${g.size}px`,
-                        height: `${g.size}px`,
-                        background: 'transparent',
-                        color: FIREFLY_TONES.create,
-                        boxShadow: 'none',
-                        animationDuration: `${g.duration.toFixed(1)}s`,
-                        animationDelay: `${g.delay.toFixed(1)}s`,
-                      }}
-                      onClick={() =>
-                        g.kind === 'silence' ? setOpenYear(g.year) : setOpenQuestion(g.id)
-                      }
-                    />
-                  );
-                })}
+        {/* The lights ride the meadow's loop: their x lives on the WORLD's timeline and wraps
+            with it, so a memory keeps its place however far the night has been dragged. */}
+        <div
+          className={`forest-lights${walking ? ' walking' : ''}`}
+          style={{ transform: `translate(0px, ${groundTy.toFixed(1)}px)` }}
+        >
+          {gaps.map((g) => {
+            const question = questions.find((q) => q.id === g.id);
+            const asked =
+              g.kind === 'silence'
+                ? t('blank.emptyYear', { year: g.year })
+                : lang === 'vi'
+                  ? (question?.question_vi ?? '')
+                  : (question?.question_en ?? question?.question_vi ?? '');
+            return (
+              <button
+                key={g.id}
+                type="button"
+                className="memory create-light"
+                lang={lang}
+                aria-label={`${t('forest.unanswered')} — ${asked}`}
+                style={{
+                  left: `${screenX(g.x).toFixed(1)}px`,
+                  top: `${g.y}%`,
+                  width: `${g.size}px`,
+                  height: `${g.size}px`,
+                  background: 'transparent',
+                  color: FIREFLY_TONES.create,
+                  boxShadow: 'none',
+                  animationDuration: `${g.duration.toFixed(1)}s`,
+                  animationDelay: `${g.delay.toFixed(1)}s`,
+                }}
+                onClick={() =>
+                  g.kind === 'silence' ? setOpenYear(g.year) : setOpenQuestion(g.id)
+                }
+              />
+            );
+          })}
 
-              {lights
-                .filter((l) => l.plane === plane)
-                .map((l) => {
-                  const colour = colourOf(l.index);
-                  const name = nameOf(l.index);
-                  return (
-                    <button
-                      key={l.key}
-                      type="button"
-                      data-light={l.index}
-                      className={`memory${l.certainty === 'conflicting' ? ' flickering' : ''}${
-                        l.reachable ? '' : ' out-of-reach'
-                      }${blooming === l.index ? ' blooming' : ''}`}
-                      tabIndex={l.index === index ? 0 : -1}
-                      aria-label={`${name} · ${t(`certainty.${l.certainty}`)}${
-                        l.reachable ? '' : ` · ${t('forest.locked')}`
-                      }`}
-                      aria-disabled={l.reachable ? undefined : true}
-                      lang={lang}
-                      style={{
-                        left: `${l.x}%`,
-                        top: `${l.y}%`,
-                        width: `${l.size}px`,
-                        height: `${l.size}px`,
-                        background: 'transparent',
-                        color: colour,
-                        boxShadow: 'none',
-                        animationDuration: `${l.duration.toFixed(2)}s`,
-                        animationDelay: `${l.delay.toFixed(1)}s`,
-                      }}
-                      onClick={() => {
-                        if (!l.reachable) return;
-                        // T3 — the light has to BECOME the book, not be replaced by it. The
-                        // delay is the bloom; reduced motion skips straight through.
-                        const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-                        if (still) return openAt(l.index);
-                        setBlooming(l.index);
-                        window.setTimeout(() => openAt(l.index), 260);
-                      }}
-                    >
-                      <span className="memory-name" aria-hidden="true">
-                        {name}
-                      </span>
-                    </button>
-                  );
-                })}
-            </div>
-          );
-        })}
+          {lights.map((l) => {
+            const colour = colourOf(l.index);
+            const name = nameOf(l.index);
+            return (
+              <button
+                key={l.key}
+                type="button"
+                data-light={l.index}
+                className={`memory${l.certainty === 'conflicting' ? ' flickering' : ''}${
+                  l.reachable ? '' : ' out-of-reach'
+                }${blooming === l.index ? ' blooming' : ''}`}
+                tabIndex={l.index === index ? 0 : -1}
+                aria-label={`${name} · ${t(`certainty.${l.certainty}`)}${
+                  l.reachable ? '' : ` · ${t('forest.locked')}`
+                }`}
+                aria-disabled={l.reachable ? undefined : true}
+                lang={lang}
+                style={{
+                  left: `${screenX(l.x).toFixed(1)}px`,
+                  top: `${l.y}%`,
+                  width: `${l.size}px`,
+                  height: `${l.size}px`,
+                  background: 'transparent',
+                  color: colour,
+                  boxShadow: 'none',
+                  animationDuration: `${l.duration.toFixed(2)}s`,
+                  animationDelay: `${l.delay.toFixed(1)}s`,
+                }}
+                onClick={() => {
+                  if (!l.reachable) return;
+                  // T3 — the light has to BECOME the book, not be replaced by it. The
+                  // delay is the bloom; reduced motion skips straight through.
+                  const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                  if (still) return openAt(l.index);
+                  setBlooming(l.index);
+                  window.setTimeout(() => openAt(l.index), 260);
+                }}
+              >
+                <span className="memory-name" aria-hidden="true">
+                  {name}
+                </span>
+              </button>
+            );
+          })}
+        </div>
 
       </div>
     </section>

@@ -82,13 +82,30 @@ export function lightShift(pointer: Pointer, plane: Plane): Pointer {
  */
 export const TRAVEL_LIMIT = 0.05;
 
+/**
+ * TASK-048, the loop: the world is SCENE_COUNT scenes joined in a ring, so horizontal travel is
+ * deliberately unbounded — walk far enough and you come home. Only the vertical walk is still
+ * clamped: there is no sky above the sky.
+ */
+export const SCENE_COUNT = 5;
+
 export function clampTravel(travel: Pointer, stage: { width: number; height: number }): Pointer {
-  const limitX = stage.width * TRAVEL_LIMIT;
   const limitY = stage.height * TRAVEL_LIMIT * 0.45;
   return {
-    x: Math.max(-limitX, Math.min(limitX, travel.x)),
+    x: travel.x,
     y: Math.max(-limitY, Math.min(limitY, travel.y)),
   };
+}
+
+/**
+ * Where a layer stands inside its own loop: a translate in (-loop, 0], so two copies of the
+ * layer side by side always cover the window. Each layer wraps at its OWN rate — that is what
+ * lets parallax survive an infinite pan without the layers drifting apart at a seam.
+ */
+export function wrapOffset(travelX: number, rate: number, loopWidth: number): number {
+  if (loopWidth <= 0) return 0;
+  const m = ((travelX * rate) % loopWidth + loopWidth) % loopWidth;
+  return m - loopWidth;
 }
 
 /** Scenery is dragged further than the lights, so walking has the same depth leaning does. */

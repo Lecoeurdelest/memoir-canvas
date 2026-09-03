@@ -52,6 +52,9 @@ const VERTEX = /* glsl */ `
     // ride (LIGHT_PLANES rates), keyed by each fly's depth, so a drag carries the flies too.
     vec2 rate = vec2(44.0, 16.0) + aDepth * vec2(53.0, 16.0);
     p += -uLean * rate + uTravel * (0.85 + aDepth * 0.12);
+    // The world is a ring and travel never ends: a fly that leaves one edge re-enters the
+    // other, so the swarm is everywhere however far the night is dragged.
+    p.x = mod(p.x, uRes.x);
 
     float blink = 0.25 + 0.75 * pow(0.5 + 0.5 * sin(uTime * (0.6 + aSeed) * 1.4 + aSeed * 40.0), 3.0);
     float bokeh = mix(1.0, 0.35, step(24.0, aSize));
@@ -168,6 +171,7 @@ export const FirefliesGL = forwardRef<FirefliesHandle, FirefliesProps>(function 
         const depth = w.depths[i];
         fx += -ln.x * (44 + depth * 53) + tv.x * (0.85 + depth * 0.12);
         fy += -ln.y * (16 + depth * 16) + tv.y * (0.85 + depth * 0.12);
+        fx = ((fx % res.x) + res.x) % res.x;
         const r = w.sizes[i] * 0.5 + 8;
         if ((fx - x) ** 2 + (fy - y) ** 2 <= r * r) return true;
       }
