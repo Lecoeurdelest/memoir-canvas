@@ -53,7 +53,7 @@ const VERTEX = /* glsl */ `
     p += -uLean * rate + uTravel * (0.85 + aDepth * 0.12);
 
     float blink = 0.25 + 0.75 * pow(0.5 + 0.5 * sin(uTime * (0.6 + aSeed) * 1.4 + aSeed * 40.0), 3.0);
-    float bokeh = mix(1.0, 0.35, step(18.0, aSize));
+    float bokeh = mix(1.0, 0.35, step(24.0, aSize));
     vAlpha = blink * bokeh * (1.0 - uDim * 0.75);
     vColor = mix(aColor, vec3(0.35, 0.40, 0.38), uDim);
 
@@ -96,7 +96,8 @@ function swarm(count: number): {
     positions[i * 3 + 1] = 0.57 + 0.41 * hash(`${key}:y`) ** 0.8;
     positions[i * 3 + 2] = 0;
     seeds[i] = hash(`${key}:seed`) * 6.28318;
-    sizes[i] = hash(`${key}:bokeh`) < 0.16 ? 18 + hash(`${key}:size`) * 12 : 5 + hash(`${key}:size`) * 8;
+    // Bigger than life on purpose (owner's ask): a firefly the size of a pixel is a dead star.
+    sizes[i] = hash(`${key}:bokeh`) < 0.16 ? 26 + hash(`${key}:size`) * 16 : 9 + hash(`${key}:size`) * 11;
     depths[i] = Math.floor(hash(`${key}:plane`) * 3);
     tone.set(WARM[Math.floor(hash(`${key}:tone`) * (hash(`${key}:blue`) < 0.12 ? WARM.length : WARM.length - 1))]);
     colours[i * 3] = tone.r;

@@ -366,6 +366,12 @@ function meadowMarkup(p: Palette, sparse: boolean, W: number): string {
     );
   }
 
+  // A pair of small pines standing on the ridges, flanking the open centre (owner's ask).
+  const midPines =
+    `<g fill="#0b2233" filter="url(#fa-mid-blur1)">` +
+    `<path d="${pinePaths(rand, W * 0.31, HY + H * 0.01, H * 0.14, H * 0.09, 5)}"/>` +
+    `<path d="${pinePaths(rand, W * 0.655, HY + H * 0.03, H * 0.11, H * 0.07, 5)}"/></g>`;
+
   const grass = tufts(rand, {
     W,
     clumps: Math.round((sparse ? 24 : 48) * wide),
@@ -380,7 +386,7 @@ function meadowMarkup(p: Palette, sparse: boolean, W: number): string {
     widthScale: 1,
   });
 
-  return svgOf('fa-mid', W, '', `${hills}<g>${speckles.join('')}</g><g>${drift.join('')}</g><g>${grass}</g>`);
+  return svgOf('fa-mid', W, '', `${hills}${midPines}<g>${speckles.join('')}</g><g>${drift.join('')}</g><g>${grass}</g>`);
 }
 
 function foregroundMarkup(p: Palette, sparse: boolean, W: number): string {
@@ -396,13 +402,19 @@ function foregroundMarkup(p: Palette, sparse: boolean, W: number): string {
     canopyBlobs.push(`<ellipse cx="${px(bx)}" cy="${px(by)}" rx="${px(br)}" ry="${px(br * (0.72 + rand() * 0.25))}"/>`);
   }
 
-  // Inward of the outer 12%: the plane overscan crops that band off-screen at rest.
+  // Inward of the outer 12%: the plane overscan crops that band off-screen at rest. The
+  // company grew on the owner's ask — edge trees peeking in, a mid-size one each side lower
+  // in the meadow — but the centre stays empty: that opening is the approved view.
   const pineW = Math.min(W * 0.13, 210);
   const pines =
     `<g fill="${p.pine}" filter="url(#fa-fore-rough)">` +
+    `<path d="${pinePaths(rand, W * 0.05, H * 0.04, H * 0.64, pineW * 1.05, 8)}"/>` +
     `<path d="${pinePaths(rand, W * 0.14, H * 0.1, H * 0.58, pineW, 8)}"/>` +
+    `<path d="${pinePaths(rand, W * 0.245, H * 0.44, H * 0.4, pineW * 0.6, 6)}"/>` +
+    `<path d="${pinePaths(rand, W * 0.7, H * 0.5, H * 0.36, pineW * 0.55, 6)}"/>` +
     `<path d="${pinePaths(rand, W * 0.865, H * 0.02, H * 0.72, pineW * 1.2, 9)}"/>` +
-    `<path d="${pinePaths(rand, W * 0.78, H * 0.24, H * 0.44, pineW * 0.73, 7)}"/></g>`;
+    `<path d="${pinePaths(rand, W * 0.78, H * 0.24, H * 0.44, pineW * 0.73, 7)}"/>` +
+    `<path d="${pinePaths(rand, W * 0.945, H * -0.02, H * 0.78, pineW * 1.15, 9)}"/></g>`;
 
   const flowers: string[] = [];
   for (let c = 0; c < Math.round(8 * wide); c += 1) {
