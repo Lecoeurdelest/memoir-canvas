@@ -1512,7 +1512,10 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 @media (max-width: 900px) {
   .reading-book .book-body { transform: none; }
   .reading-book .book-body::before { display: none; }
-  .reading-book .spread, .reading-book .flyleaf-spread { grid-template-columns: 1fr; }
+  /* TASK-048 — the leaves do NOT collapse into one column here. The fold is painted down the
+     middle of the book at every width, so a single column runs the text straight across it and
+     off the bottom of the block. A narrow window gets two narrow leaves, each scrolling itself,
+     which is what a small book is. */
   .reading-book .page { padding: 20px 18px; }
   .reading-book .fore-edge {
     right: auto;

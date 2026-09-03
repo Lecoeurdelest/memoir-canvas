@@ -10,8 +10,9 @@
  * already says so. What `open` gates is the thing that matters — while the forest is showing,
  * nothing is open and the agent is not handed tools for a page nobody looked at.
  *
- * The flat list is not a failure mode — it is the escape hatch, reachable with `?flat=1` or the
- * toggle, and it is what NFR-PORT-01 guarantees is always there.
+ * The flat list is not a failure mode — it is the escape hatch NFR-PORT-01 guarantees is always
+ * there, reached with `?flat=1` (or the stored choice) since TASK-048 took the toggle off the
+ * page along with every other control.
  */
 
 import { useEffect, useMemo, useState } from 'react';
@@ -31,7 +32,7 @@ import { useStore } from '../store/store';
 export function BookStage(): JSX.Element {
   const { t } = useTranslation();
   const nav = useSpreadNavigation();
-  const [flat, setFlat] = useState(flatRequested);
+  const [flat] = useState(flatRequested);
   const [bound, setBound] = useState(true);
   const [atFront, setAtFront] = useState(false);
   const [guided, setGuided] = useState(false);
@@ -68,15 +69,19 @@ export function BookStage(): JSX.Element {
     return () => window.removeEventListener('keydown', onKey);
   }, [open, close]);
 
-  function toggle(): void {
-    const next = !flat;
-    setFlat(next);
-    try {
-      window.localStorage.setItem('memoir:flat', next ? '1' : '0');
-    } catch {
-      /* private browsing — the choice simply does not persist */
-    }
-  }
+  // FR-BOOK-08 gave the book a downward drag and Escape. The owner added the third way out, the
+  // one the forest already uses: press anywhere off the book. Guided mode runs its own overlay
+  // and closes itself, so it is left alone.
+  useEffect(() => {
+    if (!open || flat || guided) return undefined;
+    const onDown = (e: PointerEvent): void => {
+      const t = e.target as HTMLElement | null;
+      if (t?.closest('.volume, .cover-stage, .front-page, .stage-controls, dialog')) return;
+      close();
+    };
+    document.addEventListener('pointerdown', onDown);
+    return () => document.removeEventListener('pointerdown', onDown);
+  }, [open, flat, guided, close]);
 
   if (question || openYear !== null) {
     const shut = (): void => {
@@ -110,15 +115,14 @@ export function BookStage(): JSX.Element {
       ) : (
         <Volume nav={nav} onBeforeFirst={() => setAtFront(true)} onClose={close} />
       )}
-      {/* The way out is a downward drag or Escape (FR-BOOK-08). What stays visible is the
-          NFR-PORT-01 escape hatch, which has to be visible to be an escape hatch. */}
+      {/* The only words left under the book are the ones that ARGUE: the count changes as the
+          reader opens things, which is R4 shown rather than claimed. The flat list is still the
+          NFR-PORT-01 escape hatch, now reached deliberately with `?flat=1` rather than by a
+          control sitting under every page. */}
       <div className="stage-controls">
         <p className="reading-agent" role="status">
           {t('forest.agentHolds', { count: toolCount })}
         </p>
-        <button type="button" className="skin-toggle" onClick={toggle}>
-          {t(flat ? 'volume.bookView' : 'volume.listView')}
-        </button>
       </div>
     </div>
   );

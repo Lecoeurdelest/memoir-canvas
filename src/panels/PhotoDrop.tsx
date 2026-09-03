@@ -56,6 +56,7 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
   const refresh = useStore((s) => s.refresh);
   const input = useRef<HTMLInputElement>(null);
 
+  const zone = useRef<HTMLDivElement>(null);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [landed, setLanded] = useState<Landed[]>([]);
@@ -113,8 +114,30 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
     }
   }
 
+  // TASK-048 — a photograph pasted from the clipboard is the same act as one dropped on the
+  // page, so it lands the same way. A spread can carry several claims and therefore several of
+  // these; the press decides which — the zone under the pointer takes the paste, and when the
+  // page has only one there is nothing to decide.
+  const latest = useRef(take);
+  latest.current = take;
+  useEffect(() => {
+    const onPaste = (e: ClipboardEvent): void => {
+      const files = e.clipboardData?.files;
+      if (!files || files.length === 0) return;
+      const mine = zone.current;
+      const zones = document.querySelectorAll('.photo-drop');
+      const target = document.querySelector('.photo-drop:hover') ?? (zones.length === 1 ? zones[0] : null);
+      if (!mine || target !== mine) return;
+      e.preventDefault();
+      void latest.current(files);
+    };
+    document.addEventListener('paste', onPaste);
+    return () => document.removeEventListener('paste', onPaste);
+  }, []);
+
   return (
     <div
+      ref={zone}
       className={`photo-drop${over ? ' over' : ''}`}
       onDragOver={(e) => {
         e.preventDefault();
