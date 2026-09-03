@@ -279,33 +279,32 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
   ];
   const clouds = spots.map(([cx, cy, cw]) => cloud(rand, cx, cy, cw, cw * (0.2 + rand() * 0.06), p.cloudBody, p.cloudRim));
 
-  // The horizon forest is a CONTINUOUS band with pine-toothed peaks, not a picket line of
-  // separate trees — scattered silhouettes read as thorns. It still opens in the middle: the
-  // envelope sinks the band to a low distant ripple there instead of deleting trees.
-  const band = (hMax: number, baseY: number): string => {
-    let d = `M-20 ${px(baseY + 10)} L-20 ${px(baseY - hMax * 0.3)}`;
+  // The horizon is mountains and hills, not trees (owner's call): a hazy far range with sharp
+  // peaks behind a darker, rounder near ridge. Both still sink toward the centre so the middle
+  // of the horizon stays open.
+  const ridge = (hMax: number, baseY: number, segW: number, sharp: boolean): string => {
+    // Valleys sit ON the horizon line, so the ridge is peaks rising from it — a raised
+    // baseline read as a flat dark bar across the whole picture.
+    let d = `M-20 ${px(baseY + 10)} L-20 ${px(baseY)}`;
     let x = -20;
     while (x < W + 20) {
-      const edge = Math.abs(x - W / 2) / (W / 2);
-      const env = Math.max(0.07, 1 - 0.82 * (1 - edge ** 1.6));
-      const th = hMax * env * (0.5 + rand() * 0.5) * (rand() < 0.1 && env > 0.6 ? 1.4 : 1);
-      const wPeak = 10 + th * (0.5 + rand() * 0.4);
-      const xm = x + wPeak / 2;
-      const x1 = x + wPeak;
-      d +=
-        ` L${px(x + wPeak * 0.2)} ${px(baseY - th * 0.45)}` +
-        ` L${px(xm - wPeak * 0.12)} ${px(baseY - th * 0.55)}` +
-        ` L${px(xm)} ${px(baseY - th)}` +
-        ` L${px(xm + wPeak * 0.12)} ${px(baseY - th * 0.55)}` +
-        ` L${px(x1 - wPeak * 0.2)} ${px(baseY - th * 0.45)}` +
-        ` L${px(x1)} ${px(baseY - th * (0.15 + rand() * 0.2))}`;
-      x = x1;
+      const step = segW * (0.7 + rand() * 0.6);
+      const nx = x + step;
+      const mid = (x + nx) / 2;
+      const edge = Math.abs(mid - W / 2) / (W / 2);
+      const env = Math.max(0.12, 1 - 0.78 * (1 - edge ** 1.5));
+      const peakY = baseY - hMax * env * (0.45 + rand() * 0.55);
+      const valleyY = baseY - hMax * env * rand() * 0.08;
+      d += sharp
+        ? ` L${px(mid + (rand() - 0.5) * step * 0.2)} ${px(peakY)} L${px(nx)} ${px(valleyY)}`
+        : ` Q${px(mid)} ${px(peakY)} ${px(nx)} ${px(valleyY)}`;
+      x = nx;
     }
     return `${d} L${px(W + 20)} ${px(baseY + 10)} Z`;
   };
   const rows = [
-    `<g filter="url(#fa-sky-blur1)" opacity="0.9"><path d="${band(H * 0.06, HY + 2)}" fill="${p.treeFar}"/></g>`,
-    `<path d="${band(H * 0.1, HY + 4)}" fill="${p.treeNear}"/>`,
+    `<g filter="url(#fa-sky-blur1)" opacity="0.85"><path d="${ridge(H * 0.16, HY + 2, W / 9, true)}" fill="${p.treeFar}"/></g>`,
+    `<path d="${ridge(H * 0.09, HY + 4, W / 5, false)}" fill="${p.treeNear}"/>`,
   ];
 
   const defs =
