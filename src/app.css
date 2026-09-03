@@ -1269,10 +1269,8 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
   line-height: 1.65;
   break-inside: avoid;
 }
-.entry-source .stance { font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
-.stance-contradicts .stance { color: var(--lacquer); }
-.stance-supports .stance { color: var(--ok); }
-.entry-source .kind { color: var(--ink-soft); font-size: 13px; }
+/* The one word left on a source, and it is a word in the sentence — not a tag. */
+.entry-source .stance { font-style: italic; color: var(--lacquer); }
 .entry-source .title { font-weight: 600; }
 .entry-source .verbatim,
 .entry-source .excerpt { display: block; font-style: italic; quotes: '“' '”'; }
@@ -1282,7 +1280,11 @@ button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-v
 
 /* The whole apparatus of the old page — its labels, chips, group borders and the dashed rule
    round the photograph drop — is gone from the book. */
-.entry .photo-drop { border: 0; padding: 0; margin: 10px 0 0; background: none; }
+/* The zone is the entry itself now: no border, no button, nothing to see until a photograph is
+   dragged over it. */
+.entry .photo-drop { border: 0; padding: 0; margin: 0; background: none; }
+.entry .photo-drop.over { background: rgba(106, 84, 16, 0.09); box-shadow: 0 0 0 6px rgba(106, 84, 16, 0.09); }
+.entry .photo-drop.busy { opacity: 0.55; }
 
 .reading-book .spread.entry {
   display: block;

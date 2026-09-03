@@ -19,6 +19,7 @@
  */
 
 import { useEffect, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import * as commands from '../domain/commands';
 import { useTranslation } from 'react-i18next';
 import { exifDateTaken, sniff, stanceFor, takeoutYear, yearOfExifDate } from '../lib/photoDate';
@@ -32,8 +33,14 @@ interface Landed {
   name: string;
   year: number | null;
   stance: 'supports' | 'contradicts' | 'mentions';
-  preview: string | null;
 }
+
+/**
+ * The entry the pointer is currently over. A spread carries one zone per claim and each zone is
+ * a block fragmented across two columns, so their bounding boxes overlap and `:hover` cannot be
+ * trusted to name one — but `pointerenter` fires on the element actually under the cursor.
+ */
+let hovered: HTMLElement | null = null;
 
 async function yearOf(file: File): Promise<number | null> {
   const head = new Uint8Array(await file.slice(0, HEAD_BYTES).arrayBuffer());
@@ -51,7 +58,7 @@ async function yearOf(file: File): Promise<number | null> {
   return yearOfExifDate(exifDateTaken(head));
 }
 
-export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
+export function PhotoDrop({ claim, children }: { claim: Claim; children?: ReactNode }): JSX.Element {
   const { t } = useTranslation();
   const refresh = useStore((s) => s.refresh);
   const input = useRef<HTMLInputElement>(null);
@@ -59,15 +66,7 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
   const zone = useRef<HTMLDivElement>(null);
   const [over, setOver] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [landed, setLanded] = useState<Landed[]>([]);
   const [error, setError] = useState<string | null>(null);
-
-  // A blob URL is a live handle to memory, not a string. Left unrevoked, dropping a folder of
-  // photographs leaks every one of them for the life of the tab.
-  useEffect(
-    () => () => landed.forEach((l) => l.preview && URL.revokeObjectURL(l.preview)),
-    [landed],
-  );
 
   async function take(files: FileList | null): Promise<void> {
     if (!files || files.length === 0) return;
@@ -98,14 +97,10 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
           { actor: 'human', registeredBecause: 'a person added a photograph to this memory' },
         );
 
-        seen.push({
-          name: file.name,
-          year,
-          stance,
-          preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
-        });
+        seen.push({ name: file.name, year, stance });
       }
-      setLanded((was) => [...was, ...seen]);
+      // No list of what landed: the page itself gains a line for the photograph, which is the
+      // only confirmation that means anything.
       await refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
@@ -126,7 +121,9 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
       if (!files || files.length === 0) return;
       const mine = zone.current;
       const zones = document.querySelectorAll('.photo-drop');
-      const target = document.querySelector('.photo-drop:hover') ?? (zones.length === 1 ? zones[0] : null);
+      // The entry under the pointer takes it; with one entry on the page there is nothing to
+      // decide, and with none of them under the pointer the paste is not ours to catch.
+      const target = hovered ?? (zones.length === 1 ? zones[0] : null);
       if (!mine || target !== mine) return;
       e.preventDefault();
       void latest.current(files);
@@ -138,19 +135,31 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
   return (
     <div
       ref={zone}
-      className={`photo-drop${over ? ' over' : ''}`}
+      className={`photo-drop${over ? ' over' : ''}${busy ? ' busy' : ''}`}
       onDragOver={(e) => {
         e.preventDefault();
         setOver(true);
       }}
       onDragLeave={() => setOver(false)}
+      onPointerEnter={() => {
+        hovered = zone.current;
+      }}
+      onPointerLeave={() => {
+        if (hovered === zone.current) hovered = null;
+      }}
       onDrop={(e) => {
         e.preventDefault();
         setOver(false);
         void take(e.dataTransfer.files);
       }}
+      // TASK-048 — the button is gone, the act is not. Drop a photograph on the entry, paste one
+      // onto it, or double-press it to go looking for one; a phone with no drag still has the
+      // last of those, which is what the button used to be for.
+      onDoubleClick={() => input.current?.click()}
     >
-      {/* The input is the whole mechanism on a phone, where there is no drag. */}
+      {children}
+
+      {/* The input is the whole mechanism where there is no drag. */}
       <input
         ref={input}
         type="file"
@@ -162,26 +171,6 @@ export function PhotoDrop({ claim }: { claim: Claim }): JSX.Element {
           e.target.value = '';
         }}
       />
-      <button type="button" className="photo-add" disabled={busy} onClick={() => input.current?.click()}>
-        {busy ? t('photo.reading') : t('photo.add')}
-      </button>
-
-      {landed.length > 0 && (
-        <ul className="photo-landed">
-          {landed.map((l) => (
-            <li key={l.name} className={`landed stance-${l.stance}`}>
-              {l.preview && <img src={l.preview} alt="" />}
-              <span className="landed-name">{l.name}</span>
-              <span className="landed-year">
-                {l.year === null ? t('photo.noDate') : t('photo.fileSays', { year: l.year })}
-              </span>
-              {l.stance === 'contradicts' && (
-                <span className="landed-clash">{t('photo.disagrees')}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
 
       {error && (
         <p className="result refused-error" role="alert">

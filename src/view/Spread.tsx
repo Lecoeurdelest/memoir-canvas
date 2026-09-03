@@ -2,11 +2,14 @@
  * TASK-016 · TASK-048 — one memory, written out as a book writes things out.
  *
  * The owner took the apparatus off the page: no RECOLLECTION/EVIDENCE headings, no certainty
- * chips, no bordered group per claim. What is left is prose on paper — the memory as a sentence,
- * then each year, then each source in a line of its own with its testimony under it. The words
- * that carried meaning are still words: `contradicts` and `supports` are written out, and so is
- * how sure the archive is, because a picture that says it in colour alone says it to nobody
- * (NFR-A11Y-02).
+ * chips, no bordered group per claim, and no stance or kind tag on a source. What is left is
+ * prose on paper — the memory as a sentence, then each year, then each source named with its
+ * testimony under it and the hand that gave it at the end.
+ *
+ * One word survives the cull, and only where it is load-bearing: a source that CONTRADICTS says
+ * so. Burying the thing that disagrees is the exact failure this project exists to prevent, and
+ * a page that marked it by colour alone would be marking it for nobody (NFR-A11Y-02). Agreement
+ * needs no word — it is what a source beneath a claim already means.
  *
  * In the book skin these flow as TWO COLUMNS across the spread, so what will not fit the near
  * leaf runs onto the far one instead of growing a scrollbar. The flat list (NFR-PORT-01) renders
@@ -62,8 +65,9 @@ function ClaimProse({ claim }: { claim: Claim }): JSX.Element {
         const contributor = people.find((p) => p.id === source.contributor_id);
         return (
           <p key={`${e.claim_id}-${e.source_id}-${e.stance}`} className={`entry-source stance-${e.stance}`}>
-            <span className="stance">{t(`evidence.stance.${e.stance}`)}</span>{' '}
-            <span className="kind">{t(`evidence.kind.${source.kind}`)}</span>{' '}
+            {e.stance === 'contradicts' && (
+              <span className="stance">{t('evidence.stance.contradicts')} </span>
+            )}
             <span className="title">{source.title}</span>
             {/* Testimony, whole: nothing here truncates or paraphrases it. */}
             {source.verbatim && <q className="verbatim">{source.verbatim}</q>}
@@ -72,8 +76,6 @@ function ClaimProse({ claim }: { claim: Claim }): JSX.Element {
           </p>
         );
       })}
-
-      <PhotoDrop claim={claim} />
     </>
   );
 }
@@ -102,7 +104,10 @@ export function Spread({ spread }: { spread: SpreadModel }): JSX.Element {
 
       {spread.claims.map((claim) => (
         <Fragment key={claim.id}>
-          <ClaimProse claim={claim} />
+          {/* The entry itself is where a photograph lands — drop, paste or double-press it. */}
+          <PhotoDrop claim={claim}>
+            <ClaimProse claim={claim} />
+          </PhotoDrop>
         </Fragment>
       ))}
     </article>
