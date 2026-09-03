@@ -44,8 +44,12 @@ function stream(seed: string): () => number {
 }
 
 interface Palette {
-  treeFar: string;
-  treeNear: string;
+  /** Mountain wash, peak → base: the three stops of one continuous gradient. */
+  mtn: [string, string, string];
+  /** The foothill ridge's deepest tone — the wash keeps darkening into it. */
+  foot: string;
+  /** The mist that melts the mountain bases into the horizon glow. */
+  haze: string;
   pine: string;
   hills: [string, string, string];
   crest: string;
@@ -60,8 +64,9 @@ interface Palette {
 }
 
 const NIGHT: Palette = {
-  treeFar: '#0f2b47',
-  treeNear: '#061527',
+  mtn: ['#6b8fbc', '#31517c', '#152e52'],
+  foot: '#081527',
+  haze: '#63b4dd',
   pine: '#020c18',
   hills: ['#123f2d', '#0c2f21', '#07231a'],
   crest: '#8fd4b8',
@@ -77,8 +82,9 @@ const NIGHT: Palette = {
 
 /** The wood while the archive argues with itself: grey, quiet, waiting for a person. */
 const TORN: Palette = {
-  treeFar: '#101b23',
-  treeNear: '#080f15',
+  mtn: ['#2a343d', '#1b232b', '#10161c'],
+  foot: '#080e14',
+  haze: '#3a4a52',
   pine: '#04080d',
   hills: ['#18231b', '#101913', '#0a110d'],
   crest: '#3d4a42',
@@ -282,7 +288,7 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
   // The horizon is mountains and hills, not trees (owner's call): a hazy far range with sharp
   // peaks behind a darker, rounder near ridge. Both still sink toward the centre so the middle
   // of the horizon stays open.
-  const ridge = (hMax: number, baseY: number, segW: number, sharp: boolean): string => {
+  const ridge = (hMax: number, baseY: number, segW: number, sharp: boolean, envFloor: number): string => {
     // Valleys sit ON the horizon line, so the ridge is peaks rising from it — a raised
     // baseline read as a flat dark bar across the whole picture.
     let d = `M-20 ${px(baseY + 10)} L-20 ${px(baseY)}`;
@@ -292,7 +298,7 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
       const nx = x + step;
       const mid = (x + nx) / 2;
       const edge = Math.abs(mid - W / 2) / (W / 2);
-      const env = Math.max(0.12, 1 - 0.78 * (1 - edge ** 1.5));
+      const env = Math.max(envFloor, 1 - 0.78 * (1 - edge ** 1.5));
       const peakY = baseY - hMax * env * (0.45 + rand() * 0.55);
       const valleyY = baseY - hMax * env * rand() * 0.08;
       d += sharp
@@ -302,9 +308,13 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
     }
     return `${d} L${px(W + 20)} ${px(baseY + 10)} Z`;
   };
+  // One continuous wash, not two flat cut-outs: the far range fades from airy peaks into a
+  // deepening base, the foothills pick that tone up and keep darkening, and a breath of haze
+  // melts both into the horizon glow.
   const rows = [
-    `<g filter="url(#fa-sky-blur1)" opacity="0.85"><path d="${ridge(H * 0.16, HY + 2, W / 9, true)}" fill="${p.treeFar}"/></g>`,
-    `<path d="${ridge(H * 0.09, HY + 4, W / 5, false)}" fill="${p.treeNear}"/>`,
+    `<g filter="url(#fa-sky-blur2)" opacity="0.9"><path d="${ridge(H * 0.16, HY + 2, W / 9, true, 0.12)}" fill="url(#fa-sky-mtnfar-g)"/></g>`,
+    `<g filter="url(#fa-sky-blur1)"><path d="${ridge(H * 0.07, HY + 4, W / 5, false, 0.4)}" fill="url(#fa-sky-mtnnear-g)"/></g>`,
+    `<rect x="0" y="${px(HY - H * 0.08)}" width="${W}" height="${px(H * 0.09)}" fill="url(#fa-sky-haze-g)"/>`,
   ];
 
   const defs =
@@ -312,7 +322,13 @@ function skyMarkup(p: Palette, sparse: boolean, W: number): string {
     `<radialGradient id="fa-sky-nebmask"><stop offset="0%" stop-color="#fff"/><stop offset="60%" stop-color="#777"/><stop offset="100%" stop-color="#000"/></radialGradient>` +
     `<mask id="fa-sky-nebm"><ellipse cx="${W * 0.52}" cy="${HY * 0.42}" rx="${W * 0.52}" ry="${HY * 0.34}" fill="url(#fa-sky-nebmask)" transform="rotate(-19 ${W * 0.52} ${HY * 0.42})"/></mask>` +
     `<radialGradient id="fa-sky-moonhalo"><stop offset="0%" stop-color="#e6f0ff" stop-opacity="0.55"/><stop offset="34%" stop-color="#b9d4ff" stop-opacity="0.2"/><stop offset="100%" stop-color="#b9d4ff" stop-opacity="0"/></radialGradient>` +
-    `<radialGradient id="fa-sky-moonface" cx="0.42" cy="0.38" r="0.75"><stop offset="0%" stop-color="#f4f8ff"/><stop offset="72%" stop-color="#dbe8fa"/><stop offset="100%" stop-color="#bfd3ef"/></radialGradient>`;
+    `<radialGradient id="fa-sky-moonface" cx="0.42" cy="0.38" r="0.75"><stop offset="0%" stop-color="#f4f8ff"/><stop offset="72%" stop-color="#dbe8fa"/><stop offset="100%" stop-color="#bfd3ef"/></radialGradient>` +
+    `<linearGradient id="fa-sky-mtnfar-g" gradientUnits="userSpaceOnUse" x1="0" y1="${px(HY - H * 0.18)}" x2="0" y2="${px(HY + 4)}">` +
+    `<stop offset="0" stop-color="${p.mtn[0]}" stop-opacity="0.25"/><stop offset="0.45" stop-color="${p.mtn[1]}" stop-opacity="0.72"/><stop offset="1" stop-color="${p.mtn[2]}" stop-opacity="0.96"/></linearGradient>` +
+    `<linearGradient id="fa-sky-mtnnear-g" gradientUnits="userSpaceOnUse" x1="0" y1="${px(HY - H * 0.07)}" x2="0" y2="${px(HY + 10)}">` +
+    `<stop offset="0" stop-color="${p.mtn[2]}" stop-opacity="0.85"/><stop offset="0.6" stop-color="${p.foot}" stop-opacity="0.75"/><stop offset="1" stop-color="${p.foot}" stop-opacity="0"/></linearGradient>` +
+    `<linearGradient id="fa-sky-haze-g" gradientUnits="userSpaceOnUse" x1="0" y1="${px(HY - H * 0.08)}" x2="0" y2="${px(HY + H * 0.01)}">` +
+    `<stop offset="0" stop-color="${p.haze}" stop-opacity="0"/><stop offset="1" stop-color="${p.haze}" stop-opacity="0.28"/></linearGradient>`;
 
   return svgOf(
     'fa-sky',
